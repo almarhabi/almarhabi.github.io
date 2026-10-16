@@ -183,6 +183,11 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .doc .dots i{width:7px;height:7px;border-radius:50%;background:var(--kc)}
 .dochead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .dochead h2{font-family:var(--f-display);font-size:20px;margin:0;font-weight:600}
+.syncpanel{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.fl{font-size:12.5px;font-weight:600;color:var(--muted)}
+.syncpanel textarea,.syncpanel input{width:100%;min-width:0;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:8px 10px;font:12.5px/1.5 var(--f-mono)}
+.frow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.frow input{flex:1 1 180px}
+#syncBtn{padding:3px 10px;font-size:12px}
 .back{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
 .body{border-top:1px dashed var(--line);padding:12px 16px 14px;display:flex;flex-direction:column;gap:12px}
 .rows{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:0}
@@ -636,7 +641,18 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
   </header>
 
   <section class="tasks" id="tasks" aria-label="مهام اليوم">
-    <div class="tasks-head"><h2>مهام اليوم</h2><span class="tcount" id="tcount">0</span><span class="sync" id="sync"><i></i><span>محفوظ على هذا الجهاز فقط</span></span></div>
+    <div class="tasks-head"><h2>مهام اليوم</h2><span class="tcount" id="tcount">0</span><span class="sync" id="sync"><i></i><span>محفوظ على هذا الجهاز فقط</span></span><button class="back" id="syncBtn">إعداد المزامنة</button></div>
+    <div class="syncpanel" id="syncPanel" hidden>
+      <p class="note" style="margin:0">المزامنة هنا عن طريق <b>Firebase</b> (مجاني من Google). سوِّ قاعدة بيانات Realtime Database، ثم الصق إعدادات تطبيق الويب <span class="en">firebaseConfig</span> هنا.</p>
+      <label class="fl" for="fbCfg">إعدادات Firebase</label>
+      <textarea id="fbCfg" rows="6" dir="ltr" placeholder="const firebaseConfig = { apiKey: &quot;...&quot;, ... };"></textarea>
+      <label class="fl" for="fbKey">رمز المزامنة (نفسه على كل أجهزتك)</label>
+      <div class="frow"><input id="fbKey" dir="ltr" autocomplete="off" placeholder="اتركه فاضي وينشأ تلقائيًا"><button class="back" id="fbNew">رمز جديد</button></div>
+      <div class="frow"><button class="btn primary" id="fbSave">حفظ وتشغيل المزامنة</button><button class="btn" id="fbStop">إيقاف المزامنة</button></div>
+      <div id="fbLinkBox" hidden><label class="fl" for="fbLink">رابط ربط جهازك الثاني</label>
+        <div class="frow"><input id="fbLink" dir="ltr" readonly><button class="back" id="fbCopy">نسخ</button></div></div>
+      <p class="note" id="fbMsg" style="margin:0" aria-live="polite"></p>
+    </div>
     <div class="tlist" id="tlist"></div>
   </section>
 
@@ -722,7 +738,7 @@ const cache=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
 const mk=id=>S.marks[id]||{};
 const isDone=b=>!!mk(b.id).studied;
 
-let remote=null,remoteExists=false,merged=false,live=false;
+let remote=null,remoteExists=false,merged=false,live=false,syncErr="";
 const pending={};const jobs=[];let busy=false;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function pump(){
@@ -763,20 +779,89 @@ function applyRemote(snap){
   for(const key in pending){const [id,f]=key.split("|");rm[id]={...(rm[id]||{}),[f]:pending[key]}}
   S.marks=rm;cache();render();
 }
-async function connect(){
-  try{
-    if(!window.claude||typeof window.claude.use!=="function")return;
-    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
-    if(!db||!user)return;
-    const uid=await user.id();if(!uid)return;
-    remote=db.doc("data/users/"+uid+"/state");live=true;renderSync();
-    remote.onSnapshot(applyRemote,()=>{live=false;remote=null;renderSync()});
-    pump();
-  }catch(e){live=false;renderSync()}
+// ---- backends: claude.ai db (artifact) → Firebase Realtime Database (GitHub / any host) → this device only ----
+const FB_LS="uqu-fb";
+const FB_VER="10.12.2";
+const fbSaved=()=>{try{const o=JSON.parse(localStorage.getItem(FB_LS)||"null");return o&&o.config&&o.key?o:null}catch(e){return null}};
+const b64e=s=>btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const b64d=s=>atob(s.replace(/-/g,"+").replace(/_/g,"/"));
+window.addEventListener("hashchange",()=>{if(/^#sync=/.test(location.hash))location.reload()});
+(function importLink(){
+  const m=location.hash.match(/^#sync=([A-Za-z0-9_-]+)$/);if(!m)return;
+  try{const o=JSON.parse(b64d(m[1]));if(o.c&&o.k)localStorage.setItem(FB_LS,JSON.stringify({config:o.c,key:o.k}))}catch(e){}
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+})();
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+function fbAdapter(ref){
+  const flat=p=>{const out={};const ms=p.marks||{};for(const id in ms)for(const f in ms[id])out[`marks/${id}/${f}`]=ms[id][f]??false;return out};
+  const clean=d=>{const c=JSON.parse(JSON.stringify(d));const ms=c.marks||{};for(const id in ms)for(const f in ms[id])if(ms[id][f]===null)ms[id][f]=false;return c};
+  return{
+    get:async()=>{const s=await ref.get();return{exists:s.exists(),data:()=>s.val()}},
+    set:d=>ref.set(clean(d)),
+    update:p=>ref.update(flat(p)),
+    onSnapshot:(next,err)=>{const cb=s=>next({exists:s.exists(),data:()=>s.val()||{},metadata:{fromCache:false,hasPendingWrites:false}});
+      ref.on("value",cb,e=>err&&err(e));return()=>ref.off("value",cb)}
+  };
 }
+async function connectClaude(){
+  try{
+    if(!window.claude||typeof window.claude.use!=="function")return false;
+    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    if(!db||!user)return false;
+    const uid=await user.id();if(!uid)return false;
+    remote=db.doc("data/users/"+uid+"/state");live="claude";renderSync();
+    remote.onSnapshot(applyRemote,()=>{live=false;remote=null;renderSync()});
+    pump();return true;
+  }catch(e){return false}
+}
+async function connectFirebase(){
+  const c=fbSaved();if(!c){renderSync();return}
+  live="connecting";syncErr="";renderSync();
+  try{
+    if(!window.firebase||!window.firebase.database){
+      await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app-compat.js`);
+      await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-database-compat.js`);
+    }
+    const cfg={...c.config};
+    if(!cfg.databaseURL&&cfg.projectId)cfg.databaseURL=`https://${cfg.projectId}-default-rtdb.firebaseio.com`;
+    const app=firebase.apps.length?firebase.app():firebase.initializeApp(cfg);
+    const ref=app.database().ref("users/"+c.key);
+    remote=fbAdapter(ref);remoteExists=false;merged=false;live="fb";renderSync();
+    remote.onSnapshot(applyRemote,e=>{live=false;remote=null;
+      syncErr=/permission/i.test(String(e&&(e.code||e.message)))?"رفض Firebase الوصول. تأكد إنك نشرت القواعد (Rules).":"انقطع الاتصال بـ Firebase.";renderSync()});
+    pump();
+  }catch(e){live=false;remote=null;syncErr="تعذّر الاتصال بـ Firebase. تأكد من الإعدادات والإنترنت.";renderSync()}
+}
+async function connect(){if(!(await connectClaude()))connectFirebase()}
 function renderSync(){
-  const el=$("#sync");el.classList.toggle("live",live);
-  el.lastElementChild.textContent=live?"مزامنة مباشرة بين أجهزتك":"محفوظ على هذا الجهاز فقط";
+  const el=$("#sync");el.classList.toggle("live",live==="claude"||live==="fb");
+  el.lastElementChild.textContent=live==="claude"?"مزامنة مباشرة بين أجهزتك":live==="fb"?"مزامنة مباشرة (Firebase)":live==="connecting"?"جاري الاتصال…":syncErr||"محفوظ على هذا الجهاز فقط";
+  $("#syncBtn").hidden=live==="claude";
+}
+function parseCfg(txt){
+  const o={};const re=/["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g;let m;while((m=re.exec(txt)))o[m[1]]=m[2];
+  return o.apiKey&&(o.databaseURL||o.projectId)?o:null;
+}
+function newKey(){const a=new Uint8Array(18);crypto.getRandomValues(a);return Array.from(a,x=>"abcdefghijkmnpqrstuvwxyz23456789"[x%32]).join("")+"x"+Date.now().toString(36)}
+function openSetup(){
+  const p=$("#syncPanel"),c=fbSaved();p.hidden=!p.hidden;if(p.hidden)return;
+  $("#fbCfg").value=c?JSON.stringify(c.config,null,1):"";$("#fbKey").value=c?c.key:"";$("#fbMsg").textContent="";
+  $("#fbLinkBox").hidden=!c;if(c)$("#fbLink").value=location.origin+location.pathname+"#sync="+b64e(JSON.stringify({c:c.config,k:c.key}));
+}
+function saveSetup(){
+  const cfg=parseCfg($("#fbCfg").value);
+  if(!cfg){$("#fbMsg").textContent="ما قدرت أقرأ الإعدادات. انسخ كتلة firebaseConfig كاملة من Firebase والصقها.";return}
+  let key=$("#fbKey").value.trim();
+  if(!key){key=newKey();$("#fbKey").value=key}
+  if(!/^[A-Za-z0-9_-]{20,}$/.test(key)){$("#fbMsg").textContent="رمز المزامنة لازم يكون 20 حرف أو أكثر (حروف إنجليزية وأرقام). اضغط «رمز جديد».";return}
+  try{localStorage.setItem(FB_LS,JSON.stringify({config:cfg,key}))}catch(e){}
+  location.reload();
+}
+function stopSync(){try{localStorage.removeItem(FB_LS)}catch(e){}location.reload()}
+async function copyLink(){
+  const inp=$("#fbLink");
+  try{await navigator.clipboard.writeText(inp.value);$("#fbMsg").textContent="انسخ الرابط وافتحه على جهازك الثاني، وبيتربط تلقائيًا."}
+  catch(e){inp.select();$("#fbMsg").textContent="حدد الرابط وانسخه يدويًا، ثم افتحه على جهازك الثاني."}
 }
 
 // ---------- spaced-review tasks ----------
@@ -986,6 +1071,8 @@ $("#vDoc").onclick=()=>{st.view="doc";st.dr=null;st.open=null;st.q="";$("#q").va
 const setW=m=>{st.wmode=m;try{localStorage.setItem("uqu-wmode",m)}catch(e){};render()};
 $("#wGrid").onclick=()=>setW("grid");$("#wList").onclick=()=>setW("list");
 $("#q").oninput=e=>{st.q=e.target.value;render()};
+$("#syncBtn").onclick=openSetup;$("#fbSave").onclick=saveSetup;$("#fbStop").onclick=stopSync;$("#fbCopy").onclick=copyLink;
+$("#fbNew").onclick=()=>{$("#fbKey").value=newKey()};
 renderSync();renderNext();render();connect();
 </script>
 
