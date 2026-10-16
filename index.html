@@ -275,7 +275,9 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .rcbar.good>span{background:var(--s-study)}.rcbar.mid>span{background:var(--s-r2)}.rcbar.low>span{background:var(--k-exam)}
 .mk.knot{background:var(--k-disc-bg);color:var(--k-disc)}
 .sbtn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
-.lockmsg{margin:0;font-size:12.5px;color:var(--k-disc);font-weight:600}
+.lockmsg{margin:0;font-size:12.5px;color:var(--k-disc);font-weight:600;border-radius:8px;padding:4px 6px}
+.lockmsg.flash{animation:lockpulse 1.4s ease-out}
+@keyframes lockpulse{0%,30%{background:var(--k-disc-bg);box-shadow:0 0 0 2px var(--k-disc)}100%{background:transparent;box-shadow:0 0 0 0 transparent}}
 .prompt{display:flex;flex-direction:column;gap:6px;background:var(--surface-2);border-radius:10px;padding:10px 12px}
 .pq{font-size:13px;font-weight:700}
 .pchips{display:flex;gap:6px;flex-wrap:wrap}
@@ -910,7 +912,8 @@ function applyRemote(snap){
     }
   }
   for(const key in pending){const [id,f]=key.split("|");rm[id]={...(rm[id]||{}),[f]:pending[key]}}
-  if(typeof data.cap==="number")S.cap=data.cap;
+  if(typeof data.cap==="number"&&!("cap" in pendingTop))S.cap=data.cap;
+  if(typeof data.slept==="string"&&!("slept" in pendingTop))S.slept=data.slept;
   S.marks=rm;cache();render();
 }
 const FB_LS="uqu-fb";
@@ -1005,28 +1008,30 @@ async function copyLink(){
 // ---------- recall: forgetting curve R(t)=1/(1+t/(9·S)); every review raises stability S ----------
 function recall(id){
   const m=mk(id);if(!m.studied)return null;
+  const ORD={s:0,a:1,r1:2,r2:3};
   const ev=[[m.studied,"s"]];if(m.again)ev.push([m.again,"a"]);if(m.rev1)ev.push([m.rev1,"r1"]);if(m.rev2)ev.push([m.rev2,"r2"]);
-  ev.sort((x,y)=>x[0].localeCompare(y[0]));
-  let st=0,last=m.studied;
+  ev.sort((x,y)=>x[0].localeCompare(y[0])||ORD[x[1]]-ORD[y[1]]);
+  // st = stability (days), r0 = how much you could actually retrieve at the last event
+  let st=0,r0=1,last=m.studied;
   for(const [d,k] of ev){
-    if(k==="s")st=Math.max(st,1.5);
-    else if(k==="a")st=Math.max(1.5,st*1.2);
-    else if(k==="r1")st=Math.max(st,1.5)*(m.g1==="e"?5:3);
-    else st=Math.max(st,4)*2.5;
+    if(k==="s"){st=Math.max(st,1.5);r0=1}
+    else if(k==="a"){st=Math.max(0.8,st*0.6);r0=0.55}      // lapse: you only half-recalled it and it fades faster
+    else if(k==="r1"){st=Math.max(st,1.5)*(m.g1==="e"?5:3);r0=1}
+    else{st=Math.max(st,4)*2.5;r0=1}
     last=d;
   }
   if(m.anki)st*=1.3;
   const t=Math.max(0,(Date.now()-new Date(last+"T18:00:00").getTime())/864e5);
-  return Math.round(100/(1+t/(9*st)));
+  return Math.round(100*r0/(1+t/(9*st)));
 }
 const rcClass=r=>r>=85?"good":r>=65?"mid":"low";
 const rcChip=id=>{const r=recall(id);return r==null?"":`<span class="rc ${rcClass(r)}" title="نسبة التذكر المتوقعة الآن">تذكّر ${pct(r)}</span>`};
 
-// ---------- completion: stages weighted, lecture hours as weight, only lectures already held ----------
+// ---------- completion: stages weighted by lecture hours; counts lectures that ended or that you already started ----------
 const comp=b=>{const m=mk(b.id);return(m.studied?.4:0)+(m.rev1?.25:0)+(m.rev2?.2:0)+(m.anki?.15:0)};
 const needsStudy=b=>!!b.topic&&b.from>0&&b.kind!=="exam"&&b.kind!=="rev"&&!/^revision$/i.test(b.topic.trim());
 function progress(list){
-  const el=list.filter(b=>needsStudy(b)&&hasEnded(b));if(!el.length)return null;
+  const el=list.filter(b=>needsStudy(b)&&(hasEnded(b)||comp(b)>0));if(!el.length)return null;
   let s=0,w=0;el.forEach(b=>{const h=hrs(b);s+=comp(b)*h;w+=h});return Math.round(s/w*100);
 }
 const avgRecall=list=>{const r=list.map(b=>recall(b.id)).filter(x=>x!=null);return r.length?Math.round(r.reduce((a,b)=>a+b,0)/r.length):null};
@@ -1121,7 +1126,7 @@ const taskKey=x=>`${x.t.kind}|${x.b.id}|${x.knot?x.knot.k:""}`;
 function taskHTML(x){
   const late=diffDays(x.due,todayISO),key=taskKey(x),sp=x.t===STUDY_T&&!x.done?speed():null,est=sp&&sp.all!=null?estMin(x.b,sp):null;
   const pr=st.prompt&&st.prompt.where==="task"&&st.prompt.key===key?promptHTML(x.b.id,st.prompt.type,key):"";
-  const blocked=x.t===R1_T&&!x.done&&openKnots(x.b.id).length;
+  const blocked=(x.t===R1_T||x.t===R2_T)&&!x.done&&openKnots(x.b.id).length;
   return `<div class="task${x.done?" done":""}" style="${sv(x.t.c)}">
     <button class="tcheck" role="checkbox" aria-checked="${x.done}" aria-label="${x.t.ar}: ${esc(label(x.b))}" data-task="${key}">✓</button>
     <button class="tmain" data-go="${x.b.id}">
@@ -1154,31 +1159,43 @@ function tickTask(x){
   if(x.t===STUDY_T){if(x.done)unsetStudied(id);else{st.prompt={type:"time",where:"task",key:taskKey(x),id};savePatch(id,{studied:todayISO})}}
   else if(x.t===R1_T){
     if(x.done){if(x.hard)savePatch(id,{again:null});else savePatch(id,{rev1:null,g1:null})}
-    else if(openKnots(id).length){go(id)}
+    else if(openKnots(id).length){go(id);flashLock(id)}
     else{st.prompt=st.prompt&&st.prompt.key===taskKey(x)?null:{type:"rate",where:"task",key:taskKey(x),id};renderTasks()}
   }
-  else if(x.t===R2_T)savePatch(id,{rev2:x.done?null:todayISO});
+  else if(x.t===R2_T){if(!x.done&&openKnots(id).length){go(id);flashLock(id)}else savePatch(id,{rev2:x.done?null:todayISO})}
   else if(x.t===KNOT_T)setKnot(id,x.knot.k,{...stripK(x.knot),d:x.done?false:todayISO});
+}
+// top-level settings (daily cap, finished pre-sleep replays) saved and synced like marks
+const pendingTop={};
+function setTop(f,v){
+  S[f]=v;pendingTop[f]=v;cache();
+  if(!remote){delete pendingTop[f];return}
+  jobs.push(async()=>{
+    if(!remoteExists){const s=await remote.get();remoteExists=s.exists}
+    if(remoteExists)await remote.update({[f]:v});else{await remote.set({v:3,marks:S.marks,cap:S.cap||6,...(S.slept?{slept:S.slept}:{}),[f]:v});remoteExists=true}
+    if(pendingTop[f]===v)delete pendingTop[f];
+  });pump();
 }
 function setCap(n){
   n=Math.max(1,Math.min(20,n));if(n===(S.cap||6))return;
-  S.cap=n;cache();renderTasks();
-  if(remote){jobs.push(async()=>{
-    if(!remoteExists){const s=await remote.get();remoteExists=s.exists}
-    if(remoteExists)await remote.update({cap:n});else{await remote.set({v:3,marks:S.marks,cap:n});remoteExists=true}
-  });pump()}
+  setTop("cap",n);renderTasks();
 }
 
 // ---------- mark actions ----------
 const stripK=k=>({t:k.t,c:k.c,d:k.d||false});
 function unsetStudied(id){savePatch(id,{studied:null,mins:null});if(st.prompt&&st.prompt.id===id)st.prompt=null}
+const LOCKED=["rev1","rev2","anki"];
+function flashLock(id){
+  st.lockFlash=id;st.open=id;render();
+  const el=document.querySelector(`#c-${CSS.escape(id)} .lockmsg`);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+  setTimeout(()=>{if(st.lockFlash===id)st.lockFlash=null},1600);
+}
 function clickMark(id,f){
   const m=mk(id),on=!!m[f];
+  if(!on&&LOCKED.includes(f)&&openKnots(id).length){flashLock(id);return}
   if(f==="studied"){if(on)unsetStudied(id);else{st.prompt={type:"time",where:"card",id};savePatch(id,{studied:todayISO})}return}
   if(f==="rev1"){if(on){savePatch(id,{rev1:null,g1:null});return}
-    if(openKnots(id).length)return;
     st.prompt=st.prompt&&st.prompt.id===id&&st.prompt.type==="rate"?null:{type:"rate",where:"card",id};render();return}
-  if(f==="anki"&&!on&&openKnots(id).length)return;
   savePatch(id,{[f]:on?null:todayISO});
 }
 function rate(id,g){
@@ -1220,29 +1237,39 @@ function bindPrompts(root){
 // ---------- pre-sleep replay (after 9 pm): lectures studied today, 90 s each ----------
 let sleepRun=null;
 function sleepDay(){const h=nowH();return h>=21?todayISO:h<4?addDays(todayISO,-1):null}
+// S.slept = "YYYY-MM-DD|id,id,…" — the lectures already replayed for that night
+const sleptIds=day=>{const [d,ids]=(S.slept||"").split("|");return d===day&&ids?ids.split(",").filter(Boolean):[]};
+function markSlept(day,id){const ids=sleptIds(day);if(!ids.includes(id))setTop("slept",`${day}|${[...ids,id].join(",")}`)}
 function renderSleep(){
   const box=$("#sleepBox"),day=sleepDay();
   const list=day?ALL.filter(b=>mk(b.id).studied===day):[];
   if(!list.length){box.innerHTML="";sleepRun=null;return}
   if(sleepRun){drawSleepRun();return}
-  box.innerHTML=`<div class="sleep"><div class="sl-h">🌙 تثبيت الحُصين قبل النوم <small>(${cnt(Math.ceil(list.length*1.5),"دقيقة","دقيقتين","دقائق")})</small></div>
-    <p class="sl-p">غمّض عينك 90 ثانية لكل محاضرة، واسترجع هيكلها العام في ذهنك: العنوان، الأقسام، الآليات الرئيسية.</p>
-    <div class="sl-list">${list.map(b=>`<span class="en">${esc(label(b))}</span>`).join("")}</div>
+  const done=new Set(sleptIds(day)),todo=list.filter(b=>!done.has(b.id));
+  if(!todo.length){
+    box.innerHTML=`<div class="sleep"><div class="sl-h">🌙 ثبّت ${cnt(list.length,"محاضرة اليوم","محاضرتي اليوم","محاضرات اليوم")}. نوم هادئ.</div>
+      <button class="btn sl-go" id="slAgain">إعادة التثبيت</button></div>`;
+    $("#slAgain").onclick=()=>{sleepRun={day,list,i:0,end:Date.now()+90000};drawSleepRun()};return;
+  }
+  box.innerHTML=`<div class="sleep"><div class="sl-h">🌙 تثبيت الحُصين قبل النوم <small>(${cnt(Math.ceil(todo.length*1.5),"دقيقة","دقيقتين","دقائق")})</small></div>
+    <p class="sl-p">غمّض عينك 90 ثانية لكل محاضرة، واسترجع هيكلها العام في ذهنك: العنوان، الأقسام، الآليات الرئيسية.${done.size?` ثبّت ${done.size} قبل، وباقي اللي ذاكرتها بعدها.`:""}</p>
+    <div class="sl-list">${todo.map(b=>`<span class="en">${esc(label(b))}</span>`).join("")}</div>
     <button class="btn sl-go" id="slGo">ابدأ التثبيت</button></div>`;
-  $("#slGo").onclick=()=>{sleepRun={list,i:0,end:Date.now()+90000};drawSleepRun()};
+  $("#slGo").onclick=()=>{sleepRun={day,list:todo,i:0,end:Date.now()+90000};drawSleepRun()};
 }
+function advanceSleep(){const r=sleepRun;markSlept(r.day,r.list[r.i].id);r.i++;r.end=Date.now()+90000;drawSleepRun()}
 function drawSleepRun(){
   const r=sleepRun,box=$("#sleepBox");
-  if(r.i>=r.list.length){box.innerHTML=`<div class="sleep"><div class="sl-h">🌙 تم التثبيت. نوم هادئ.</div></div>`;sleepRun=null;return}
+  if(r.i>=r.list.length){sleepRun=null;renderSleep();return}
   const left=Math.max(0,Math.ceil((r.end-Date.now())/1000));
   box.innerHTML=`<div class="sleep run"><div class="sl-h">🌙 ${r.i+1} من ${r.list.length}</div>
     <div class="sl-topic en">${esc(label(r.list[r.i]))}</div><div class="sl-t num">${left}</div>
     <div class="frow"><button class="btn" id="slNext">التالي</button><button class="btn" id="slStop">إيقاف</button></div></div>`;
-  $("#slNext").onclick=()=>{r.i++;r.end=Date.now()+90000;drawSleepRun()};
+  $("#slNext").onclick=advanceSleep;
   $("#slStop").onclick=()=>{sleepRun=null;renderSleep()};
 }
 setInterval(()=>{if(!sleepRun)return;const t=$("#sleepBox .sl-t");const left=Math.ceil((sleepRun.end-Date.now())/1000);
-  if(left<=0){sleepRun.i++;sleepRun.end=Date.now()+90000;drawSleepRun()}else if(t)t.textContent=left},1000);
+  if(left<=0)advanceSleep();else if(t)t.textContent=left},1000);
 
 // ---------- exams panel ----------
 function renderExams(){
@@ -1325,7 +1352,7 @@ function marksHTML(b){
 }
 function cardHTML(b){
   const open=st.open===b.id, m=mk(b.id), rel=open?related(b):[], ok=openKnots(b.id), r=recall(b.id);
-  const locked=f=>(f==="rev1"||f==="anki")&&!m[f]&&ok.length;
+  const locked=f=>LOCKED.includes(f)&&!m[f]&&ok.length;
   const prompt=open&&st.prompt&&st.prompt.where==="card"&&st.prompt.id===b.id?promptHTML(b.id,st.prompt.type):"";
   const kn=knotsOf(b.id);
   return `<article class="card${isDone(b)?" done":""}" id="c-${b.id}" style="${kv(b.kind)}" data-open="${open}">
@@ -1348,7 +1375,7 @@ function cardHTML(b){
       ${needsStudy(b)?`<div class="actions">
         ${MARKS.map(x=>`<button class="sbtn" style="${sv(x.c)}" aria-pressed="${!!m[x.f]}"${locked(x.f)?` aria-disabled="true" title="حل عُقد الفهم أول"`:""} data-mark="${b.id}|${x.f}"><i></i>${m[x.f]?"✓ ":locked(x.f)?"🔒 ":""}${x.ar}${m[x.f]?` <small>${fmt(m[x.f])}</small>`:""}</button>`).join("")}
       </div>${prompt}
-      ${ok.length?`<p class="lockmsg">🔒 مراجعة 1 و ANKI مقفلة لين تحل عُقد الفهم. لا تحفظ شي ما فهمته.</p>`:""}
+      ${ok.length?`<p class="lockmsg${st.lockFlash===b.id?" flash":""}" role="status">🔒 المراجعات و ANKI مقفلة لين تحل ${cnt(ok.length,"عُقدة الفهم","عُقدتي الفهم","عُقد فهم")} تحت. لا تحفظ شي ما فهمته.</p>`:""}
       <div class="knots">
         ${kn.length?`<div class="kh">🚧 عُقد الفهم</div>${kn.map(k=>`<div class="kn${k.d?" ok":""}"><button class="kcheck" role="checkbox" aria-checked="${!!k.d}" data-kdone="${b.id}|${k.k}" aria-label="حلّيتها">✓</button><span class="kt">${esc(k.t)}</span><button class="kdel" data-kdel="${b.id}|${k.k}" aria-label="حذف">×</button></div>`).join("")}`:""}
         ${st.knotFor===b.id?`<div class="frow"><input id="knotIn" maxlength="140" placeholder="وش النقطة اللي ما فهمتها؟ (سطر واحد)"><button class="btn primary" data-kadd="${b.id}">سجّل</button></div>`
@@ -1363,14 +1390,15 @@ function relHTML(o){
   const d=DATA[o.wi].days[o.di];
   return `<button class="rel" style="${kv(o.kind)}" data-go="${o.id}"><i></i><span class="${o.topic?"en":""}">${esc(label(o))}</span><span class="w">${KINDS[o.kind].ar} · ${d.ar} ${dnum(d.date)} · ${timeTxt(o)}</span></button>`;
 }
-const HOW=`<details class="how"><summary>كيف تنحسب النسب؟</summary><p><b>الإنجاز:</b> كل محاضرة = ذاكرتها ${pct(40)} + مراجعة أولى ${pct(25)} + ثانية ${pct(20)} + ANKI ${pct(15)}، وتوزن بعدد ساعاتها، وينحسب على المحاضرات اللي انعقدت بس. <b>التذكر:</b> منحنى نسيان ينزل مع الوقت، وكل مراجعة ترفعه وتبطّئ نزوله، والتقييم «راسخة» و ANKI يقوّونه أكثر.</p></details>`;
+const HOW=()=>`<details class="how"${st.howOpen?" open":""}><summary>كيف تنحسب النسب؟</summary><p><b>الإنجاز:</b> كل محاضرة = ذاكرتها ${pct(40)} + مراجعة أولى ${pct(25)} + ثانية ${pct(20)} + ANKI ${pct(15)}، وتوزن بعدد ساعاتها. تنحسب المحاضرات اللي انعقدت، وأي محاضرة ذاكرتها مقدمًا قبل موعدها. <b>التذكر:</b> منحنى نسيان ينزل مع الوقت، وكل مراجعة ترفعه وتبطّئ نزوله. «راسخة» و ANKI يقوّونه أكثر، و«بصعوبة» ينزّله لأنك ما تذكرتها كاملة.</p></details>`;
 function progLine(p,label2,r){return p==null?`<span class="pll">${label2}</span><span>لم يبدأ</span>`:`<span class="pll">${label2}</span><b class="num">${pct(p)}</b>${pbar(p)}${r!=null?`<span class="rc ${rcClass(r)}">تذكّر ${pct(r)}</span>`:""}`}
 function renderDay(){
   const w=DATA[st.wi],d=w.days[st.di];
   const blocks=d.blocks.filter(b=>st.kinds.has(b.kind));
   $("#dayTitle").textContent=`${d.ar} ${fmt(d.date)}`;
   $("#prog").innerHTML=`<div class="pl">${progLine(progress(d.blocks),"إنجاز اليوم",avgRecall(d.blocks))}</div><div class="pl">${progLine(progress(weekBlocks(w)),"الأسبوع",avgRecall(weekBlocks(w)))}</div>`;
-  $("#dayEst").innerHTML=estLine(weekBlocks(w),"من محاضرات هذا الأسبوع")+HOW;
+  $("#dayEst").innerHTML=estLine(weekBlocks(w),"من محاضرات هذا الأسبوع")+HOW();
+  const how=$("#dayEst details");if(how)how.ontoggle=()=>{st.howOpen=how.open};
   $("#list").innerHTML=blocks.length?blocks.map(cardHTML).join(""):
     `<div class="empty-state"><b>${d.blocks.length?"لا توجد جلسات بهذا الفلتر":"لا توجد محاضرات"}</b>${d.blocks.length?"غيّر نوع النشاط من الأعلى لعرض بقية الجلسات.":(w.days.some(x=>x.blocks.length)?"هذا اليوم فاضي في الجدول.":"جدول هذا الأسبوع لم يُعبّأ بعد في الملف.")}</div>`;
   bindCards($("#list"));
@@ -1433,7 +1461,7 @@ function renderDocs(){
 }
 function bindCards(root){
   root.querySelectorAll(".head").forEach(h=>h.onclick=()=>{st.open=st.open===h.dataset.id?null:h.dataset.id;if(st.prompt&&st.prompt.where==="card")st.prompt=null;st.knotFor=null;render()});
-  root.querySelectorAll("[data-mark]").forEach(b=>b.onclick=()=>{if(b.getAttribute("aria-disabled")==="true")return;const [id,f]=b.dataset.mark.split("|");clickMark(id,f)});
+  root.querySelectorAll("[data-mark]").forEach(b=>b.onclick=()=>{const [id,f]=b.dataset.mark.split("|");clickMark(id,f)});
   root.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
   root.querySelectorAll("[data-dr]").forEach(b=>b.onclick=()=>{st.view="doc";st.dr=b.dataset.dr;st.open=null;render();const v=$("#docView");window.scrollTo({top:v.offsetTop-12,behavior:"smooth"})});
   root.querySelectorAll("[data-knew]").forEach(b=>b.onclick=()=>{st.knotFor=b.dataset.knew;render();const i=$("#knotIn");if(i)i.focus()});
@@ -1459,6 +1487,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{if(deferred&&!typing())
 function render(){
   // don't wipe a knot the user is typing; repaint when they leave the field
   if(typing()){deferred=true;return}
+  lastSig=timeSig();
   $("#vDay").setAttribute("aria-pressed",st.view==="day");$("#vWeek").setAttribute("aria-pressed",st.view==="week");$("#vDoc").setAttribute("aria-pressed",st.view==="doc");
   renderTasks();renderChips();renderExams();
   $("#weeks").hidden=st.view==="doc";
@@ -1480,7 +1509,10 @@ $("#capMinus").onclick=()=>setCap((S.cap||6)-1);$("#capPlus").onclick=()=>setCap
 ["examsBox","tasksBox"].forEach(id=>{const d=$("#"+id);try{const v=localStorage.getItem("uqu-open-"+id);if(v!=null)d.open=v==="1"}catch(e){}
   d.addEventListener("toggle",()=>{try{localStorage.setItem("uqu-open-"+id,d.open?"1":"0")}catch(e){}})});
 // every minute: new lectures end, the day may roll over, memory decays
-setInterval(()=>{const iso=isoOf(new Date());if(iso!==todayISO){todayISO=iso;render()}else if(!sleepRun)render()},60000);
+// repaint only when the clock changes something: a lecture ends, the day turns, the 9 pm window opens, or every 30 min for memory decay
+const timeSig=()=>`${todayISO}|${ALL.reduce((n,b)=>n+(hasEnded(b)?1:0),0)}|${sleepDay()||""}|${Math.floor(Date.now()/18e5)}`;
+let lastSig="";
+setInterval(()=>{todayISO=isoOf(new Date());if(timeSig()!==lastSig)render()},60000);
 renderSync();renderNext();render();connect();
 </script>
 
