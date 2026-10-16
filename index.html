@@ -285,6 +285,10 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .rt small{font-weight:500;font-size:11px;opacity:.85}
 .rt.h{--mc:var(--k-exam);--mb:var(--k-exam-bg)}.rt.m{--mc:var(--s-r2);--mb:var(--s-r2-bg)}.rt.e{--mc:var(--s-study);--mb:var(--s-study-bg)}
 .task+.prompt{margin-top:-2px}
+.tin label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.tin input{width:68px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 8px;font:600 15px var(--f-mono);text-align:center}
+.perr{margin:0;font-size:12px;color:var(--k-exam);font-weight:600}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;font-size:12.5px;padding:0 4px;text-decoration:underline}
 .knots{display:flex;flex-direction:column;gap:6px}
 .kh{font-size:12.5px;font-weight:700;color:var(--k-disc)}
 .kn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:9px;padding:6px 8px;background:var(--bg)}
@@ -1126,6 +1130,7 @@ function taskHTML(x){
     </button></div>${pr}`;
 }
 function renderTasks(){
+  if(typing()&&document.activeElement.closest("#tlist")){deferred=true;return}
   const p=plan();
   const c=$("#tcount");c.textContent=p.today.length;c.classList.toggle("zero",!p.today.length);
   $("#capN").textContent=p.cap;
@@ -1182,19 +1187,34 @@ function rate(id,g){
   else savePatch(id,{rev1:todayISO,g1:g});
 }
 function setKnot(id,k,val){const all={...(mk(id).knots||{}),[k]:val};savePatch(id,{knots:all},{knots:{[k]:val}})}
-const TIMES=[[30,"30 د"],[45,"45 د"],[60,"ساعة"],[90,"ساعة ونص"],[120,"ساعتين"],[150,"ساعتين ونص"],[180,"3 ساعات"],[240,"4 ساعات"]];
+// exact study time entered by hand (hours + minutes), kept as a draft while typing
+const durFmt=m=>{const h=Math.floor(m/60),r=m%60;return[h?cnt(h,"ساعة","ساعتين","ساعات"):"",r?`${r} دقيقة`:""].filter(Boolean).join(" و")||"0 دقيقة"};
 function promptHTML(id,type,key){
   const ks=key?` data-pkey="${key}"`:"";
-  if(type==="time")return`<div class="prompt"${ks}><span class="pq">كم أخذت منك فعليًا؟</span><div class="pchips">${TIMES.map(([v,l])=>`<button class="pc" data-mins="${id}|${v}">${l}</button>`).join("")}<button class="pc skip" data-pskip="1">تخطي</button></div></div>`;
+  if(type==="time"){
+    const m0=mk(id).mins,d=st.tdraft&&st.tdraft.id===id?st.tdraft:{h:m0?Math.floor(m0/60):"",m:m0?m0%60:""};
+    return`<div class="prompt"${ks}><span class="pq">كم أخذت منك فعليًا؟</span>
+      <div class="frow tin"><label>ساعات<input type="number" inputmode="numeric" min="0" max="24" class="tH" value="${d.h}" placeholder="0"></label>
+        <label>دقائق<input type="number" inputmode="numeric" min="0" max="59" class="tM" value="${d.m}" placeholder="0"></label>
+        <button class="btn primary" data-tsave="${id}">حفظ</button><button class="pc skip" data-pskip="1">تخطي</button></div>
+      <p class="perr" hidden></p></div>`;
+  }
   return`<div class="prompt"${ks}><span class="pq">كيف كان تذكرك؟</span><div class="pchips">
     <button class="rt h" data-rate="${id}|h">تذكرتها بصعوبة<small>ترجع بعد يومين</small></button>
     <button class="rt m" data-rate="${id}|m">تذكرت أغلبها<small>الثانية بعد 5 أيام</small></button>
     <button class="rt e" data-rate="${id}|e">راسخة تمامًا<small>الثانية بعد 8 أيام</small></button></div></div>`;
 }
 function bindPrompts(root){
-  root.querySelectorAll("[data-mins]").forEach(b=>b.onclick=()=>{const [id,v]=b.dataset.mins.split("|");st.prompt=null;savePatch(id,{mins:+v})});
+  root.querySelectorAll("[data-tsave]").forEach(b=>{const box=b.closest(".prompt"),id=b.dataset.tsave,h=box.querySelector(".tH"),mm=box.querySelector(".tM"),err=box.querySelector(".perr");
+    const keep=()=>{st.tdraft={id,h:h.value,m:mm.value}};h.oninput=keep;mm.oninput=keep;
+    const save=()=>{const v=(parseInt(h.value,10)||0)*60+(parseInt(mm.value,10)||0);
+      if(v<=0){err.hidden=false;err.textContent="اكتب الوقت بالساعات أو الدقائق.";return}
+      if(v>24*60){err.hidden=false;err.textContent="الوقت أكثر من 24 ساعة، تأكد منه.";return}
+      st.prompt=null;st.tdraft=null;document.activeElement&&document.activeElement.blur&&document.activeElement.blur();deferred=false;savePatch(id,{mins:v})};
+    b.onclick=save;[h,mm].forEach(x=>x.onkeydown=ev=>{if(ev.key==="Enter"){ev.preventDefault();save()}})});
+  root.querySelectorAll("[data-tedit]").forEach(b=>b.onclick=()=>{st.tdraft=null;st.prompt={type:"time",where:"card",id:b.dataset.tedit};render();const i=document.querySelector(".prompt .tH");if(i)i.focus()});
   root.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{const [id,g]=b.dataset.rate.split("|");rate(id,g)});
-  root.querySelectorAll("[data-pskip]").forEach(b=>b.onclick=()=>{st.prompt=null;render()});
+  root.querySelectorAll("[data-pskip]").forEach(b=>b.onclick=()=>{st.prompt=null;st.tdraft=null;deferred=false;document.activeElement&&document.activeElement.blur&&document.activeElement.blur();render()});
 }
 
 // ---------- pre-sleep replay (after 9 pm): lectures studied today, 90 s each ----------
@@ -1323,7 +1343,7 @@ function cardHTML(b){
         ${b.dr?`<dt>الدكتور</dt><dd>${esc(b.dr)}</dd>`:""}
         <dt>اليوم</dt><dd>${DATA[b.wi].days[b.di].ar} ${fmt(heldDate(b))} · الأسبوع ${DATA[b.wi].n}</dd>
         ${r!=null?`<dt>التذكر</dt><dd><span class="rc ${rcClass(r)}">${pct(r)}</span>${pbar(r,"rcbar "+rcClass(r))}</dd>`:""}
-        ${m.mins?`<dt>ذاكرتها في</dt><dd>${minTxt(m.mins)}</dd>`:""}
+        ${m.studied?`<dt>وقت المذاكرة</dt><dd>${m.mins?durFmt(m.mins):"غير مسجّل"} <button class="linkbtn" data-tedit="${b.id}">${m.mins?"تعديل":"سجّل الوقت"}</button></dd>`:""}
       </dl>
       ${needsStudy(b)?`<div class="actions">
         ${MARKS.map(x=>`<button class="sbtn" style="${sv(x.c)}" aria-pressed="${!!m[x.f]}"${locked(x.f)?` aria-disabled="true" title="حل عُقد الفهم أول"`:""} data-mark="${b.id}|${x.f}"><i></i>${m[x.f]?"✓ ":locked(x.f)?"🔒 ":""}${x.ar}${m[x.f]?` <small>${fmt(m[x.f])}</small>`:""}</button>`).join("")}
@@ -1418,14 +1438,14 @@ function bindCards(root){
   root.querySelectorAll("[data-dr]").forEach(b=>b.onclick=()=>{st.view="doc";st.dr=b.dataset.dr;st.open=null;render();const v=$("#docView");window.scrollTo({top:v.offsetTop-12,behavior:"smooth"})});
   root.querySelectorAll("[data-knew]").forEach(b=>b.onclick=()=>{st.knotFor=b.dataset.knew;render();const i=$("#knotIn");if(i)i.focus()});
   root.querySelectorAll("[data-kadd]").forEach(b=>b.onclick=()=>addKnot(b.dataset.kadd));
-  const ki=root.querySelector("#knotIn");if(ki){ki.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addKnot(st.knotFor)}};ki.onblur=()=>{if(deferred){deferred=false;setTimeout(render,0)}}}
+  const ki=root.querySelector("#knotIn");if(ki){ki.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addKnot(st.knotFor)}}}
   root.querySelectorAll("[data-kdone]").forEach(b=>b.onclick=()=>{const [id,k]=b.dataset.kdone.split("|");const kn=knotsOf(id).find(x=>x.k===k);if(kn)setKnot(id,k,{...stripK(kn),d:kn.d?false:todayISO})});
   root.querySelectorAll("[data-kdel]").forEach(b=>b.onclick=()=>{const [id,k]=b.dataset.kdel.split("|");setKnot(id,k,false)});
   bindPrompts(root);
 }
 function addKnot(id){
   const i=$("#knotIn"),t=(i&&i.value||"").trim();if(!t){i&&i.focus();return}
-  st.knotFor=null;deferred=false;i.onblur=null;i.blur();
+  st.knotFor=null;deferred=false;i.blur();
   setKnot(id,"k"+Date.now().toString(36),{t,c:todayISO,d:false});
 }
 function go(id){
@@ -1434,9 +1454,11 @@ function go(id){
   const el=document.getElementById("c-"+id);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash")}
 }
 let deferred=false;
+const typing=()=>{const a=document.activeElement;return!!(a&&a.tagName==="INPUT"&&(a.id==="knotIn"||a.closest(".prompt")))};
+document.addEventListener("focusout",()=>setTimeout(()=>{if(deferred&&!typing()){deferred=false;render()}},350));
 function render(){
   // don't wipe a knot the user is typing; repaint when they leave the field
-  if(document.activeElement&&document.activeElement.id==="knotIn"){deferred=true;renderTasks();return}
+  if(typing()){deferred=true;return}
   $("#vDay").setAttribute("aria-pressed",st.view==="day");$("#vWeek").setAttribute("aria-pressed",st.view==="week");$("#vDoc").setAttribute("aria-pressed",st.view==="doc");
   renderTasks();renderChips();renderExams();
   $("#weeks").hidden=st.view==="doc";
