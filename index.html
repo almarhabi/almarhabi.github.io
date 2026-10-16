@@ -1236,13 +1236,16 @@ function bindPrompts(root){
 
 // ---------- pre-sleep replay (after 9 pm): lectures studied today, 90 s each ----------
 let sleepRun=null;
-function sleepDay(){const h=nowH();return h>=21?todayISO:h<4?addDays(todayISO,-1):null}
+// available all day once you've studied something; before 4 am you're still on "last night"
+function sleepDay(){return nowH()<4?addDays(todayISO,-1):todayISO}
+const sleepList=day=>ALL.filter(b=>{const s=mk(b.id).studied;return s===day||(day!==todayISO&&s===todayISO)});
+const sleepHint=()=>{const h=nowH();return h>=21||h<4?"الوقت المثالي الحين، قبل نومك مباشرة.":"تقدر تسويه أي وقت، بس مفعوله أقوى لما يكون قبل النوم مباشرة."};
 // S.slept = "YYYY-MM-DD|id,id,…" — the lectures already replayed for that night
 const sleptIds=day=>{const [d,ids]=(S.slept||"").split("|");return d===day&&ids?ids.split(",").filter(Boolean):[]};
 function markSlept(day,id){const ids=sleptIds(day);if(!ids.includes(id))setTop("slept",`${day}|${[...ids,id].join(",")}`)}
 function renderSleep(){
   const box=$("#sleepBox"),day=sleepDay();
-  const list=day?ALL.filter(b=>mk(b.id).studied===day):[];
+  const list=sleepList(day);
   if(!list.length){box.innerHTML="";sleepRun=null;return}
   if(sleepRun){drawSleepRun();return}
   const done=new Set(sleptIds(day)),todo=list.filter(b=>!done.has(b.id));
@@ -1252,7 +1255,7 @@ function renderSleep(){
     $("#slAgain").onclick=()=>{sleepRun={day,list,i:0,end:Date.now()+90000};drawSleepRun()};return;
   }
   box.innerHTML=`<div class="sleep"><div class="sl-h">🌙 تثبيت الحُصين قبل النوم <small>(${cnt(Math.ceil(todo.length*1.5),"دقيقة","دقيقتين","دقائق")})</small></div>
-    <p class="sl-p">غمّض عينك 90 ثانية لكل محاضرة، واسترجع هيكلها العام في ذهنك: العنوان، الأقسام، الآليات الرئيسية.${done.size?` ثبّت ${done.size} قبل، وباقي اللي ذاكرتها بعدها.`:""}</p>
+    <p class="sl-p">${sleepHint()} غمّض عينك 90 ثانية لكل محاضرة، واسترجع هيكلها العام في ذهنك: العنوان، الأقسام، الآليات الرئيسية.${done.size?` ثبّت ${done.size} قبل، وباقي اللي ذاكرتها بعدها.`:""}</p>
     <div class="sl-list">${todo.map(b=>`<span class="en">${esc(label(b))}</span>`).join("")}</div>
     <button class="btn sl-go" id="slGo">ابدأ التثبيت</button></div>`;
   $("#slGo").onclick=()=>{sleepRun={day,list:todo,i:0,end:Date.now()+90000};drawSleepRun()};
