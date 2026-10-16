@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -21,6 +20,11 @@
   --k-exam:#B3261E; --k-exam-bg:#FBE4E2;
   --k-rev:#4A5A66; --k-rev-bg:#E6EBEE;
   --k-none:#6B716E; --k-none-bg:#ECEDEB;
+  --s-study:#0F5C4D; --s-study-bg:#DCEBE6;
+  --s-r1:#C2362B; --s-r1-bg:#FBE3E0;
+  --s-r2:#7A5800; --s-r2-bg:#FFEBA8;
+  --s-anki:#1F5FD0; --s-anki-bg:#E1EBFD;
+  --s-r3:#4A5A66; --s-r3-bg:#E6EBEE;
   --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -36,6 +40,11 @@
   --k-exam:#F28B82; --k-exam-bg:#41201D;
   --k-rev:#A9BAC6; --k-rev-bg:#26303A;
   --k-none:#A3AAA6; --k-none-bg:#272C2A;
+  --s-study:#5CC2A8; --s-study-bg:#1D3A33;
+  --s-r1:#FF8A80; --s-r1-bg:#46201C;
+  --s-r2:#FFD166; --s-r2-bg:#3D3112;
+  --s-anki:#82AFFF; --s-anki-bg:#1B2A47;
+  --s-r3:#B6C3CC; --s-r3-bg:#26303A;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111614; --surface:#1A201D; --surface-2:#232A27; --ink:#E7ECE9; --muted:#9AA6A0; --line:#2F3834;
@@ -47,6 +56,11 @@
   --k-exam:#F28B82; --k-exam-bg:#41201D;
   --k-rev:#A9BAC6; --k-rev-bg:#26303A;
   --k-none:#A3AAA6; --k-none-bg:#272C2A;
+  --s-study:#5CC2A8; --s-study-bg:#1D3A33;
+  --s-r1:#FF8A80; --s-r1-bg:#46201C;
+  --s-r2:#FFD166; --s-r2-bg:#3D3112;
+  --s-anki:#82AFFF; --s-anki-bg:#1B2A47;
+  --s-r3:#B6C3CC; --s-r3-bg:#26303A;
   color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -105,7 +119,7 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .list{display:flex;flex-direction:column;gap:10px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;position:relative}
 .card::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--kc)}
-.card.done{opacity:.72}
+.card.done .head{opacity:.72}
 .card.flash{animation:flash 1.2s ease-out}
 @keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
 .head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;width:100%;border:0;background:transparent;padding:12px 14px 12px 12px;padding-inline-start:16px;text-align:start}
@@ -118,7 +132,58 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .kind{color:var(--kc);font-weight:600}
 .chev{width:22px;height:22px;color:var(--muted);transition:transform .2s}
 .card[data-open="true"] .chev{transform:rotate(180deg)}
-.tick{position:absolute;top:8px;inset-inline-end:40px;color:var(--accent);font-size:12px;font-weight:700}
+/* study-status chips (inside the card text column, so they never overlap the title) */
+.marks{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.mk{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;background:var(--mb);color:var(--mc);line-height:1.6}
+.sbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;display:inline-flex;gap:7px;align-items:center}
+.sbtn i{width:9px;height:9px;border-radius:50%;background:var(--mc);flex:none}
+.sbtn[aria-pressed="true"]{background:var(--mb);border-color:var(--mc);color:var(--mc)}
+.sbtn[aria-pressed="true"] i{display:none}
+.sbtn small{font-weight:500;opacity:.8}
+.gb .gm{display:flex;gap:3px;margin-top:2px}
+.gb .gm i{width:7px;height:7px;border-radius:50%;background:var(--mc)}
+
+/* today's tasks */
+.tasks{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.tasks-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tasks-head h2{font-family:var(--f-display);font-size:18px;margin:0;font-weight:600}
+.tcount{font-size:12px;font-weight:700;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:0 8px;min-width:22px;text-align:center}
+.tcount.zero{background:var(--surface-2);color:var(--muted)}
+.sync{margin-inline-start:auto;font-size:11.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sync.live i{background:var(--s-study);box-shadow:0 0 0 3px var(--s-study-bg)}
+.tlist{display:flex;flex-direction:column;gap:6px}
+.task{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.tcheck{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--mc);background:transparent;display:grid;place-items:center;color:transparent;font-size:15px;font-weight:700;line-height:1;padding:0}
+.tmain{flex:1;min-width:0;border:0;background:transparent;text-align:start;padding:0;display:flex;flex-direction:column;gap:1px}
+.tline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.tlabel{font-size:11.5px;font-weight:700;color:var(--mc);background:var(--mb);border-radius:999px;padding:0 8px;white-space:nowrap}
+.ttopic{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.tmeta{font-size:12px;color:var(--muted)}
+.tmeta .late{color:var(--s-r1);font-weight:600}
+.task.done{opacity:.55}
+.task.done .tcheck{background:var(--muted);border-color:var(--muted);color:var(--surface)}
+.task.done .ttopic{text-decoration:line-through}
+.task.done .tlabel{background:var(--surface-2);color:var(--muted)}
+.tempty{font-size:13px;color:var(--muted);margin:0}
+.tmore{align-self:flex-start;border:0;background:transparent;color:var(--accent);font-weight:600;font-size:13px;padding:2px 0}
+
+/* week list + doctors */
+.wtools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.seg.sm button{padding:4px 12px;font-size:12.5px}
+.dgroup{display:flex;flex-direction:column;gap:10px}
+.dgh{font-family:var(--f-display);font-size:17px;font-weight:700;margin:6px 0 0;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.dgh small{font-family:var(--f-body);font-size:12.5px;font-weight:500;color:var(--muted)}
+.dgh.off{color:var(--muted);font-size:15px}
+.docs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.doc{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px 14px;text-align:start;display:flex;flex-direction:column;gap:4px}
+.doc b{font-size:15px}
+.doc .dmeta{font-size:12.5px;color:var(--muted)}
+.doc .dots{display:flex;gap:3px;flex-wrap:wrap}
+.doc .dots i{width:7px;height:7px;border-radius:50%;background:var(--kc)}
+.dochead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dochead h2{font-family:var(--f-display);font-size:20px;margin:0;font-weight:600}
+.back{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
 .body{border-top:1px dashed var(--line);padding:12px 16px 14px;display:flex;flex-direction:column;gap:12px}
 .rows{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:0}
 .rows dt{color:var(--muted)}
@@ -570,12 +635,18 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
     <div class="next" id="next" hidden></div>
   </header>
 
+  <section class="tasks" id="tasks" aria-label="مهام اليوم">
+    <div class="tasks-head"><h2>مهام اليوم</h2><span class="tcount" id="tcount">0</span><span class="sync" id="sync"><i></i><span>محفوظ على هذا الجهاز فقط</span></span></div>
+    <div class="tlist" id="tlist"></div>
+  </section>
+
   <nav class="weeks" id="weeks" aria-label="الأسابيع"></nav>
 
   <div class="toolbar">
     <div class="seg" role="group" aria-label="طريقة العرض">
       <button id="vDay" aria-pressed="true">يوم</button>
       <button id="vWeek" aria-pressed="false">أسبوع كامل</button>
+      <button id="vDoc" aria-pressed="false">الدكاترة</button>
     </div>
     <label class="search"><span hidden>بحث</span>
       <input id="q" type="search" placeholder="ابحث عن موضوع أو دكتور…" autocomplete="off">
@@ -589,10 +660,18 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
     <div class="list" id="list"></div>
   </section>
 
-  <section id="weekView" hidden>
-    <div class="gridwrap"><div class="grid" id="grid"></div></div>
-    <p class="note">اضغط على أي محاضرة لفتح تفاصيلها.</p>
+  <section id="weekView" class="wrap" style="gap:12px" hidden>
+    <div class="wtools"><h2 class="dgh" id="weekTitle" style="margin:0"></h2>
+      <div class="seg sm" role="group" aria-label="شكل عرض الأسبوع">
+        <button id="wGrid" aria-pressed="true">جدول</button>
+        <button id="wList" aria-pressed="false">قائمة</button>
+      </div></div>
+    <div id="wGridBox"><div class="gridwrap"><div class="grid" id="grid"></div></div>
+      <p class="note">اضغط على أي محاضرة لفتح تفاصيلها.</p></div>
+    <div id="wListBox" class="list" hidden></div>
   </section>
+
+  <section id="docView" class="wrap" style="gap:12px" hidden></section>
 
   <section id="searchView" hidden>
     <div class="results" id="results"></div>
@@ -622,17 +701,127 @@ DATA.forEach((w,wi)=>w.days.forEach((d,di)=>d.blocks.forEach((b,bi)=>{b.id=`${w.
 const ALL=DATA.flatMap(w=>w.days.flatMap(d=>d.blocks));
 const norm=t=>t.toLowerCase().replace(/\(lab\)|lab:|\blab\b|\(tbl\)|tbl:?/g,"").replace(/[^a-z0-9&]+/g," ").trim();
 
-// per-viewer "studied" marks
-let done={};
-try{done=JSON.parse(localStorage.getItem("uqu-done")||"{}")||{}}catch(e){done={}}
-const saveDone=()=>{try{localStorage.setItem("uqu-done",JSON.stringify(done))}catch(e){}};
-
+// ---------- study marks: local cache + live sync (claude.ai db) ----------
+const MARKS=[
+  {f:"studied",ar:"ذاكرتها",short:"ذاكرتها",c:"study"},
+  {f:"rev1",ar:"راجعتها للمرة الأولى",short:"مراجعة 1",c:"r1"},
+  {f:"rev2",ar:"راجعتها للمرة الثانية",short:"مراجعة 2",c:"r2"},
+  {f:"anki",ar:"سويت أسئلة ANKI",short:"ANKI",c:"anki"},
+];
+const sv=c=>`--mc:var(--s-${c});--mb:var(--s-${c}-bg)`;
 const todayISO=(()=>{const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`})();
+const addDays=(iso,n)=>{const d=new Date(iso+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const diffDays=(a,b)=>Math.round((Date.parse(b+"T12:00:00Z")-Date.parse(a+"T12:00:00Z"))/864e5);
+const BY_ID=Object.fromEntries(ALL.map(b=>[b.id,b]));
+
+const LS="uqu-state-v2";
+let S={marks:{}};
+try{const r=JSON.parse(localStorage.getItem(LS)||"null");if(r&&r.marks)S=r;
+  else{const old=JSON.parse(localStorage.getItem("uqu-done")||"null");if(old)for(const id in old)S.marks[id]={studied:todayISO}}}catch(e){}
+const cache=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+const mk=id=>S.marks[id]||{};
+const isDone=b=>!!mk(b.id).studied;
+
+let remote=null,remoteExists=false,merged=false,live=false;
+const pending={};const jobs=[];let busy=false;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function pump(){
+  if(busy||!remote)return;busy=true;
+  while(jobs.length){const job=jobs[0];
+    try{await job()}catch(e){if(e&&e.code==="unavailable"){await sleep(700+Math.random()*900);try{await job()}catch(_){}}else console.warn(e)}
+    jobs.shift()}
+  busy=false;
+}
+function pushMark(id,f,val){
+  const key=id+"|"+f;
+  if(!remote){delete pending[key];return}
+  jobs.push(async()=>{
+    if(!remoteExists){const s=await remote.get();remoteExists=s.exists}
+    if(remoteExists)await remote.update({marks:{[id]:{[f]:val}}});
+    else{await remote.set({v:2,marks:S.marks});remoteExists=true}
+    if(pending[key]===val)delete pending[key];
+  });pump();
+}
+function toggleMark(id,f){
+  const val=mk(id)[f]?null:todayISO;
+  S.marks[id]={...mk(id),[f]:val};pending[id+"|"+f]=val;cache();render();pushMark(id,f,val);
+}
+function applyRemote(snap){
+  const rm=snap.exists?JSON.parse(JSON.stringify((snap.data()||{}).marks||{})):{};
+  if(snap.exists)remoteExists=true;
+  if(!merged){
+    const localOnly=Object.keys(S.marks).filter(k=>!(k in rm));
+    localOnly.forEach(k=>rm[k]=S.marks[k]);
+    if(!snap.metadata.fromCache){merged=true;
+      if(localOnly.length)jobs.push(async()=>{
+        const s=await remote.get();
+        if(s.exists){remoteExists=true;const patch={};localOnly.forEach(k=>patch[k]=S.marks[k]);await remote.update({marks:patch})}
+        else{await remote.set({v:2,marks:S.marks});remoteExists=true}
+      }),pump();
+    }
+  }
+  for(const key in pending){const [id,f]=key.split("|");rm[id]={...(rm[id]||{}),[f]:pending[key]}}
+  S.marks=rm;cache();render();
+}
+async function connect(){
+  try{
+    if(!window.claude||typeof window.claude.use!=="function")return;
+    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    if(!db||!user)return;
+    const uid=await user.id();if(!uid)return;
+    remote=db.doc("data/users/"+uid+"/state");live=true;renderSync();
+    remote.onSnapshot(applyRemote,()=>{live=false;remote=null;renderSync()});
+    pump();
+  }catch(e){live=false;renderSync()}
+}
+function renderSync(){
+  const el=$("#sync");el.classList.toggle("live",live);
+  el.lastElementChild.textContent=live?"مزامنة مباشرة بين أجهزتك":"محفوظ على هذا الجهاز فقط";
+}
+
+// ---------- spaced-review tasks ----------
+const TASKS=[
+  {from:"studied",gap:3,done:"rev1",ar:"مراجعة أولى",base:"ذاكرتها",c:"r1"},
+  {from:"rev1",gap:7,done:"rev2",ar:"مراجعة ثانية",base:"راجعتها أول مرة",c:"r2"},
+  {from:"rev2",gap:10,done:"rev3",ar:"مراجعة ثالثة",base:"راجعتها ثاني مرة",c:"r3"},
+];
+const dayWord=n=>n===1?"يوم":n===2?"يومين":n<=10?`${n} أيام`:`${n} يوم`;
+function todayTasks(){
+  const out=[];
+  for(const id in S.marks){const b=BY_ID[id],m=S.marks[id];if(!b)continue;
+    for(const t of TASKS){if(!m[t.from])continue;
+      const due=addDays(m[t.from],t.gap),dn=m[t.done];
+      if(due>todayISO)continue;
+      if(dn&&dn!==todayISO)continue;            // finished on an earlier day
+      out.push({b,t,due,done:!!dn,since:m[t.from]});
+    }}
+  return out.sort((x,y)=>(x.done-y.done)||x.due.localeCompare(y.due));
+}
+function renderTasks(){
+  const ts=todayTasks(),left=ts.filter(x=>!x.done).length;
+  const c=$("#tcount");c.textContent=left;c.classList.toggle("zero",!left);
+  if(!ts.length){$("#tlist").innerHTML=`<p class="tempty">ما عندك مهام اليوم. لما تضغط «ذاكرتها» على محاضرة، تطلع مراجعتها الأولى هنا بعد 3 أيام، والثانية بعد 7 أيام من الأولى، والثالثة بعد 10 أيام من الثانية.</p>`;return}
+  const shown=st.tAll?ts:ts.slice(0,6);
+  $("#tlist").innerHTML=shown.map(x=>{
+    const late=diffDays(x.due,todayISO);
+    return `<div class="task${x.done?" done":""}" style="${sv(x.t.c)}">
+      <button class="tcheck" role="checkbox" aria-checked="${x.done}" aria-label="${x.t.ar}: ${esc(label(x.b))}" data-tk="${x.b.id}|${x.t.done}">✓</button>
+      <button class="tmain" data-go="${x.b.id}">
+        <span class="tline"><span class="tlabel">${x.t.ar}</span><span class="ttopic${x.b.topic?" en":""}">${esc(label(x.b))}</span></span>
+        <span class="tmeta">${x.t.base} ${fmt(x.since)}${x.done?" · أنجزتها اليوم":late>0?` · <span class="late">متأخرة ${dayWord(late)}</span>`:""}</span>
+      </button></div>`}).join("")+(ts.length>6?`<button class="tmore" id="tmore">${st.tAll?"عرض أقل":`عرض كل المهام (${ts.length})`}</button>`:"");
+  $("#tlist").querySelectorAll("[data-tk]").forEach(b=>b.onclick=()=>{const [id,f]=b.dataset.tk.split("|");toggleMark(id,f)});
+  $("#tlist").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+  const more=$("#tmore");if(more)more.onclick=()=>{st.tAll=!st.tAll;renderTasks()};
+}
+
+// ---------- schedule views ----------
 function defaultPos(){
   for(let wi=0;wi<DATA.length;wi++)for(let di=0;di<5;di++){const d=DATA[wi].days[di];if(d.date>=todayISO&&d.blocks.length)return{wi,di}}
   return{wi:0,di:0};
 }
-const st={...defaultPos(),view:"day",open:null,kinds:new Set(Object.keys(KINDS)),q:""};
+const st={...defaultPos(),view:"day",wmode:"grid",dr:null,tAll:false,open:null,kinds:new Set(Object.keys(KINDS)),q:""};
+try{const w=localStorage.getItem("uqu-wmode");if(w==="list"||w==="grid")st.wmode=w}catch(e){}
 
 function renderNext(){
   const p=defaultPos(),d=DATA[p.wi].days[p.di];
@@ -645,7 +834,8 @@ function renderWeeks(){
   const now=defaultPos().wi;
   $("#weeks").innerHTML=DATA.map((w,i)=>`<button class="wk${i===now?" now":""}" aria-pressed="${i===st.wi}" data-w="${i}"><span class="t">الأسبوع ${w.n}</span><span class="d"><span class="num en">${dnum(w.days[0].date)}–${dnum(w.days[4].date)}</span> ${MONTHS[Number(w.days[4].date.slice(5,7))-1]}</span></button>`).join("");
   $("#weeks").querySelectorAll(".wk").forEach(b=>b.onclick=()=>{st.wi=+b.dataset.w;const ds=DATA[st.wi].days;st.di=Math.max(0,ds.findIndex(d=>d.blocks.length));st.open=null;st.q="";$("#q").value="";render()});
-  const cur=$("#weeks").querySelector('[aria-pressed="true"]');cur&&cur.scrollIntoView({block:"nearest",inline:"nearest"});
+  const cur=$("#weeks").querySelector('[aria-pressed="true"]');
+  if(cur){const wr=$("#weeks"),a=cur.getBoundingClientRect(),c=wr.getBoundingClientRect();if(a.left<c.left||a.right>c.right)wr.scrollLeft+=a.left-c.left-8}
 }
 function renderChips(){
   const used=new Set(ALL.map(b=>b.kind));
@@ -668,14 +858,19 @@ function related(b){
   const key=norm(b.topic||"");if(!key)return[];
   return ALL.filter(o=>o!==b&&o.topic&&(norm(o.topic)===key||(key.length>6&&(norm(o.topic).includes(key)||key.includes(norm(o.topic))))));
 }
+function marksHTML(b){
+  const m=mk(b.id);
+  const chips=MARKS.filter(x=>m[x.f]).map(x=>`<span class="mk" style="${sv(x.c)}">${x.short}</span>`);
+  if(m.rev3)chips.push(`<span class="mk" style="${sv("r3")}">مراجعة 3</span>`);
+  return chips.length?`<span class="marks">${chips.join("")}</span>`:"";
+}
 function cardHTML(b){
-  const open=st.open===b.id, isDone=!!done[b.id], rel=open?related(b):[];
-  return `<article class="card${isDone?" done":""}" id="c-${b.id}" style="${kv(b.kind)}" data-open="${open}">
-    ${isDone?'<span class="tick">✓ تمت المذاكرة</span>':""}
+  const open=st.open===b.id, m=mk(b.id), rel=open?related(b):[];
+  return `<article class="card${isDone(b)?" done":""}" id="c-${b.id}" style="${kv(b.kind)}" data-open="${open}">
     <button class="head" data-id="${b.id}" aria-expanded="${open}">
       <span class="per"><small>الحصة</small><b>${perTxt(b)}</b></span>
       <span class="main"><span class="topic${b.topic?" en":""}">${esc(label(b))}</span>
-        <span class="meta"><span class="kind">${KINDS[b.kind].ar}</span>${b.dr?`<span>· ${esc(b.dr)}</span>`:""}</span></span>
+        <span class="meta"><span class="kind">${KINDS[b.kind].ar}</span>${b.dr?`<span>· ${esc(b.dr)}</span>`:""}</span>${marksHTML(b)}</span>
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     ${open?`<div class="body">
@@ -687,9 +882,9 @@ function cardHTML(b){
         <dt>اليوم</dt><dd>${DATA[b.wi].days[b.di].ar} ${fmt(DATA[b.wi].days[b.di].date)} · الأسبوع ${DATA[b.wi].n}</dd>
       </dl>
       <div class="actions">
-        <button class="btn${isDone?"":" primary"}" data-done="${b.id}">${isDone?"إلغاء علامة المذاكرة":"✓ ذاكرتها"}</button>
-        ${b.dr?`<button class="btn" data-dr="${esc(b.dr)}">كل محاضرات ${esc(b.dr)}</button>`:""}
+        ${MARKS.map(x=>`<button class="sbtn" style="${sv(x.c)}" aria-pressed="${!!m[x.f]}" data-mark="${b.id}|${x.f}"><i></i>${m[x.f]?"✓ ":""}${x.ar}${m[x.f]?` <small>${fmt(m[x.f])}</small>`:""}</button>`).join("")}
       </div>
+      ${b.dr?`<div class="actions"><button class="btn" data-dr="${esc(b.dr)}">كل محاضرات ${esc(b.dr)}</button></div>`:""}
       ${rel.length?`<div class="related"><h3>نفس الموضوع في أماكن أخرى</h3>${rel.map(relHTML).join("")}</div>`:""}
     </div>`:""}
   </article>`;
@@ -703,7 +898,7 @@ function renderDay(){
   const blocks=d.blocks.filter(b=>st.kinds.has(b.kind));
   $("#dayTitle").textContent=`${d.ar} ${fmt(d.date)}`;
   const wk=DATA[st.wi].days.flatMap(x=>x.blocks).filter(b=>b.kind!=="exam");
-  const n=wk.filter(b=>done[b.id]).length;
+  const n=wk.filter(isDone).length;
   $("#prog").innerHTML=wk.length?`<span>مذاكرة الأسبوع <b class="num">${n}/${wk.length}</b></span><span class="bar"><span style="width:${wk.length?n/wk.length*100:0}%"></span></span>`:"";
   $("#list").innerHTML=blocks.length?blocks.map(cardHTML).join(""):
     `<div class="empty-state"><b>${d.blocks.length?"لا توجد جلسات بهذا الفلتر":"لا توجد محاضرات"}</b>${d.blocks.length?"غيّر نوع النشاط من الأعلى لعرض بقية الجلسات.":(DATA[st.wi].days.some(x=>x.blocks.length)?"هذا اليوم فاضي في الجدول.":"جدول هذا الأسبوع لم يُعبّأ بعد في الملف.")}</div>`;
@@ -711,17 +906,48 @@ function renderDay(){
 }
 function renderWeek(){
   const w=DATA[st.wi];
+  $("#weekTitle").textContent=`الأسبوع ${w.n}`;
+  $("#wGrid").setAttribute("aria-pressed",st.wmode==="grid");$("#wList").setAttribute("aria-pressed",st.wmode==="list");
+  $("#wGridBox").hidden=st.wmode!=="grid";$("#wListBox").hidden=st.wmode!=="list";
+  if(st.wmode==="list"){
+    const box=$("#wListBox");
+    if(!w.days.some(d=>d.blocks.length)){box.innerHTML=`<div class="empty-state"><b>لا توجد محاضرات</b>جدول هذا الأسبوع لم يُعبّأ بعد في الملف.</div>`;return}
+    box.innerHTML=w.days.map(d=>{const bl=d.blocks.filter(b=>st.kinds.has(b.kind));
+      return `<div class="dgroup"><h3 class="dgh${bl.length?"":" off"}">${d.ar} ${fmt(d.date)}${d.date===todayISO?" <small>· اليوم</small>":""}${bl.length?"":" <small>· لا توجد محاضرات</small>"}</h3>${bl.map(cardHTML).join("")}</div>`}).join("");
+    bindCards(box);return;
+  }
   const maxP=Math.max(6,...w.days.flatMap(d=>d.blocks.map(b=>b.to)));
   let h=`<div class="gh" style="grid-column:1;grid-row:1">ح</div>`;
   w.days.forEach((d,i)=>h+=`<div class="gh" style="grid-column:${i+2};grid-row:1">${d.ar}<small>${dnum(d.date)}</small></div>`);
   for(let p=1;p<=maxP;p++){h+=`<div class="gp" style="grid-column:1;grid-row:${p+1}">${p}</div>`;
     for(let i=0;i<5;i++)h+=`<div class="gc" style="grid-column:${i+2};grid-row:${p+1}"></div>`}
-  w.days.forEach((d,i)=>d.blocks.forEach(b=>{
-    h+=`<button class="gb${done[b.id]?" done":""}${st.kinds.has(b.kind)?"":" dim"}" style="${kv(b.kind)};grid-column:${i+2};grid-row:${b.from+1}/${b.to+2}" data-go="${b.id}">
-      <span class="tt ${b.topic?"en":""}">${esc(label(b))}</span>${b.dr?`<span class="dr">${esc(b.dr)}</span>`:""}</button>`}));
+  w.days.forEach((d,i)=>d.blocks.forEach(b=>{const m=mk(b.id);
+    const dots=MARKS.filter(x=>m[x.f]).map(x=>`<i style="${sv(x.c)}"></i>`).join("");
+    h+=`<button class="gb${isDone(b)?" done":""}${st.kinds.has(b.kind)?"":" dim"}" style="${kv(b.kind)};grid-column:${i+2};grid-row:${b.from+1}/${b.to+2}" data-go="${b.id}">
+      <span class="tt ${b.topic?"en":""}">${esc(label(b))}</span>${b.dr?`<span class="dr">${esc(b.dr)}</span>`:""}${dots?`<span class="gm">${dots}</span>`:""}</button>`}));
   if(!w.days.some(d=>d.blocks.length))h+=`<div style="grid-column:2/7;grid-row:2/5;display:flex;align-items:center;justify-content:center;color:var(--muted)">جدول هذا الأسبوع لم يُعبّأ بعد في الملف.</div>`;
   $("#grid").innerHTML=h;
   $("#grid").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+}
+const DOCTORS=(()=>{const m=new Map();ALL.forEach(b=>{if(!b.dr)return;if(!m.has(b.dr))m.set(b.dr,[]);m.get(b.dr).push(b)});
+  return [...m.entries()].map(([name,bl])=>({name,bl,sid:(bl.find(b=>b.sid)||{}).sid||""})).sort((a,b)=>b.bl.length-a.bl.length)})();
+function renderDocs(){
+  const box=$("#docView");
+  if(!st.dr){
+    box.innerHTML=`<div class="dochead"><h2>دكاترة المديول</h2><span class="note">${DOCTORS.length} دكاترة · اضغط على الاسم لعرض محاضراته</span></div>
+      <div class="docs">${DOCTORS.map((d,i)=>{const n=d.bl.filter(b=>b.kind!=="exam");const s=n.filter(isDone).length;
+        return `<button class="doc" data-di="${i}"><b>${esc(d.name)}</b><span class="dmeta">${d.bl.length} ${d.bl.length>2&&d.bl.length<11?"جلسات":"جلسة"} · ذاكرت ${s} من ${n.length}${d.sid?` · <span class="num">${d.sid}</span>`:""}</span><span class="dots">${d.bl.map(b=>`<i style="${kv(b.kind)}"></i>`).join("")}</span></button>`}).join("")}</div>`;
+    box.querySelectorAll("[data-di]").forEach(b=>b.onclick=()=>{st.dr=DOCTORS[+b.dataset.di].name;st.open=null;render();window.scrollTo({top:box.offsetTop-12,behavior:"smooth"})});
+    return;
+  }
+  const d=DOCTORS.find(x=>x.name===st.dr);if(!d){st.dr=null;return renderDocs()}
+  const bl=d.bl.filter(b=>st.kinds.has(b.kind));
+  const groups=[];bl.forEach(b=>{const day=DATA[b.wi].days[b.di];const g=groups[groups.length-1];if(g&&g.day===day)g.bl.push(b);else groups.push({day,w:DATA[b.wi],bl:[b]})});
+  box.innerHTML=`<div class="dochead"><button class="back" id="docBack">→ كل الدكاترة</button><h2>${esc(d.name)}</h2><span class="note">${d.bl.length} ${d.bl.length>2&&d.bl.length<11?"جلسات":"جلسة"}${d.sid?` · <span class="num">${d.sid}</span>`:""}</span></div>`+
+    (groups.length?groups.map(g=>`<div class="dgroup"><h3 class="dgh">${g.day.ar} ${fmt(g.day.date)} <small>· الأسبوع ${g.w.n}${g.day.date===todayISO?" · اليوم":""}</small></h3>${g.bl.map(cardHTML).join("")}</div>`).join("")
+      :`<div class="empty-state"><b>لا توجد جلسات بهذا الفلتر</b>غيّر نوع النشاط من الأعلى.</div>`);
+  $("#docBack").onclick=()=>{st.dr=null;st.open=null;render()};
+  bindCards(box);
 }
 function renderSearch(){
   const q=st.q.trim().toLowerCase(), qa=st.q.trim();
@@ -732,32 +958,36 @@ function renderSearch(){
   $("#results").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
 function bindCards(root){
-  root.querySelectorAll(".head").forEach(h=>h.onclick=()=>{st.open=st.open===h.dataset.id?null:h.dataset.id;renderDay()});
-  root.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const id=b.dataset.done;if(done[id])delete done[id];else done[id]=1;saveDone();render()});
+  root.querySelectorAll(".head").forEach(h=>h.onclick=()=>{st.open=st.open===h.dataset.id?null:h.dataset.id;render()});
+  root.querySelectorAll("[data-mark]").forEach(b=>b.onclick=()=>{const [id,f]=b.dataset.mark.split("|");toggleMark(id,f)});
   root.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
-  root.querySelectorAll("[data-dr]").forEach(b=>b.onclick=()=>{st.q=b.dataset.dr;$("#q").value=st.q;render();window.scrollTo({top:0,behavior:"smooth"})});
+  root.querySelectorAll("[data-dr]").forEach(b=>b.onclick=()=>{st.view="doc";st.dr=b.dataset.dr;st.open=null;st.q="";$("#q").value="";render();const v=$("#docView");window.scrollTo({top:v.offsetTop-12,behavior:"smooth"})});
 }
 function go(id){
-  const b=ALL.find(x=>x.id===id);if(!b)return;
+  const b=BY_ID[id];if(!b)return;
   st.wi=b.wi;st.di=b.di;st.open=id;st.view="day";st.q="";$("#q").value="";st.kinds.add(b.kind);render();
   const el=document.getElementById("c-"+id);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash")}
 }
 function render(){
   const searching=!!st.q.trim();
-  $("#vDay").setAttribute("aria-pressed",st.view==="day");$("#vWeek").setAttribute("aria-pressed",st.view==="week");
-  renderWeeks();renderChips();
+  $("#vDay").setAttribute("aria-pressed",st.view==="day");$("#vWeek").setAttribute("aria-pressed",st.view==="week");$("#vDoc").setAttribute("aria-pressed",st.view==="doc");
+  renderTasks();renderChips();
+  $("#weeks").hidden=!searching&&st.view==="doc";
+  if(!$("#weeks").hidden)renderWeeks();
   $("#searchView").hidden=!searching;
   $("#dayView").hidden=searching||st.view!=="day";
   $("#weekView").hidden=searching||st.view!=="week";
-  if(searching)renderSearch();else if(st.view==="day"){renderDays();renderDay()}else renderWeek();
+  $("#docView").hidden=searching||st.view!=="doc";
+  if(searching)renderSearch();else if(st.view==="day"){renderDays();renderDay()}else if(st.view==="week")renderWeek();else renderDocs();
 }
 $("#vDay").onclick=()=>{st.view="day";st.q="";$("#q").value="";render()};
 $("#vWeek").onclick=()=>{st.view="week";st.q="";$("#q").value="";render()};
+$("#vDoc").onclick=()=>{st.view="doc";st.dr=null;st.open=null;st.q="";$("#q").value="";render()};
+const setW=m=>{st.wmode=m;try{localStorage.setItem("uqu-wmode",m)}catch(e){};render()};
+$("#wGrid").onclick=()=>setW("grid");$("#wList").onclick=()=>setW("list");
 $("#q").oninput=e=>{st.q=e.target.value;render()};
-renderNext();render();
+renderSync();renderNext();render();connect();
 </script>
 
 </body>
 </html>
-
-</body></html>
