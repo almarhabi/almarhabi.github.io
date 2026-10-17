@@ -559,6 +559,15 @@ body.has-sess{padding-bottom:96px}
 .achpage .achead,.achpage .achbody{text-align:start}
 .rel .rk{flex:none;width:22px;height:22px;border-radius:7px;background:var(--surface);display:grid;place-items:center;font-size:12px}
 .sleeppg .sl-ul li{cursor:pointer}
+/* v11: one merged file, floating player, seek ±5 */
+.aplayer{display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;max-width:440px}.aplayer audio{width:100%}
+.aseek{display:flex;gap:8px;justify-content:center;direction:ltr}
+.nowplay{position:fixed;z-index:42;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom,0px));width:min(560px,calc(100% - 24px));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 10px;box-shadow:0 10px 30px rgb(0 0 0 / .22);display:flex;flex-direction:column;gap:4px}
+.nowplay .aplayer{max-width:none;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;direction:ltr}.nowplay .aseek{display:contents}.nowplay [data-sk="-5"]{order:-1}.nowplay [data-sk="5"]{order:1}.nowplay audio{height:40px;min-width:0}
+body.has-np .toast{bottom:150px}body.has-sess.has-np .toast{bottom:230px}
+.np-t{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}.np-t b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.np-x{border:0;background:transparent;font-size:22px;line-height:1;padding:0 4px;color:var(--muted)}
+body.has-np{padding-bottom:150px}body.has-sess .nowplay{bottom:84px}body.has-sess.has-np{padding-bottom:230px}
 /* v10: multi-part recordings */
 .seqp{display:flex;flex-direction:column;gap:4px;align-items:center;max-width:100%}.rec .seqp{align-items:flex-start}.seqi{font-size:11.5px;color:var(--muted)}
 /* v9: ledger, wake-up offers, recording pause, week swipe */
@@ -1053,6 +1062,7 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
       <label class="chk"><input type="checkbox" id="rsKeep"> احتفظ بتعديلات الجدول (الأسماء والأوقات والمحاضرات المضافة)</label>
       <button class="btn dangerbtn" id="rsBtn">امسح كل بياناتي</button>
     </section>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">11</b> · تسجيل بملف واحد وتقديم ورجوع ⏪⏩</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="next" id="next" hidden></div>
@@ -1106,6 +1116,7 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
 </div>
 <div class="sessbar" id="sessBar" hidden></div>
 <div class="offerbar" id="offerBar" role="status" hidden></div>
+<div class="nowplay" id="nowPlay" hidden></div>
 <div class="parkpop" id="parkPop" hidden></div>
 <div class="xppop" id="xpPop" hidden></div>
 <div class="ov" id="ov" hidden></div>
@@ -1612,13 +1623,14 @@ function bindPrompts(root){
   root.querySelectorAll("[data-cedit]").forEach(b=>b.onclick=()=>sheetCards(b.dataset.cedit));
   root.querySelectorAll("[data-recnew]").forEach(b=>b.onclick=()=>{const [id,stg]=b.dataset.recnew.split("|");sheetSummary(id,stg)});
   root.querySelectorAll("[data-play]").forEach(b=>b.onclick=async()=>{const [id,rid]=b.dataset.play.split("|"),r=(mk(id).recs||{})[rid];if(!r)return;
-    b.disabled=true;b.textContent="…";const data=await audioStore.get(rid,r.w).catch(()=>null);b.disabled=false;
-    if(!data){b.textContent=r.w==="local"?"محفوظ على جهاز ثاني":"غير متاح";return}
-    const parts=recParts(data);if(!parts.length){b.textContent="الملف ما ينقرأ";return}
-    b.replaceWith(seqPlayer(parts,{autoplay:true,expect:r.s||0}))});
+    const t0=b.textContent;b.disabled=true;b.textContent="…";
+    const bl=await recBlob(id,rid,r,t=>{if(b.isConnected)b.textContent=t}).catch(()=>null);
+    const btn=b.isConnected?b:document.querySelector(`[data-play="${id}|${rid}"]`);if(btn){btn.disabled=false;btn.textContent=t0}
+    if(!bl){if(btn)btn.textContent=r.w==="local"?"محفوظ على جهاز ثاني":"غير متاح";return}
+    playNow(bl,`${label(BY_ID[id])} · ${REC_ST[r.st||"s"]}`)});
   root.querySelectorAll("[data-recdel]").forEach(b=>b.onclick=()=>{const [id,rid]=b.dataset.recdel.split("|"),r=(mk(id).recs||{})[rid];if(!r)return;
     if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟";setTimeout(()=>{b.dataset.sure="";b.textContent="حذف"},3000);return}
-    if(r.a)audioStore.del(rid,r.w);savePatch(id,{recs:{...(mk(id).recs||{}),[rid]:false}},{recs:{[rid]:false}})});
+    if(r.a){audioStore.del(rid,r.w);if(r.mp)audioStore.del(r.mp,r.mw||r.w)}savePatch(id,{recs:{...(mk(id).recs||{}),[rid]:false}},{recs:{[rid]:false}})});
   root.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{const [id,g]=b.dataset.rate.split("|");rate(id,g)});
   root.querySelectorAll("[data-pskip]").forEach(b=>b.onclick=()=>{st.prompt=null;st.tdraft=null;deferred=false;document.activeElement&&document.activeElement.blur&&document.activeElement.blur();render()});
 }
@@ -1646,8 +1658,8 @@ let fbAudioRef=null;
 function idb(){return new Promise((res,rej)=>{const r=indexedDB.open("uqu-audio",1);r.onupgradeneeded=()=>r.result.createObjectStore("a");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbDo(mode,fn){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction("a",mode);const r=fn(tx.objectStore("a"));tx.oncomplete=()=>res(r&&r.result);tx.onerror=()=>rej(tx.error)})}
 const audioStore={
-  async put(rid,data){if(fbAudioRef){await fbAudioRef.child(rid).set({d:data});return"fb"}await idbDo("readwrite",s=>s.put(data,rid));return"local"},
-  async get(rid,where){if(where==="fb"){if(!fbAudioRef)return null;const s=await fbAudioRef.child(rid).get();return s.exists()?s.val().d:null}
+  async put(rid,data){if(fbAudioRef){const C=7e6;if(data.length>C){const o={n:Math.ceil(data.length/C)};for(let i=0;i<o.n;i++)o["d"+i]=data.slice(i*C,(i+1)*C);await fbAudioRef.child(rid).set(o)}else await fbAudioRef.child(rid).set({d:data});return"fb"}await idbDo("readwrite",s=>s.put(data,rid));return"local"},
+  async get(rid,where){if(where==="fb"){if(!fbAudioRef)return null;const s=await fbAudioRef.child(rid).get();if(!s.exists())return null;const v=s.val();return v.n?Array.from({length:v.n},(_,i)=>v["d"+i]||"").join(""):v.d}
     return(await idbDo("readonly",s=>s.get(rid)))||null},
   async del(rid,where){try{if(where==="fb"&&fbAudioRef)await fbAudioRef.child(rid).remove();else await idbDo("readwrite",s=>s.delete(rid))}catch(e){}}
 };
@@ -1722,6 +1734,131 @@ async function fullPlay(blobs,btn){
   btn.onclick=stop;src[src.length-1].onended=()=>{if(ac.state!=="closed")stop()};
 }
 
+// ---------- 🛟 rescue: every AAC frame inside an MP4, whatever its index says ----------
+function mp4ToAdts(u){
+  const N=u.length,str=p=>String.fromCharCode(u[p],u[p+1],u[p+2],u[p+3]);
+  const U32=p=>((u[p]<<24)|(u[p+1]<<16)|(u[p+2]<<8)|u[p+3])>>>0;
+  if(N<16||str(4)!=="ftyp")return null;
+  const kids=(s,e)=>{const out=[];let p=s;while(p+8<=e){let sz=U32(p),h=8;const t=str(p+4);
+      if(sz===1){sz=U32(p+8)*4294967296+U32(p+12);h=16}else if(sz===0)sz=e-p;
+      if(sz<h){break}const end=Math.min(p+sz,e);out.push({t,s:p,b:p+h,e:end});if(p+sz>e)break;p+=sz}return out};
+  const find=(list,t)=>list.filter(x=>x.t===t);
+  // AudioSpecificConfig: esds → ES_Descriptor(3) → DecoderConfig(4) → DecoderSpecificInfo(5)
+  let asc=null;
+  for(let p=8;p<N-12&&!asc;p++){if(u[p]!==0x65||u[p+1]!==0x73||u[p+2]!==0x64||u[p+3]!==0x73)continue;
+    let q=p+8;const rd=()=>{let len=0;for(let i=0;i<4;i++){const c=u[q++];len=(len<<7)|(c&0x7F);if(!(c&0x80))break}return len};
+    if(u[q]===0x03){q++;rd();q+=2;const f=u[q++];if(f&0x80)q+=2;if(f&0x40)q+=1+u[q];if(f&0x20)q+=2}
+    if(u[q]===0x04){q++;rd();q+=13}
+    if(u[q]===0x05){q++;const len=rd();if(len>=2&&q+len<=N)asc=u.subarray(q,q+len)}}
+  if(!asc)return null;
+  const obj=asc[0]>>3,fi=((asc[0]&7)<<1)|(asc[1]>>7),ch=(asc[1]>>3)&15;
+  if(fi>12||ch<1||ch>7)return null;
+  const prof=Math.min(3,Math.max(0,(obj===5||obj===29?2:obj)-1));   // HE-AAC carries an LC core
+  const top=kids(0,N),frames=[];
+  // default sample size from moov/mvex/trex
+  let trexSize=0;find(top,"moov").forEach(mv=>find(kids(mv.b,mv.e),"mvex").forEach(mx=>find(kids(mx.b,mx.e),"trex").forEach(tx=>{trexSize=U32(tx.b+16)})));
+  // 1) fragments: moof → traf → tfhd/trun, data lives in the mdat that follows
+  for(let i=0;i<top.length;i++){const mf=top[i];if(mf.t!=="moof")continue;
+    const nextMdat=top.slice(i+1).find(x=>x.t==="mdat");
+    find(kids(mf.b,mf.e),"traf").forEach(tf=>{const tk=kids(tf.b,tf.e);let base=mf.s,defSize=trexSize,cursor=null;
+      find(tk,"tfhd").forEach(h=>{const fl=U32(h.b)&0xFFFFFF;let q=h.b+8;if(fl&1){base=U32(q)*4294967296+U32(q+4);q+=8}if(fl&2)q+=4;if(fl&8)q+=4;if(fl&0x10){defSize=U32(q);q+=4}});
+      find(tk,"trun").forEach(r=>{const fl=U32(r.b)&0xFFFFFF,cnt=U32(r.b+4);let q=r.b+8,pos;
+        if(fl&1){pos=base+(U32(q)|0);q+=4}else pos=cursor!=null?cursor:(nextMdat?nextMdat.b:base);
+        if(fl&4)q+=4;
+        for(let k=0;k<cnt;k++){if(fl&0x100)q+=4;let sz=defSize;if(fl&0x200){sz=U32(q);q+=4}if(fl&0x400)q+=4;if(fl&0x800)q+=4;
+          if(sz>0&&sz<8192&&pos+sz<=N)frames.push([pos,sz]);pos+=sz}
+        cursor=pos})})}
+  // 2) classic index: moov/trak/.../stbl (only when there were no fragments)
+  if(!frames.length)find(top,"moov").forEach(mv=>find(kids(mv.b,mv.e),"trak").forEach(tr=>{
+    const path=["mdia","minf","stbl"];let lv=kids(tr.b,tr.e);for(const t of path){const x=find(lv,t)[0];if(!x)return;lv=kids(x.b,x.e)}
+    const stsz=find(lv,"stsz")[0],stsc=find(lv,"stsc")[0],stco=find(lv,"stco")[0]||find(lv,"co64")[0];if(!stsz||!stsc||!stco)return;
+    const fixed=U32(stsz.b+4),cnt=U32(stsz.b+8),sizes=[];for(let k=0;k<cnt;k++)sizes.push(fixed||U32(stsz.b+12+k*4));
+    const co=[],nC=U32(stco.b+4),big=stco.t==="co64";for(let k=0;k<nC;k++)co.push(big?U32(stco.b+8+k*8)*4294967296+U32(stco.b+12+k*8):U32(stco.b+8+k*4));
+    const sc=[],nS=U32(stsc.b+4);for(let k=0;k<nS;k++)sc.push([U32(stsc.b+8+k*12),U32(stsc.b+12+k*12)]);
+    let si=0;for(let c=0;c<co.length&&si<sizes.length;c++){let per=0;for(const [first,n] of sc)if(c+1>=first)per=n;let pos=co[c];
+      for(let k=0;k<per&&si<sizes.length;k++){const sz=sizes[si++];if(sz>0&&pos+sz<=N)frames.push([pos,sz]);pos+=sz}}}));
+  if(!frames.length)return null;
+  const out=new Uint8Array(frames.reduce((a,f)=>a+f[1]+7,0));let o=0;
+  for(const [p,sz] of frames){const L=sz+7;
+    out[o]=0xFF;out[o+1]=0xF1;out[o+2]=(prof<<6)|(fi<<2)|(ch>>2);out[o+3]=((ch&3)<<6)|(L>>11);out[o+4]=(L>>3)&0xFF;out[o+5]=((L&7)<<5)|0x1F;out[o+6]=0xFC;
+    out.set(u.subarray(p,p+sz),o+7);o+=L}
+  return out;
+}
+const AAC_RATES=[96000,88200,64000,48000,44100,32000,24000,22050,16000,12000,11025,8000,7350];
+function adtsSec(a){let p=0,n=0,fi=-1;while(p+7<=a.length&&a[p]===0xFF&&(a[p+1]&0xF0)===0xF0){const L=((a[p+3]&3)<<11)|(a[p+4]<<3)|(a[p+5]>>5);if(L<7)break;if(fi<0)fi=(a[p+2]>>2)&15;n++;p+=L}return fi>=0&&fi<13?n*1024/AAC_RATES[fi]:0}
+// decode anything the browser can read into 16 kHz mono
+async function decode16(blob){
+  const OAC=window.OfflineAudioContext||window.webkitOfflineAudioContext,ctx=new OAC(1,16000,16000),ab=await blob.arrayBuffer();
+  const buf=await new Promise((res,rej)=>{const p=ctx.decodeAudioData(ab,res,rej);if(p&&p.then)p.then(res,rej)});
+  const n=buf.length,c=buf.numberOfChannels,out=new Float32Array(n);
+  for(let k=0;k<c;k++){const d=buf.getChannelData(k);for(let i=0;i<n;i++)out[i]+=d[i]/c}return out;
+}
+function encodeWav(pcm,rate){const n=pcm.length,v=new DataView(new ArrayBuffer(44+n*2)),w=(o,s)=>{for(let i=0;i<4;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  w(0,"RIFF");v.setUint32(4,36+n*2,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){const s=Math.max(-1,Math.min(1,pcm[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7FFF,true)}return new Blob([v.buffer],{type:"audio/wav"})}
+let lameP=null;
+function loadLame(){if(window.lamejs&&window.lamejs.Mp3Encoder)return Promise.resolve(true);
+  if(!lameP)lameP=loadScript("https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js").catch(()=>loadScript("https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js")).then(()=>!!(window.lamejs&&window.lamejs.Mp3Encoder)).catch(()=>false).then(ok=>{if(!ok)lameP=null;return ok});
+  return lameP}
+// small MP3 when the encoder loads and the result checks out; otherwise a plain WAV (always works)
+async function encodeSmall(pcm){
+  try{if(await loadLame()){const enc=new lamejs.Mp3Encoder(1,16000,32),out=[],B=1152*16,i16=new Int16Array(pcm.length);
+      for(let i=0;i<pcm.length;i++){const s=Math.max(-1,Math.min(1,pcm[i]));i16[i]=s<0?s*0x8000:s*0x7FFF}
+      for(let i=0;i<i16.length;i+=B){const b=enc.encodeBuffer(i16.subarray(i,i+B));if(b.length)out.push(new Uint8Array(b.buffer,b.byteOffset,b.length).slice());if(i%(B*32)===0)await new Promise(r=>setTimeout(r,0))}
+      const e=enc.flush();if(e.length)out.push(new Uint8Array(e.buffer,e.byteOffset,e.length).slice());
+      const mp3=new Blob(out,{type:"audio/mpeg"}),chk=await decode16(mp3).catch(()=>null);
+      if(chk&&Math.abs(chk.length-pcm.length)<16000*1.5)return{blob:mp3,fmt:"mp3"}}}catch(e){}
+  return{blob:encodeWav(pcm,16000),fmt:"wav"};
+}
+// one continuous file from several parts
+async function mergeParts(blobs){
+  const bytes=await Promise.all(blobs.map(b=>b.arrayBuffer().then(x=>new Uint8Array(x))));
+  // AAC (Safari): join the raw frames, no re-encoding and no quality loss
+  const ad=bytes.map(u=>{try{return mp4ToAdts(u)}catch(e){return null}});
+  if(ad.length&&ad.every(a=>a&&a.length>7)&&ad.every(a=>a[2]===ad[0][2]&&(a[3]>>6)===(ad[0][3]>>6))){
+    const all=new Uint8Array(ad.reduce((s,a)=>s+a.length,0));let o=0;ad.forEach(a=>{all.set(a,o);o+=a.length});
+    return{blob:new Blob([all],{type:"audio/aac"}),fmt:"aac",sec:adtsSec(all)}}
+  // anything else (Chrome/Opus): decode, join, encode once
+  const pcms=[];for(const b of blobs){try{pcms.push(await decode16(b))}catch(e){}}
+  if(!pcms.length)return null;
+  const pcm=new Float32Array(pcms.reduce((s,x)=>s+x.length,0));let o=0;pcms.forEach(x=>{pcm.set(x,o);o+=x.length});
+  const e=await encodeSmall(pcm);return{...e,sec:pcm.length/16000};
+}
+// a player with the usual controls plus ⏪ 5 / 5 ⏩
+function audioPlayer(blob,opt={}){
+  const w=document.createElement("div");w.className="aplayer";
+  const a=document.createElement("audio");a.controls=true;a.preload="metadata";a.src=URL.createObjectURL(blob);
+  const row=document.createElement("div");row.className="aseek";
+  row.innerHTML=`<button class="btn sm" data-sk="-5" aria-label="رجوع 5 ثواني">⏪ 5</button><button class="btn sm" data-sk="5" aria-label="تقديم 5 ثواني">5 ⏩</button>`;
+  row.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>{const d=+b.dataset.sk,end=isFinite(a.duration)?a.duration:a.currentTime+Math.max(0,d);a.currentTime=Math.max(0,Math.min(end,a.currentTime+d))});
+  w.append(a,row);w.audio=a;if(opt.autoplay)a.play().catch(()=>{});return w;
+}
+// what to play for a saved recording: new ones are already one file; older ones get merged / rescued once
+async function recBlob(id,rid,r,say){
+  if(r.mp){const d=await audioStore.get(r.mp,r.mw||r.w).catch(()=>null),p=recParts(d);if(p.length)return p[0]}
+  const data=await audioStore.get(rid,r.w).catch(()=>null);if(!data)return null;
+  const parts=recParts(data);if(!parts.length)return null;
+  if(r.fmt)return parts[0];
+  say&&say("⏳ أجهّز التسجيل…");
+  let m=null;
+  try{if(parts.length>1)m=await mergeParts(parts);
+    else{const a=mp4ToAdts(new Uint8Array(await parts[0].arrayBuffer()));if(a&&a.length>7)m={blob:new Blob([a],{type:"audio/aac"}),fmt:"aac",sec:adtsSec(a)}}}catch(e){m=null}
+  if(!m)return parts[0];
+  // keep the original untouched; store the rescued copy beside it
+  try{const mid=rid+"m",w=await audioStore.put(mid,await blobToDataURL(m.blob)),cur=(mk(id).recs||{})[rid]||r,nr={...cur,mp:mid,mw:w,fx:Math.round(m.sec)};
+    savePatch(id,{recs:{...(mk(id).recs||{}),[rid]:nr}},{recs:{[rid]:nr}})}catch(e){}
+  if(r.s&&m.sec>=r.s-3)toast(`رجّعت التسجيل كامل ✓ ${mmss(m.sec)}`);
+  else if(r.s&&m.sec<r.s-3)toast(`رجّعت ${mmss(m.sec)} من ${mmss(r.s)}، والباقي ما انحفظ في الملف أصلًا`);
+  return m.blob;
+}
+
+function playNow(blob,title){
+  const box=$("#nowPlay"),old=box.querySelector("audio");if(old)old.pause();
+  box.hidden=false;document.body.classList.add("has-np");
+  box.innerHTML=`<div class="np-t"><span>🎧</span><b class="en" dir="auto">${esc(title)}</b><button class="np-x" aria-label="إغلاق المشغّل">×</button></div>`;
+  const p=audioPlayer(blob,{autoplay:true});box.append(p);
+  box.querySelector(".np-x").onclick=()=>{p.audio.pause();box.hidden=true;box.innerHTML="";document.body.classList.remove("has-np")};
+}
 // stage: s = right after studying, r1 / r2 = while reviewing, x = anything extra
 const REC_ST={s:"بعد المذاكرة",r1:"المراجعة الأولى",r2:"المراجعة الثانية",x:"تسجيل إضافي"};
 const hasRec=(id,stg)=>recsOf(id).some(r=>(r.st||"s")===stg);
@@ -1732,7 +1869,7 @@ function sheetSummary(id,stage){
     r1:["🔁","تسجيل المراجعة الأولى","وش تتذكر منها الحين؟ قارنه بأول تسجيل وشوف وش زاد."],
     r2:["🔁","تسجيل المراجعة الثانية","اشرحها كأنك تشرحها لزميلك، بدون ما تشوف السلايدات."],
     x:["🎙️","تسجيل إضافي","أي فكرة أو ربط جديد تبي تضيفه لسجل المحاضرة."]}[stage];
-  let stream=null,rec=null,type="",segs=[],tick=null,think=stage==="s"?30:10,recMs=0,segAt=0,paused=false,stopping=false;
+  let stream=null,rec=null,type="",segs=[],one=null,tick=null,think=stage==="s"?30:10,recMs=0,segAt=0,paused=false,stopping=false;
   const recSec=()=>(recMs+(segAt&&!paused?Date.now()-segAt:0))/1000;
   const canRec=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
   // ask for the mic now, inside the tap, so the browser allows it
@@ -1761,7 +1898,11 @@ function sheetSummary(id,stage){
     $("#stopRec").onclick=finish;
   };
   async function finish(){if(stopping||!rec)return;stopping=true;clearInterval(tick);if(segAt&&!paused){recMs+=Date.now()-segAt;segAt=0}
-    act.innerHTML="";await endPart();showReview()}
+    act.innerHTML="";await endPart();
+    stg.innerHTML=`<div class="ring wait"><small>${segs.length>1?"⏳ أدمج الأجزاء في ملف واحد…":"⏳ لحظة…"}</small></div>`;one=null;
+    if(segs.length>1){try{one=await mergeParts(segs)}catch(e){one=null}}
+    else if(segs.length===1)one={blob:segs[0],fmt:((segs[0].type||"audio/mp4").split("/")[1]||"mp4").split(";")[0],sec:recMs/1000};
+    showReview()}
   async function startRec(){
     clearInterval(tick);
     stg.innerHTML=`<div class="ring wait"><small>جاري تجهيز المايك…</small></div>`;act.innerHTML="";
@@ -1776,11 +1917,11 @@ function sheetSummary(id,stage){
   }
   function showReview(){
     clearInterval(tick);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
-    stg.innerHTML="";if(segs.length)stg.append(seqPlayer(segs));
-    const n=document.createElement("p");n.className="sh-note";n.textContent=`${mmss(recMs/1000)}${segs.length>1?` · ${cnt(segs.length,"جزء","جزئين","أجزاء")} تنشغل ورا بعض`:""}`;stg.append(n);
+    stg.innerHTML="";if(one)stg.append(audioPlayer(one.blob));else if(segs.length)stg.append(seqPlayer(segs));
+    const n=document.createElement("p");n.className="sh-note";n.textContent=`${mmss(recMs/1000)}${segs.length>1?(one?" · دمجت الأجزاء في ملف واحد ✓":` · ${cnt(segs.length,"جزء","جزئين","أجزاء")} تنشغل ورا بعض`):""}`;stg.append(n);
     act.innerHTML=`<button class="btn primary big" id="saveSum">حفظ في سجل المحاضرة</button><button class="btn" id="redo">إعادة التسجيل</button>`;
     $("#saveSum").onclick=save;
-    $("#redo").onclick=async()=>{segs=[];stream=await navigator.mediaDevices.getUserMedia({audio:true}).catch(()=>null);startRec()};
+    $("#redo").onclick=async()=>{segs=[];one=null;stream=await navigator.mediaDevices.getUserMedia({audio:true}).catch(()=>null);startRec()};
   }
   async function save(){
     const text=($("#sumT").value||"").trim();
@@ -1788,9 +1929,10 @@ function sheetSummary(id,stage){
     const btn=$("#saveSum");if(btn){btn.disabled=true;btn.textContent="جاري الحفظ…"}
     const rid="r"+Date.now().toString(36),meta={d:todayISO,at:Date.now(),st:stage,s:Math.round(recMs/1000)||0,t:text||false,a:false,w:false};
     if(segs.length){
-      try{if(segs.reduce((a,x)=>a+x.size,0)>9e6)throw new Error("big");
-        const parts=[];for(const x of segs)parts.push(await blobToDataURL(x));
-        meta.w=await audioStore.put(rid,parts.length===1?parts[0]:JSON.stringify({segs:parts}));meta.a=true;if(parts.length>1)meta.n=parts.length}
+      try{let data;
+        if(one){if(one.blob.size>30e6)throw new Error("big");data=await blobToDataURL(one.blob);meta.fmt=one.fmt}
+        else{if(segs.reduce((a,x)=>a+x.size,0)>30e6)throw new Error("big");const parts=[];for(const x of segs)parts.push(await blobToDataURL(x));data=parts.length===1?parts[0]:JSON.stringify({segs:parts});if(parts.length>1)meta.n=parts.length}
+        meta.w=await audioStore.put(rid,data);meta.a=true}
       catch(e){toast("ما قدرت أحفظ الصوت، انحفظ النص بس");if(!text){if(btn){btn.disabled=false;btn.textContent="حفظ في سجل المحاضرة"}return}}
     }
     savePatch(id,{recs:{...(mk(id).recs||{}),[rid]:meta}},{recs:{[rid]:meta}});
@@ -1945,19 +2087,22 @@ function sheetPodcast(key){
     box.innerHTML=`<button class="ovx" aria-label="إغلاق">×</button><div class="sh-ic">🎧</div><h2 class="sh-t">بودكاست ${e.name}</h2>
       <p class="sh-s">${items.length?`${cnt(items.length,"ملخص","ملخصين","ملخصات")} · ≈ ${mmss(total)}`:"ما سجّلت ملخصات لمحاضرات هالاختبار للحين."}</p>
       ${cur?`<div class="podnow"><span class="sh-note">${i+1} من ${items.length}</span><b class="en">${esc(label(cur.b))}</b>${cur.r.t?`<p class="podt">${esc(cur.r.t)}</p>`:""}</div>
-      <div class="podctl"><button class="btn" id="pPrev">⏮</button><button class="btn primary big" id="pPlay">${playing?"⏸ إيقاف":"▶︎ تشغيل"}</button><button class="btn" id="pNext">⏭</button></div>`:""}
+      <div class="podctl"><button class="btn" id="pPrev" aria-label="المحاضرة السابقة">⏮</button><button class="btn sm" id="pBk" aria-label="رجوع 5 ثواني">⏪ 5</button><button class="btn primary big" id="pPlay">${playing?"⏸ إيقاف":"▶︎ تشغيل"}</button><button class="btn sm" id="pFw" aria-label="تقديم 5 ثواني">5 ⏩</button><button class="btn" id="pNext" aria-label="المحاضرة الجاية">⏭</button></div>`:""}
       ${knots.length?`<div class="podk"><div class="kh">🧩 عُقد الفهم اللي حليتها</div>${knots.map(k=>`<div class="kn ok"><span class="kt">${esc(k.t)}</span><span class="mini en">${esc(label(k.b))}</span></div>`).join("")}</div>`:""}`;
     box.querySelector(".ovx").onclick=closeSheet;
     if(!cur)return;
     box.querySelector("#pPlay").onclick=()=>{if(playing){stop();draw()}else{playing=true;playCur();draw()}};
     box.querySelector("#pPrev").onclick=()=>{stop();i=Math.max(0,i-1);playing=true;playCur();draw()};
     box.querySelector("#pNext").onclick=()=>{stop();next()};
+    box.querySelector("#pBk").onclick=()=>{if(audio)audio.currentTime=Math.max(0,audio.currentTime-5)};
+    box.querySelector("#pFw").onclick=()=>{if(audio)audio.currentTime=Math.min(isFinite(audio.duration)?audio.duration:audio.currentTime+5,audio.currentTime+5)};
   };
   const next=()=>{i++;if(i>=items.length){i=items.length-1;playing=false;draw();toast("خلص البودكاست 🎧");return}playing=true;playCur();draw()};
   async function playCur(){
     const cur=items[i];if(!cur)return;
     if(cur.r.a){const d=await audioStore.get(cur.r.k,cur.r.w).catch(()=>null);if(!playing)return;
-      const urls=recParts(d).map(x=>URL.createObjectURL(x));let k=0;
+      const one=await recBlob(cur.b.id,cur.r.k,cur.r).catch(()=>null);if(!playing)return;
+      const urls=one?[URL.createObjectURL(one)]:recParts(d).map(x=>URL.createObjectURL(x));let k=0;
       const playK=()=>{audio=new Audio(urls[k]);audio.onended=()=>{k++;if(!playing)return;if(k<urls.length)playK();else next()};audio.play().catch(()=>{playing=false;draw()})};
       if(urls.length){playK();return}}
     if(cur.r.t&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(cur.r.t);u.lang=/[؀-ۿ]/.test(cur.r.t)?"ar-SA":"en-US";u.onend=()=>{if(playing)next()};speechSynthesis.speak(u);return}
