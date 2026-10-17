@@ -559,6 +559,8 @@ body.has-sess{padding-bottom:96px}
 .achpage .achead,.achpage .achbody{text-align:start}
 .rel .rk{flex:none;width:22px;height:22px;border-radius:7px;background:var(--surface);display:grid;place-items:center;font-size:12px}
 .sleeppg .sl-ul li{cursor:pointer}
+/* v10: multi-part recordings */
+.seqp{display:flex;flex-direction:column;gap:4px;align-items:center;max-width:100%}.rec .seqp{align-items:flex-start}.seqi{font-size:11.5px;color:var(--muted)}
 /* v9: ledger, wake-up offers, recording pause, week swipe */
 .offerbar{position:fixed;z-index:45;top:max(8px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 24px));display:flex;align-items:center;gap:10px;overflow:hidden;
   background:linear-gradient(100deg,#FFB547,#FF7A45);color:#3A1600;border-radius:16px;padding:9px 12px;box-shadow:0 10px 28px rgb(255 122 69 / .35);font-size:13px}
@@ -1612,7 +1614,8 @@ function bindPrompts(root){
   root.querySelectorAll("[data-play]").forEach(b=>b.onclick=async()=>{const [id,rid]=b.dataset.play.split("|"),r=(mk(id).recs||{})[rid];if(!r)return;
     b.disabled=true;b.textContent="…";const data=await audioStore.get(rid,r.w).catch(()=>null);b.disabled=false;
     if(!data){b.textContent=r.w==="local"?"محفوظ على جهاز ثاني":"غير متاح";return}
-    const a=document.createElement("audio");a.controls=true;a.src=data;b.replaceWith(a);a.play().catch(()=>{})});
+    const parts=recParts(data);if(!parts.length){b.textContent="الملف ما ينقرأ";return}
+    b.replaceWith(seqPlayer(parts,{autoplay:true,expect:r.s||0}))});
   root.querySelectorAll("[data-recdel]").forEach(b=>b.onclick=()=>{const [id,rid]=b.dataset.recdel.split("|"),r=(mk(id).recs||{})[rid];if(!r)return;
     if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟";setTimeout(()=>{b.dataset.sure="";b.textContent="حذف"},3000);return}
     if(r.a)audioStore.del(rid,r.w);savePatch(id,{recs:{...(mk(id).recs||{}),[rid]:false}},{recs:{[rid]:false}})});
@@ -1672,6 +1675,53 @@ function sheetTime(id,chain,measured){
     h.focus();
   });
 }
+// ---------- 🔊 recordings are one or more parts (every pause closes a part), played back-to-back ----------
+// Safari breaks a single file that was paused and resumed (only the part before the pause plays),
+// so a pause now finishes the current part and «كمّل» starts a new one.
+function dataToBytes(d){const i=d.indexOf(","),head=d.slice(0,i),b64=d.slice(i+1),mime=(head.match(/data:([^;,]+)/)||[])[1]||"audio/mp4";
+  const bin=atob(b64),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);return{u,mime}}
+// older paused recordings may hold two files glued together: split them where the second file starts
+function splitGlued(u,mime){
+  const cuts=[0];
+  if(/webm|ogg/.test(mime)){for(let i=4;i<u.length-16;i++)if(u[i]===0x1A&&u[i+1]===0x45&&u[i+2]===0xDF&&u[i+3]===0xA3){for(let j=i+4;j<i+16;j++)if(u[j]===0x42&&u[j+1]===0x86){cuts.push(i);break}}}
+  else{for(let i=8;i<u.length-8;i++)if(u[i+4]===0x66&&u[i+5]===0x74&&u[i+6]===0x79&&u[i+7]===0x70){const sz=((u[i]<<24)|(u[i+1]<<16)|(u[i+2]<<8)|u[i+3])>>>0;if(sz>=8&&sz<=256)cuts.push(i)}}
+  return cuts.map((c,k)=>new Blob([u.subarray(c,cuts[k+1]??u.length)],{type:mime}));
+}
+function recParts(stored){
+  if(!stored||typeof stored!=="string")return[];
+  if(stored[0]==="{"){try{return(JSON.parse(stored).segs||[]).flatMap(recParts)}catch(e){return[]}}
+  try{const {u,mime}=dataToBytes(stored);return splitGlued(u,mime)}catch(e){return[]}
+}
+// plays the parts in order; if a file still reports less time than was recorded, offers a full decode
+function seqPlayer(blobs,opt={}){
+  const wrap=document.createElement("div");wrap.className="seqp";
+  const a=document.createElement("audio");a.controls=true;a.preload="metadata";
+  const info=document.createElement("small");info.className="seqi";
+  const urls=blobs.map(b=>URL.createObjectURL(b));let i=0,fixShown=false;
+  const load=(k,play)=>{i=k;a.src=urls[k];info.textContent=urls.length>1?`جزء ${k+1} من ${urls.length} · يكمل تلقائيًا`:"";if(play)a.play().catch(()=>{})};
+  a.onended=()=>{if(i+1<urls.length)load(i+1,true);else if(opt.onDone)opt.onDone()};
+  a.onloadedmetadata=()=>{if(fixShown||!opt.expect||urls.length>1)return;
+    if(isFinite(a.duration)&&a.duration>0&&opt.expect-a.duration>3){fixShown=true;const fb=document.createElement("button");fb.className="btn sm";fb.textContent="▶︎ التشغيل الكامل";
+      const note=document.createElement("small");note.className="seqi";note.textContent=`الملف يبيّن ${mmss(a.duration)} بس سجّلت ${mmss(opt.expect)}. جرّب التشغيل الكامل.`;
+      fb.onclick=()=>{a.pause();fullPlay(blobs,fb)};wrap.append(note,fb)}};
+  wrap.append(a);if(urls.length>1)wrap.append(info);
+  wrap.audio=a;load(0,!!opt.autoplay);
+  return wrap;
+}
+// decode everything and play it through Web Audio (rescues files whose length header is wrong)
+async function fullPlay(blobs,btn){
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC){btn.textContent="غير مدعوم هنا";return}
+  const ac=new AC();btn.disabled=true;btn.textContent="…";
+  const bufs=[];for(const bl of blobs){try{bufs.push(await ac.decodeAudioData(await bl.arrayBuffer()))}catch(e){}}
+  btn.disabled=false;
+  if(!bufs.length){btn.textContent="ما قدرت أشغّله";ac.close();return}
+  let t=ac.currentTime+.05;const src=bufs.map(b=>{const s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(t);t+=b.duration;return s});
+  const total=bufs.reduce((x,b)=>x+b.duration,0);
+  btn.textContent=`⏹ إيقاف · ${mmss(total)}`;
+  const stop=()=>{try{src.forEach(s=>s.stop())}catch(e){}ac.close();btn.textContent="▶︎ التشغيل الكامل";btn.onclick=()=>fullPlay(blobs,btn)};
+  btn.onclick=stop;src[src.length-1].onended=()=>{if(ac.state!=="closed")stop()};
+}
+
 // stage: s = right after studying, r1 / r2 = while reviewing, x = anything extra
 const REC_ST={s:"بعد المذاكرة",r1:"المراجعة الأولى",r2:"المراجعة الثانية",x:"تسجيل إضافي"};
 const hasRec=(id,stg)=>recsOf(id).some(r=>(r.st||"s")===stg);
@@ -1682,7 +1732,7 @@ function sheetSummary(id,stage){
     r1:["🔁","تسجيل المراجعة الأولى","وش تتذكر منها الحين؟ قارنه بأول تسجيل وشوف وش زاد."],
     r2:["🔁","تسجيل المراجعة الثانية","اشرحها كأنك تشرحها لزميلك، بدون ما تشوف السلايدات."],
     x:["🎙️","تسجيل إضافي","أي فكرة أو ربط جديد تبي تضيفه لسجل المحاضرة."]}[stage];
-  let stream=null,rec=null,chunks=[],tick=null,blob=null,url=null,think=stage==="s"?30:10,recMs=0,segAt=0,paused=false,stopping=false;
+  let stream=null,rec=null,type="",segs=[],tick=null,think=stage==="s"?30:10,recMs=0,segAt=0,paused=false,stopping=false;
   const recSec=()=>(recMs+(segAt&&!paused?Date.now()-segAt:0))/1000;
   const canRec=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
   // ask for the mic now, inside the tap, so the browser allows it
@@ -1693,19 +1743,25 @@ function sheetSummary(id,stage){
     <button class="sb-park inline" id="sumPark">💭 فرّغ فكرة</button>
     <details class="sh-type" id="typeBox"><summary>أو اكتب بدل الصوت</summary><textarea id="sumT" rows="3" maxlength="600" placeholder="اكتب ملخصك"></textarea></details>
     <div class="sh-act" id="sAct"></div>`,()=>{});
-  sheetCleanup=()=>{clearInterval(tick);try{if(rec&&rec.state!=="inactive")rec.stop()}catch(e){}if(stream)stream.getTracks().forEach(t=>t.stop());if(url)URL.revokeObjectURL(url)};
+  sheetCleanup=()=>{clearInterval(tick);try{if(rec&&rec.state!=="inactive")rec.stop()}catch(e){}if(stream)stream.getTracks().forEach(t=>t.stop())};
   const stg=$("#stage"),act=$("#sAct");$("#sumPark").onclick=openPark;
   const showThink=()=>{stg.innerHTML=`<div class="ring"><b class="num">${think}</b><small>ثانية للتفكير</small></div>`;
     act.innerHTML=`<button class="btn primary big" id="goRec">ابدأ التسجيل الحين</button><button class="btn" id="skipAll">تخطي</button>`;
     $("#goRec").onclick=startRec;$("#skipAll").onclick=()=>{closeSheet();toast("تمام ✓")}};
+  // each part is its own complete file, so it plays on every browser
+  const newPart=()=>{let r;try{r=new MediaRecorder(stream,type?{mimeType:type,audioBitsPerSecond:32000}:{audioBitsPerSecond:32000})}catch(e){r=new MediaRecorder(stream)}
+    const ch=[];r.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
+    r.done=new Promise(res=>{r.onstop=()=>{if(ch.length)segs.push(new Blob(ch,{type:r.mimeType||type||"audio/mp4"}));res()}});
+    r.start();return r};
+  const endPart=()=>{try{if(rec&&rec.state!=="inactive")rec.stop()}catch(e){}return rec?rec.done:Promise.resolve()};
   const drawRec=()=>{
-    const canPause=rec&&typeof rec.pause==="function";
     stg.innerHTML=`<div class="ring rec${paused?" paused":""}">${paused?`<span class="pz">⏸</span>`:`<span class="dot"></span>`}<b class="num" id="recT">${mmss(recSec())}</b><small>${paused?"موقوف مؤقتًا · كمّل متى ما تبي":"يسجّل… حدّك 5 دقايق"}</small></div>`;
-    act.innerHTML=`${canPause?`<button class="btn big" id="pzRec">${paused?"▶︎ كمّل التسجيل":"⏸ إيقاف مؤقت"}</button>`:""}<button class="btn primary big" id="stopRec">⏹ خلّصت</button>`;
-    if(canPause)$("#pzRec").onclick=()=>{try{if(paused){rec.resume();segAt=Date.now();paused=false}else{rec.pause();recMs+=Date.now()-segAt;segAt=0;paused=true}}catch(e){}drawRec()};
+    act.innerHTML=`<button class="btn big" id="pzRec">${paused?"▶︎ كمّل التسجيل":"⏸ إيقاف مؤقت"}</button><button class="btn primary big" id="stopRec">⏹ خلّصت</button>`;
+    $("#pzRec").onclick=()=>{if(stopping)return;if(paused){rec=newPart();segAt=Date.now();paused=false}else{recMs+=Date.now()-segAt;segAt=0;paused=true;endPart()}drawRec()};
     $("#stopRec").onclick=finish;
   };
-  function finish(){if(stopping||!rec)return;stopping=true;if(segAt&&!paused){recMs+=Date.now()-segAt;segAt=0}try{if(paused)rec.resume()}catch(e){}rec.stop()}
+  async function finish(){if(stopping||!rec)return;stopping=true;clearInterval(tick);if(segAt&&!paused){recMs+=Date.now()-segAt;segAt=0}
+    act.innerHTML="";await endPart();showReview()}
   async function startRec(){
     clearInterval(tick);
     stg.innerHTML=`<div class="ring wait"><small>جاري تجهيز المايك…</small></div>`;act.innerHTML="";
@@ -1714,28 +1770,27 @@ function sheetSummary(id,stage){
       stg.innerHTML=`<p class="sh-note">المايك غير متاح هنا${location.hostname.endsWith("claude.ai")||location.hostname.includes("claudeusercontent")?" (التسجيل الصوتي يشتغل من رابط GitHub)":""}. اكتب ملخصك تحت.</p>`;
       act.innerHTML=`<button class="btn primary big" id="saveSum">حفظ في سجل المحاضرة</button>`;$("#saveSum").onclick=save;$("#sumT").focus();return}
     const types=["audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"];
-    const type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||"";
-    try{rec=new MediaRecorder(stream,type?{mimeType:type,audioBitsPerSecond:32000}:{audioBitsPerSecond:32000})}catch(e){rec=new MediaRecorder(stream)}
-    chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-    rec.onstop=()=>{blob=new Blob(chunks,{type:rec.mimeType||type||"audio/mp4"});url=URL.createObjectURL(blob);showReview()};
-    rec.start();recMs=0;segAt=Date.now();paused=false;stopping=false;drawRec();
-    tick=setInterval(()=>{const s=recSec(),el=$("#recT");if(el)el.textContent=mmss(s);if(s>=300){finish();toast("وصلت 5 دقايق، وقّفته لك")}},250);
+    type=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||"";
+    segs=[];recMs=0;paused=false;stopping=false;rec=newPart();segAt=Date.now();drawRec();
+    tick=setInterval(()=>{const s=recSec(),el=$("#recT");if(el)el.textContent=mmss(s);if(s>=300&&!stopping){finish();toast("وصلت 5 دقايق، وقّفته لك")}},250);
   }
   function showReview(){
     clearInterval(tick);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
-    stg.innerHTML=`<audio controls src="${url}"></audio><p class="sh-note">${mmss(recMs/1000)}</p>`;
+    stg.innerHTML="";if(segs.length)stg.append(seqPlayer(segs));
+    const n=document.createElement("p");n.className="sh-note";n.textContent=`${mmss(recMs/1000)}${segs.length>1?` · ${cnt(segs.length,"جزء","جزئين","أجزاء")} تنشغل ورا بعض`:""}`;stg.append(n);
     act.innerHTML=`<button class="btn primary big" id="saveSum">حفظ في سجل المحاضرة</button><button class="btn" id="redo">إعادة التسجيل</button>`;
     $("#saveSum").onclick=save;
-    $("#redo").onclick=async()=>{blob=null;if(url)URL.revokeObjectURL(url);url=null;
-      stream=await navigator.mediaDevices.getUserMedia({audio:true}).catch(()=>null);startRec()};
+    $("#redo").onclick=async()=>{segs=[];stream=await navigator.mediaDevices.getUserMedia({audio:true}).catch(()=>null);startRec()};
   }
   async function save(){
     const text=($("#sumT").value||"").trim();
-    if(!blob&&!text){toast("سجّل أو اكتب ملخصك أول");return}
+    if(!segs.length&&!text){toast("سجّل أو اكتب ملخصك أول");return}
     const btn=$("#saveSum");if(btn){btn.disabled=true;btn.textContent="جاري الحفظ…"}
     const rid="r"+Date.now().toString(36),meta={d:todayISO,at:Date.now(),st:stage,s:Math.round(recMs/1000)||0,t:text||false,a:false,w:false};
-    if(blob){
-      try{if(blob.size>9e6)throw new Error("big");const data=await blobToDataURL(blob);meta.w=await audioStore.put(rid,data);meta.a=true}
+    if(segs.length){
+      try{if(segs.reduce((a,x)=>a+x.size,0)>9e6)throw new Error("big");
+        const parts=[];for(const x of segs)parts.push(await blobToDataURL(x));
+        meta.w=await audioStore.put(rid,parts.length===1?parts[0]:JSON.stringify({segs:parts}));meta.a=true;if(parts.length>1)meta.n=parts.length}
       catch(e){toast("ما قدرت أحفظ الصوت، انحفظ النص بس");if(!text){if(btn){btn.disabled=false;btn.textContent="حفظ في سجل المحاضرة"}return}}
     }
     savePatch(id,{recs:{...(mk(id).recs||{}),[rid]:meta}},{recs:{[rid]:meta}});
@@ -1902,7 +1957,9 @@ function sheetPodcast(key){
   async function playCur(){
     const cur=items[i];if(!cur)return;
     if(cur.r.a){const d=await audioStore.get(cur.r.k,cur.r.w).catch(()=>null);if(!playing)return;
-      if(d){audio=new Audio(d);audio.onended=()=>{if(playing)next()};audio.play().catch(()=>{playing=false;draw()});return}}
+      const urls=recParts(d).map(x=>URL.createObjectURL(x));let k=0;
+      const playK=()=>{audio=new Audio(urls[k]);audio.onended=()=>{k++;if(!playing)return;if(k<urls.length)playK();else next()};audio.play().catch(()=>{playing=false;draw()})};
+      if(urls.length){playK();return}}
     if(cur.r.t&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(cur.r.t);u.lang=/[؀-ۿ]/.test(cur.r.t)?"ar-SA":"en-US";u.onend=()=>{if(playing)next()};speechSynthesis.speak(u);return}
     timer=setTimeout(()=>{if(playing)next()},7000);
   }
