@@ -224,7 +224,8 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .related h3{font-size:12.5px;color:var(--muted);margin:0;font-weight:600}
 .rel{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:7px 10px;text-align:start;display:flex;gap:10px;align-items:center;font-size:13px}
 .rel i{width:8px;height:8px;border-radius:50%;background:var(--kc);flex:none}
-.rel .w{color:var(--muted);margin-inline-start:auto;white-space:nowrap;font-size:12px}
+.rel .w{color:var(--muted);margin-inline-start:auto;font-size:12px}
+.rel{flex-wrap:wrap;min-width:0}.rel>span{min-width:0;overflow-wrap:anywhere}
 
 .empty-state{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:28px 16px;text-align:center;color:var(--muted)}
 .empty-state b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
@@ -251,7 +252,7 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
   .gb .tt{overflow-wrap:break-word;word-break:normal;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto}
   .gb .dr{display:none}}
 @media (max-width:480px){.day .dn{font-size:11.5px}.head{gap:10px}.per{min-width:46px}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+html.lowmo *{animation:none!important;transition:none!important}
 /* v3: hours, collapsible panels, recall, completion, knots, prompts, pre-sleep */
 .per small{white-space:nowrap}
 .per b{font-size:14.5px}
@@ -321,6 +322,7 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,5vw,32px);l
 .panel .tasks{background:transparent;border:0;border-radius:0}
 .sdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .sdot.live{background:var(--s-study);box-shadow:0 0 0 3px var(--s-study-bg)}
+.sdot.off{background:#E0A21B;box-shadow:0 0 0 3px rgba(224,162,27,.22)}
 .tasks-head .sync{margin-inline-start:0}
 .dprog{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}.dprog b{color:var(--ink)}
 .sleep{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:linear-gradient(160deg,var(--k-lec-bg),var(--surface));display:flex;flex-direction:column;gap:8px}
@@ -364,7 +366,7 @@ html.noscroll,html.noscroll body{overflow:hidden}
 .sl-ul li.ok{color:var(--muted)}.sl-ul li.ok span:first-child{color:var(--s-study)}
 .sh-done{margin:0;font-weight:700;color:var(--s-study)}
 .sl-topic{font-size:24px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgb(0 0 0 / .25);max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:18px;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgb(0 0 0 / .25);max-width:calc(100% - 32px);width:max-content;text-align:center}
 .recs{display:flex;flex-direction:column;gap:6px}
 .kh.rh{color:var(--s-r3)}
 .rec{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:var(--bg);font-size:13px}
@@ -400,10 +402,15 @@ html.noscroll,html.noscroll body{overflow:hidden}
   background:var(--ink);color:var(--bg);border-radius:16px;padding:10px 12px;box-shadow:0 10px 30px rgb(0 0 0 / .3)}
 .sb-dot{width:10px;height:10px;border-radius:50%;background:#ff6b5e;animation:recdot 1.2s infinite;flex:none}
 .sb-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.sb-t b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sb-t .num{font-size:15px;opacity:.85}
+.sessbar{flex-wrap:wrap;row-gap:8px}.sb-t{flex:1 1 140px}.sb-t small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-btns{display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-inline-start:auto}
+@media (max-width:440px){.sb-btns{flex:1 1 100%;justify-content:space-between}.sb-btns .btn.primary{flex:1;justify-content:center}
+  body.has-sess{padding-bottom:150px!important}body.has-sess .nowplay{bottom:134px!important}body.has-sess .toast{bottom:140px!important}}
+@media (max-width:360px){.sb-btns{gap:5px}.sb-btns .sb-park{padding:8px 8px}.sb-btns .sb-x{padding:0 2px}.sessbar{padding:10px 10px}}
 .sb-park{border:0;background:rgb(255 255 255 / .14);color:inherit;border-radius:12px;padding:8px 10px;font-size:16px}
 .sb-park.inline{background:var(--surface-2);color:var(--ink);font-size:13px;font-weight:600}
 .sb-x{border:0;background:transparent;color:inherit;font-size:20px;padding:0 4px;opacity:.7}
-body.has-sess{padding-bottom:96px}
+body.has-sess{padding-bottom:96px}body.has-sess .toast{bottom:90px}
 .parkpop{position:fixed;z-index:70;left:50%;transform:translateX(-50%);top:max(16px,env(safe-area-inset-top,0px));width:min(520px,calc(100% - 24px));display:flex;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 12px 30px rgb(0 0 0 / .25)}
 .parkpop input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:9px 10px;font:inherit}
 .xppop{position:fixed;z-index:65;left:50%;top:40%;transform:translate(-50%,0);font:800 26px var(--f-display);color:var(--s-solve);text-shadow:0 2px 12px rgb(0 0 0 / .15);pointer-events:none}
@@ -441,7 +448,7 @@ body.has-sess{padding-bottom:96px}
 .badge .bic{font-size:28px}.badge b{font-size:13px}.badge small{font-size:11px;color:var(--muted)}.badge .pbar{max-width:none;width:100%}.bpr{font-size:11px;font-weight:700}
 .rws{display:flex;flex-direction:column;gap:6px}
 .rw{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:start}
-.rw.past{opacity:.7}.rwn{flex:1;font-size:13.5px}.rwc{font-size:12.5px;font-weight:700;white-space:nowrap}
+.rw.past{opacity:.7}.rwn{flex:1;font-size:13.5px;min-width:0;overflow-wrap:anywhere}.rw .btn{flex:none}.kt,.hc-t,.tlb,.lg-m{min-width:0;overflow-wrap:anywhere}.rwc{font-size:12.5px;font-weight:700;white-space:nowrap}
 .rwadd input{flex:1 1 120px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px 10px;font:inherit}
 .xpb{display:flex;flex-direction:column;gap:4px;text-align:start}
 .ladder{display:flex;flex-direction:column;gap:3px;font-size:12.5px;text-align:start}
@@ -451,7 +458,7 @@ body.has-sess{padding-bottom:96px}
 .confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit}
 .confetti i{position:absolute;top:-30px;left:var(--x);font-style:normal;font-size:18px;animation:fall var(--d) ease-in forwards;transform:rotate(var(--r))}
 @keyframes fall{to{transform:translateY(110vh) rotate(calc(var(--r) + 540deg));opacity:.2}}
-@media (prefers-reduced-motion:reduce){.confetti{display:none}}
+html.lowmo .confetti{display:none}
 @media (max-width:620px){.dayhead{flex-direction:column;align-items:stretch}.progress{width:100%}.pl{min-width:0}
 .grid{--rowh:36px;grid-template-columns:28px var(--dcols,repeat(5,minmax(0,1fr)))}.gr{display:none}}
 /* v7: ☰ pages, career tiles, month calendar, five-minute bar, smart day plan, edits */
@@ -718,7 +725,7 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
 .burst{position:fixed;left:50%;top:44%;z-index:66;pointer-events:none;width:0;height:0}
 .burst i{position:absolute;font-style:normal;font-size:16px;animation:burst .9s ease-out forwards}
 @keyframes burst{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r)) scale(1);opacity:0}}
-@media (prefers-reduced-motion:reduce){.bx,.boxpile .bp-e,.gcard.l::after,.gg.near .pbar>span{animation:none}.bx.shake{animation:none}.burst{display:none}}
+html.lowmo .bx,html.lowmo .boxpile .bp-e,html.lowmo .gcard.l::after,html.lowmo .gg.near .pbar>span{animation:none}html.lowmo .bx.shake{animation:none}html.lowmo .burst{display:none}
 
 /* ===== v14: hub · focus · clips · retrieval · receipt · records ===== */
 .hub{display:flex;flex-direction:column;gap:10px}.hub:empty{display:none}
@@ -737,7 +744,7 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
 .focus{position:fixed;inset:0;z-index:46;background:var(--bg);overflow:auto;padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .fx-box{max-width:560px;margin-inline:auto;min-height:100%;display:flex;flex-direction:column;gap:12px}
 .fx-top{display:flex;align-items:center;gap:10px}.fx-t{flex:1;min-width:0;display:flex;flex-direction:column;text-align:center;line-height:1.3}.fx-t b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fx-t small{color:var(--muted);font-size:12px}
-.fx-ic{flex:none;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:18px;padding:0}
+.fx-r{display:flex;gap:6px}.fx-ic{flex:none;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:18px;padding:0}
 .fx-dots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}.fx-dots i{width:22px;height:6px;border-radius:99px;background:var(--surface-2)}
 .fx-dots i.e{background:var(--s-study)}.fx-dots i.m{background:#E3A008}.fx-dots i.h{background:var(--k-exam)}.fx-dots i.cur{outline:2px solid var(--s-solve);outline-offset:2px}
 .fx-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding-block:8px 20px}
@@ -748,7 +755,7 @@ details.card[open] .chev{transform:rotate(180deg)}.panels{display:flex;flex-dire
 .fx-prompt{font-size:17px;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;max-width:460px}
 .focus textarea,.cs-ta{width:min(460px,100%);border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:10px;font:inherit;font-size:14px;resize:vertical}
 .fx-keys{display:flex;flex-direction:column;gap:6px;width:min(460px,100%)}
-.fx-key{display:flex;gap:10px;align-items:flex-start;text-align:start;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 11px;font-size:14px}.fx-key.on{border-color:var(--s-study);background:var(--s-study-bg)}
+.fx-box,.ovbox{overflow-wrap:anywhere}.fx-key{display:flex;gap:10px;align-items:flex-start;text-align:start;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 11px;font-size:14px}.fx-key.on{border-color:var(--s-study);background:var(--s-study-bg)}
 .fx-rate{display:flex;gap:6px;width:min(460px,100%)}.fx-rate .rt{flex:1;padding:10px 6px;font-weight:700}.fx-rate .rt.sug{outline:3px solid var(--s-solve);outline-offset:2px}
 .fx-gain{margin:0;font-size:15px;font-weight:700;color:var(--s-solve)}
 .fx-cd{display:flex;flex-direction:column;align-items:center}.fx-cd b{font-size:44px;line-height:1;color:var(--s-solve)}.fx-cd small{color:var(--muted);font-size:12px}
@@ -776,7 +783,7 @@ details.warm{width:100%;max-width:460px;text-align:start;background:var(--surfac
 .prt{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;background:var(--surface)}
 .prt .pri{font-size:22px}.prt b{font-size:15px}.prt small{font-size:11px;color:var(--muted)}.prt.none{opacity:.55}
 .tcheck.play.lock{font-size:14px}
-@media (prefers-reduced-motion:reduce){.fx-cd b{transition:none}}
+html.lowmo .fx-cd b{transition:none}
 
 /* v15: three-tap gift */
 .bx.tapped{animation:none}.bx.wig{animation:bxwig .32s ease-out}
@@ -791,7 +798,33 @@ details.warm{width:100%;max-width:460px;text-align:start;background:var(--surfac
 @keyframes bxflash{0%{opacity:0}25%{opacity:.75}100%{opacity:0}}
 .scr-ic.pop{animation:icpop .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes icpop{0%{transform:scale(.2)}100%{transform:scale(1)}}
-@media (prefers-reduced-motion:reduce){.bx.wig,.bx-flash.go,.scr-ic.pop{animation:none}.bx .bx-e{transition:none}}
+html.lowmo .bx.wig,html.lowmo .bx-flash.go,html.lowmo .scr-ic.pop{animation:none}html.lowmo .bx .bx-e{transition:none}
+
+/* v16: stronger motion */
+.burst.at{position:fixed;width:0;height:0;z-index:66;pointer-events:none}
+.burst.at i{position:absolute;font-style:normal;animation:burst2 1.1s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes burst2{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}70%{opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy) + 40px)) rotate(var(--r)) scale(1.1);opacity:0}}
+.flashscr{position:fixed;inset:0;z-index:64;pointer-events:none;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--tc) 85%,#fff),transparent 70%);animation:flashscr .65s ease-out forwards}
+@keyframes flashscr{0%{opacity:0}20%{opacity:.85}100%{opacity:0}}
+.shk1{animation:shk 0.35s}.shk2{animation:shk2 0.38s}.shk3{animation:shk3 0.42s}
+@keyframes shk{20%,60%{transform:translateX(-3px)}40%,80%{transform:translateX(3px)}}
+@keyframes shk2{20%,60%{transform:translate(-6px,2px)}40%,80%{transform:translate(6px,-2px)}}
+@keyframes shk3{15%,55%{transform:translate(-10px,3px) rotate(-1deg)}35%,75%{transform:translate(10px,-3px) rotate(1deg)}}
+.bx .bx-e.squash{animation:squash .32s ease-out}
+@keyframes squash{0%{translate:0 0;scale:1 1}30%{scale:1.18 .82}60%{scale:.9 1.12;translate:0 -10px}100%{scale:1 1;translate:0 0}}
+.rays{position:absolute;left:50%;top:150px;width:520px;height:520px;margin:-260px 0 0 -260px;pointer-events:none;z-index:0;opacity:.5;
+  background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--tc) 60%,transparent) 0deg 10deg,transparent 10deg 24deg);
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 62%);mask:radial-gradient(circle,#000 18%,transparent 62%);animation:rays 9s linear infinite}
+@keyframes rays{to{transform:rotate(360deg)}}
+#bxS3{position:relative}#bxS3>*:not(.rays){position:relative;z-index:1}
+.scr-ic.big.pop{font-size:84px;animation:icpop2 .7s cubic-bezier(.34,1.8,.64,1)}
+@keyframes icpop2{0%{transform:scale(.1) rotate(-30deg)}60%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+.bx-pts.popnum{animation:popnum .45s cubic-bezier(.34,1.8,.64,1)}
+@keyframes popnum{50%{transform:scale(1.35)}}
+html.lowmo .burst.at,html.lowmo .flashscr,html.lowmo .rays{display:none}html.lowmo .shk1,html.lowmo .shk2,html.lowmo .shk3,html.lowmo .bx .bx-e.squash{animation:none}
+
+.reasons{display:flex;flex-direction:column;gap:8px;width:100%;max-width:360px}.reasons .rsn{justify-content:center;padding:12px;font-size:15px}.reasons .rsn small{color:var(--s-study);font-weight:800}
+.rsn-new{width:100%;max-width:360px;text-align:start}.rsn-new summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13px;text-align:center}.rsn-new .frow{margin-top:8px}.rsn-new .fin{flex:1;margin:0}
 </style>
 
 </head>
@@ -1189,19 +1222,26 @@ details.warm{width:100%;max-width:460px;text-align:start;background:var(--surfac
       <label class="chk"><input type="checkbox" id="rsKeep"> احتفظ بتعديلات الجدول (الأسماء والأوقات والمحاضرات المضافة)</label>
       <button class="btn dangerbtn" id="rsBtn">امسح كل بياناتي</button>
     </section>
+    <section class="rpage"><div class="rp-h"><b>📦 نسخة احتياطية</b></div>
+      <p class="note" style="margin:0">ملف صغير فيه كل سجلاتك (المذاكرة والمراجعات والنقاط والمقاطع والأفكار والمكافآت). احفظه في الملفات أو iCloud، وترجّع منه أي وقت. التسجيلات الصوتية ما تدخل فيه.</p>
+      <div class="frow"><button class="btn sm" id="bkDown">⬇️ نزّل نسخة</button><button class="btn sm" id="bkUp">📥 رجّع من نسخة</button><input type="file" id="bkFile" accept=".json,application/json" hidden></div>
+      <p class="note" id="bkUndo" style="margin:0" hidden></p>
+    </section>
     <section class="rpage"><div class="rp-h"><b>🔍 فحص تسجيلاتي</b></div>
       <p class="note" style="margin:0">يفحص كل تسجيل: كم سجّلت وكم فعلًا موجود في الملف، ويصلّح اللي ينفع.</p>
       <button class="btn" id="rcBtn" style="align-self:flex-start">🔍 افحص تسجيلاتي</button></section>
     <section class="rpage"><div class="rp-h"><b>🎧 صوت التركيز</b></div>
-      <p class="note" style="margin:0">يشتغل تلقائيًا مع بداية جلسة المذاكرة (ومع مؤقت 5 دقايق)، ويوقف مع نهايتها أو الاستراحة. لأنه ما ينسمع إلا وقت المذاكرة، مع التكرار يصير دماغك يدخل جو التركيز أول ما يسمعه.</p>
+      <p class="note" style="margin:0">يشتغل تلقائيًا مع بداية جلسة المذاكرة (ومع مؤقت 5 دقايق)، ويوقف مع نهايتها أو الإيقاف المؤقت. تكتمه وترجّعه من زر 🔊 في شريط الجلسة تحت، أو من شاشة القفل. لأنه ما ينسمع إلا وقت المذاكرة، مع التكرار يصير دماغك يدخل جو التركيز أول ما يسمعه.</p>
       <div class="seg sm" role="group" aria-label="صوت التركيز" id="fsndSeg"><button data-fsnd="brown">🟤 Brown noise</button><button data-fsnd="rain">🌧️ مطر</button><button data-fsnd="off">🔇 بدون</button></div>
       <button class="btn sm" id="fsndTest" style="align-self:flex-start">▶ اسمعه 3 ثواني</button></section>
     <section class="rpage"><div class="rp-h"><b>🔊 الأصوات والاهتزاز</b></div>
       <p class="note" style="margin:0">أصوات خفيفة لما تخلّص مهمة وتفتح صندوق. الإعداد هذا لهذا الجهاز بس.</p>
       <label class="chk"><input type="checkbox" id="sfxOn"> أصوات الإنجاز والصناديق</label>
-      <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز (يشتغل على أغلب جوالات Android، ما يشتغل على الآيباد والآيفون)</label>
+      <label class="chk"><input type="checkbox" id="sfxMed"> شغّل الأصوات حتى لو الآيباد صامت (ممكن توقف الموسيقى اللي شغّالة وقتها)</label>
+      <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
+      <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">15</b> · الهدية بثلاث ضغطات 🎁 ومراجعة شاملة للموقع</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">17</b> · مزامنة تدمج بدل ما تضيّع 🔀 ونسخة احتياطية 📦</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1286,7 +1326,7 @@ const dayWord=n=>n===1?"يوم":n===2?"يومين":n<=10?`${n} أيام`:`${n} �
 // ---------- clock: 8–12 then a one-hour break, 1 pm onwards; one hour per slot ----------
 const slotStart=p=>p<=4?7+p:8+p, slotEnd=p=>p<=4?8+p:9+p;
 // a lecture can be moved: marks[id].mv = "YYYY-MM-DD|startSlot"
-const mvOf=b=>{const v=(S.marks[b.id]||{}).mv;if(!v||typeof v!=="string")return null;const [d,f,t]=v.split("|");return{d,f:+f||0,t:+t||0}};
+const mvOf=b=>{const v=(S.marks[b.id]||{}).mv;if(!v||typeof v!=="string")return null;const [d,f,t]=v.split("|");return isISO(d)?{d,f:+f||0,t:+t||0}:null};
 const effFrom=b=>{const m=mvOf(b);return m&&b.from&&m.f?m.f:b.from};
 const effTo=b=>{if(!b.from)return 0;const m=mvOf(b);if(m&&m.f)return m.t>=m.f?m.t:m.f+(b.to-b.from);return b.to};
 const tStart=b=>slotStart(effFrom(b)), tEnd=b=>slotEnd(effTo(b));
@@ -1335,69 +1375,191 @@ const MARKS=[
   {f:"ankiS",ar:"حليت أسئلة ANKI",short:"حل ANKI",c:"solve"},
 ];
 const LS="uqu-state-v2";
+// top-level fields that sync like the daily cap
+const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons"];
+// ---------- 🛡️ whatever comes from storage or another device is checked before it's used (a broken value can't take the page down) ----------
+const isISO=v=>typeof v==="string"&&/^\d{4}-\d\d-\d\d$/.test(v)&&!isNaN(Date.parse(v+"T12:00:00Z"));
+const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
+const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards"],
+  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg"],MK_OBJ=["knots","recs","pre"];
+function cleanMark(m){
+  if(!isObj(m))return null;
+  MK_DATE.forEach(f=>{const v=m[f];if(v==null||v===false||isISO(v))return;
+    if(typeof v==="number"&&isFinite(v)&&v>1e12)m[f]=isoOf(new Date(v));else if(typeof v==="string"&&isISO(v.slice(0,10)))m[f]=v.slice(0,10);else delete m[f]});
+  MK_NUM.forEach(f=>{const v=m[f];if(v==null||v===false)return;if(typeof v==="string"&&v.trim()!==""&&isFinite(+v))m[f]=+v;else if(typeof v!=="number"||!isFinite(v))delete m[f]});
+  if(m.mins!=null&&m.mins!==false&&!(m.mins>=1&&m.mins<=1440))delete m.mins;
+  if(m.cards!=null&&m.cards!==false&&!(m.cards>=1&&m.cards<=5000))delete m.cards;
+  if(+m.acc<0)m.acc=0;
+  MK_STR.forEach(f=>{const v=m[f];if(v!=null&&v!==false&&typeof v!=="string")delete m[f]});
+  MK_OBJ.forEach(f=>{const v=m[f];if(v!=null&&v!==false&&!isObj(v))delete m[f]});
+  if(isObj(m.knots))for(const k in m.knots){const x=m.knots[k];if(x&&(!isObj(x)||!isISO(x.c)||typeof x.t!=="string"))m.knots[k]=false}
+  if(isObj(m.recs))for(const k in m.recs){const x=m.recs[k];if(x&&(!isObj(x)||!isISO(x.d)))m.recs[k]=false}
+  if(isObj(m.pre)&&m.pre.d!=null&&m.pre.d!==false&&!isISO(m.pre.d))delete m.pre;
+  return m;
+}
+const BAD_K=new Set(["__proto__","constructor","prototype"]);
+const TOP_NUM=["pts","cap","since","nap","thin"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons"];
+function cleanS(o){
+  if(!isObj(o))o={marks:{}};
+  if(!isObj(o.marks))o.marks={};
+  for(const id in o.marks){const m=BAD_K.has(id)?null:cleanMark(o.marks[id]);if(m)o.marks[id]=m;else delete o.marks[id]}
+  TOPF.forEach(f=>{let v=o[f];if(v==null||v===false)return;
+    if(TOP_NUM.includes(f)){if(typeof v==="string"&&v.trim()&&isFinite(+v))v=o[f]=+v;if(typeof v!=="number"||!isFinite(v))delete o[f];return}
+    if(TOP_JSON.includes(f)){if(typeof v==="object")o[f]=JSON.stringify(v);else if(typeof v!=="string")delete o[f];return}
+    if(typeof v!=="string")delete o[f]});
+  if(o.pts!=null&&!(o.pts>=3&&o.pts<=30))delete o.pts;
+  return o;
+}
 let S={marks:{}};
-try{const r=JSON.parse(localStorage.getItem(LS)||"null");if(r&&r.marks)S=r;
-  else{const old=JSON.parse(localStorage.getItem("uqu-done")||"null");if(old)for(const id in old)S.marks[id]={studied:todayISO}}}catch(e){}
+try{const r=JSON.parse(localStorage.getItem(LS)||"null");if(r&&r.marks)S=cleanS(r);
+  else{const old=JSON.parse(localStorage.getItem("uqu-done")||"null");if(isObj(old))for(const id in old)S.marks[id]={studied:todayISO}}}catch(e){S={marks:{}}}
 let LV=0;   // bumps on every change so the ledger recomputes
-const cache=()=>{LV++;try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+let quotaWarned=false;
+const cache=()=>{LV++;try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){if(!quotaWarned){quotaWarned=true;setTimeout(()=>toast("⚠️ ذاكرة المتصفح ممتلئة، بعض التغييرات ما تنحفظ على هالجهاز. المزامنة تحفظها لك."),50)}}};
 const mk=id=>S.marks[id]||{};
 const isDone=b=>!!mk(b.id).studied;
-const knotsOf=id=>Object.entries(mk(id).knots||{}).filter(([k,v])=>v&&typeof v==="object").map(([k,v])=>({k,...v}));
+const knotsOf=id=>Object.entries(mk(id).knots||{}).filter(([k,v])=>isObj(v)&&isISO(v.c)).map(([k,v])=>({k,...v}));
 const openKnots=id=>knotsOf(id).filter(x=>!x.d);
 
 // ---------- sync: claude.ai db (artifact) → Firebase (GitHub) → this device only ----------
-let remote=null,remoteExists=false,merged=false,live=false,syncErr="",epochPush=false;
-const pending={};const jobs=[];let busy=false;
+// Every change waits in a small queue (kept on the device) until the server has it. Nothing is written before a fresh
+// copy of the server has arrived, so a «start over» made on another device always beats old leftovers, and lists that
+// two devices changed at the same time are merged item by item instead of one overwriting the other.
+let remote=null,remoteExists=false,merged=false,live=false,syncErr="",epochPush=false,canW=false,resetPend=null,fbOn=null;
+const pending={},pendingTop={};const jobs=[];let busy=false,flushQ=false;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const offErr=e=>!!e&&(e.code==="unavailable"||/offline|network|disconnect|unavailable|timeout/i.test(String(e.message||e)));
 async function pump(){
-  if(busy||!remote)return;busy=true;
-  while(jobs.length){const job=jobs[0];
-    try{await job()}catch(e){if(e&&e.code==="unavailable"){await sleep(700+Math.random()*900);try{await job()}catch(_){}}else console.warn(e)}
-    jobs.shift()}
-  busy=false;
+  if(busy||!remote||!canW)return;busy=true;
+  try{while(jobs.length&&remote&&canW){const job=jobs[0];let ok=true;
+      try{await job()}catch(e){if(offErr(e))ok=false;else console.warn(e)}
+      if(!ok){canW=false;setTimeout(resync,15000);break}
+      jobs.shift()}}
+  finally{busy=false}
 }
-// write some fields of one lecture: `local` is what the page keeps, `wire` (optional) the minimal remote patch
+const vClean=v=>isObj(v)?Object.fromEntries(Object.entries(v).filter(([k,x])=>x!==undefined).map(([k,x])=>[k,vClean(x)])):(v??false);
+const sameV=(a,b)=>a===b||(!!a&&!!b&&typeof a==="object"&&typeof b==="object"&&JSON.stringify(a)===JSON.stringify(b));
+// one queue entry per changed field ("id|f"), or per changed key inside an object field ("id|f/k")
+function pend(id,f,sub,v){
+  const w=id+"|"+f;
+  if(sub==null){for(const k in pending)if(k.startsWith(w+"/"))delete pending[k];pending[w]=v;return}
+  if(w in pending)pending[w]={...(isObj(pending[w])?pending[w]:{}),[sub]:v};else pending[w+"/"+sub]=v;
+}
+const pendN=()=>Object.keys(pending).length+Object.keys(pendingTop).length;
+function schedFlush(){renderSync();if(!flushQ){flushQ=true;setTimeout(()=>{jobs.push(flushNow);pump()},0)}else pump()}   // changes made in the same moment go up as one write
+// sends everything still waiting in one write; whatever changed again meanwhile stays for the next one
+async function flushNow(){
+  flushQ=false;
+  const sm={...pending},stp={...pendingTop},paths={};
+  for(const k in sm){const i=k.indexOf("|");paths[`marks/${k.slice(0,i)}/${k.slice(i+1)}`]=vClean(sm[k])}
+  for(const f in stp)paths[f]=vClean(stp[f]);
+  if(!Object.keys(paths).length)return;
+  if(!remoteExists){const s=await remote.get();remoteExists=!!s.exists}
+  if(remoteExists)await remote.updatePaths(paths);else{await remote.set(fullDoc());remoteExists=true}
+  for(const k in sm)if(k in pending&&sameV(pending[k],sm[k]))delete pending[k];
+  for(const f in stp)if(f in pendingTop&&sameV(pendingTop[f],stp[f]))delete pendingTop[f];
+  savePend();renderSync();
+}
+// write some fields of one lecture: `local` is what the page keeps, `wire` (optional) the keys that really changed inside object fields
 function savePatch(id,local,wire){
   const xp0=achReady?xpTotal():0,prev=mk(id);
   S.marks[id]={...prev,...local};LV++;
   if(achReady)try{newBoxes(id,prev,S.marks[id])}catch(e){console.warn(e)}
   if(achReady){const gain=xpTotal()-xp0;if(gain>0)xpPop(gain)}
-  const keys=Object.keys(local);keys.forEach(f=>pending[id+"|"+f]=local[f]);
+  const sync=!!remote||syncPlanned();
+  if(sync){const W=wire||{};for(const f in local){if(isObj(W[f]))for(const s in W[f])pend(id,f,s,W[f][s]);else pend(id,f,null,local[f])}savePend()}
   cache();render();
-  if(!remote&&!syncPlanned()){keys.forEach(f=>delete pending[id+"|"+f]);savePend();return}
-  savePend();
-  jobs.push(async()=>{
-    if(!remoteExists){const s=await remote.get();remoteExists=s.exists}
-    if(remoteExists)await remote.update({marks:{[id]:wire||local}});
-    else{await remote.set(fullDoc());remoteExists=true}
-    keys.forEach(f=>{if(pending[id+"|"+f]===local[f])delete pending[id+"|"+f]});savePend();
-  });pump();
+  if(sync)schedFlush();
+}
+// ---------- 🔀 lists that two devices changed at once: merged item by item, the same way on every device ----------
+const pj=(s,d)=>{if(typeof s!=="string"||!s)return d;try{const o=JSON.parse(s);return o??d}catch(e){return d}};
+const canon=v=>JSON.stringify(v,(k,x)=>isObj(x)?Object.keys(x).sort().reduce((o,q)=>(o[q]=x[q],o),{}):x);
+const tie=(a,b)=>canon(a)>=canon(b)?a:b;
+const minNZ=(a,b)=>(+a&&+b)?Math.min(+a,+b):(+a||+b||0);
+const newer=(a,b)=>{const ua=+a.u||+a.at||0,ub=+b.u||+b.at||0;return ua!==ub?(ua>ub?a:b):tie(a,b)};
+const srtN=k=>(x,y)=>(+x[k]||0)-(+y[k]||0)||(canon(x)<canon(y)?-1:canon(x)>canon(y)?1:0);
+const srtS=k=>(x,y)=>String(x[k]).localeCompare(String(y[k]))||(canon(x)<canon(y)?-1:canon(x)>canon(y)?1:0);
+const arrOf=s=>{const l=pj(s,[]);return Array.isArray(l)?l:[]};
+function listM(keyOf,pick,tidy){return{
+  merge(a,b){const m=new Map();[...arrOf(b),...arrOf(a)].forEach(x=>{if(!isObj(x))return;const k=keyOf(x);if(k==null||k==="")return;m.set(k,m.has(k)?pick(m.get(k),x):x)});
+    let L=[...m.values()];if(tidy)L=tidy(L);return JSON.stringify(L)},
+  eq:(a,b)=>{const c=s=>arrOf(s).filter(isObj).map(canon).sort().join("\n");return c(a)===c(b)}}}
+const strM={merge:(a,b)=>{const o=[];[...arrOf(b),...arrOf(a)].forEach(x=>{if(typeof x==="string"&&x&&!o.includes(x))o.push(x)});return JSON.stringify(o)},
+  eq:(a,b)=>{const c=s=>[...new Set(arrOf(s).filter(x=>typeof x==="string"&&x))].sort().join("\n");return c(a)===c(b)}};
+function mapM(pick){return{
+  merge(a,b){const A=pj(a,{}),B=pj(b,{}),o=isObj(B)?{...B}:{};if(isObj(A))for(const k in A)o[k]=k in o?pick(o[k],A[k]):A[k];return JSON.stringify(o)},
+  eq:(a,b)=>{const c=s=>{const o=pj(s,{});return canon(isObj(o)?o:{})};return c(a)===c(b)}}}
+const selfM=merge=>({merge,eq:(a,b)=>merge(a,a)===merge(b,b)});
+const boxRank=x=>!isObj(x)?0:x.n?1:x.o?3:2;
+const pickBox=(a,b)=>{const ra=boxRank(a),rb=boxRank(b);if(ra!==rb)return ra>rb?a:b;if(ra===3&&+a.o!==+b.o)return+a.o<+b.o?a:b;if(+a.c!==+b.c)return+a.c<+b.c?a:b;return tie(a,b)};
+const isoList=s=>String(s||"").split(",").filter(isISO);
+const MERGE={
+  parked:listM(x=>x.at?`${x.at}|${x.t||""}`:null,newer,L=>L.sort(srtN("at")).slice(-300)),
+  rewards:listM(x=>x.id,(a,b)=>!!a.x!==!!b.x?(a.x?a:b):tie(a,b)),
+  redeems:listM(x=>x.at?`${x.at}|${x.n}`:null,tie,L=>L.sort(srtN("at"))),
+  extra:listM(x=>x.id,newer),
+  offers:listM(x=>x.id,(a,b)=>({...tie(a,b),s:minNZ(a.s,b.s)||false,sh:minNZ(a.sh,b.sh)||false}),L=>{const mx=Math.max(0,...L.map(o=>+o.at||0));return L.filter(o=>(+o.at||0)>mx-21*864e5).sort(srtN("at"))}),
+  sits:listM(x=>x.s&&x.id?`${x.id}|${x.s}`:null,(a,b)=>(+a.ms||0)!==(+b.ms||0)?((+a.ms||0)>(+b.ms||0)?a:b):tie(a,b),L=>L.sort(srtN("s")).slice(-150)),
+  pauses:listM(x=>x.s&&x.id?`${x.id}|${x.s}`:null,(a,b)=>{const ea=+a.e||0,eb=+b.e||0;if(!ea!==!eb)return ea?a:b;if(ea!==eb)return ea<eb?a:b;return tie(a,b)},L=>L.sort(srtN("s")).slice(-400)),
+  rtvDays:listM(x=>isISO(x.d)?x.d:null,(a,b)=>(+a.at||0)!==(+b.at||0)?((+a.at||0)<(+b.at||0)?a:b):tie(a,b),L=>L.sort(srtS("d")).slice(-120)),
+  preasons:strM,docs:strM,
+  boxes:mapM(pickBox),bt:mapM((a,b)=>minNZ(a,b)),
+  seen:selfM((a,b)=>{const p=s=>{const [l,i]=String(s||"").split("|");return{l:+l||0,i:(i||"").split(",").filter(Boolean)}},x=p(a),y=p(b);return`${Math.max(x.l,y.l)}|${[...new Set([...x.i,...y.i])].sort().join(",")}`}),
+  sleepLog:selfM((a,b)=>[...new Set([...isoList(a),...isoList(b)])].sort().join(",")),
+  slept:selfM((a,b)=>{const p=s=>{const [d,i]=String(s||"").split("|");return{d:isISO(d)?d:"",i:(i||"").split(",").filter(Boolean)}},x=p(a),y=p(b);
+    if(x.d!==y.d){const w=x.d>y.d?x:y;return w.d?`${w.d}|${[...new Set(w.i)].sort().join(",")}`:""}return x.d?`${x.d}|${[...new Set([...x.i,...y.i])].sort().join(",")}`:""}),
+};
+// ---------- applying a copy of the server ----------
+const epochMs=e=>{if(typeof e!=="string"||!/^[0-9a-z]{6,12}$/.test(e))return 0;const n=parseInt(e,36);return n>1.4e12&&n<4.2e12?n:0};
+const LINK_LS="uqu-link";
+const syncKey=()=>{const c=fbSaved();return live==="claude"?"claude":c?c.key:""};
+const linking=()=>{try{return localStorage.getItem(LINK_LS)==="1"}catch(e){return false}};
+function pushReset(){
+  if(epochPush)return;epochPush=true;jobs.splice(busy?1:0);flushQ=false;
+  jobs.push(async()=>{await remote.set(fullDoc());remoteExists=true;merged=true;epochPush=false;resetPend=null;
+    for(const k in pending)delete pending[k];for(const k in pendingTop)delete pendingTop[k];savePend()});
 }
 function applyRemote(snap){
-  const data=snap.exists?(snap.data()||{}):{};
-  // someone pressed "start over": the newer clean start wins over whatever this device still has
-  if((data.epoch||S.epoch)&&data.epoch!==S.epoch){
-    const le=parseInt(S.epoch||"0",36),re=parseInt(data.epoch||"0",36);
-    if(re>le){S={marks:{}};merged=false;for(const k in pending)delete pending[k];for(const k in pendingTop)delete pendingTop[k];savePend();clearLocalAudio()}
-    else{if(!epochPush){epochPush=true;const doc=fullDoc();jobs.push(async()=>{await remote.set(doc);remoteExists=true;epochPush=false});pump()}achReady=true;return}
-  }
-  const rm=JSON.parse(JSON.stringify(data.marks||{}));
+  const data=snap&&snap.exists?(snap.data()||{}):{},isLive=!(snap&&snap.metadata&&snap.metadata.fromCache);
+  if(!isObj(data))return;
   if(snap.exists)remoteExists=true;
-  if(!merged){
-    const localOnly=Object.keys(S.marks).filter(k=>!(k in rm));
-    localOnly.forEach(k=>rm[k]=S.marks[k]);
-    if(!snap.metadata.fromCache){merged=true;
-      if(localOnly.length)jobs.push(async()=>{
-        const s=await remote.get();
-        if(s.exists){remoteExists=true;const patch={};localOnly.forEach(k=>patch[k]=S.marks[k]);await remote.update({marks:patch})}
-        else{await remote.set(fullDoc());remoteExists=true}
-      }),pump();
-    }
-  }
-  for(const key in pending){const [id,f]=key.split("|");rm[id]={...(rm[id]||{}),[f]:pending[key]}}
-  TOPF.forEach(f=>{if(data[f]!==undefined&&!(f in pendingTop))S[f]=data[f]});
-  if(!snap.metadata.fromCache)achReady=true;
-  S.marks=rm;cache();render();
+  const re=epochMs(data.epoch),key=syncKey(),foreign=isLive&&(linking()||(!!S.lk&&!!key&&S.lk!==key));
+  // a clean start made on this device that the server hasn't seen yet goes up exactly as it is
+  if(resetPend){if(epochMs(resetPend)>re){if(isLive){pushReset();canW=true;achReady=true;pump()}return}resetPend=null;savePend()}
+  // someone pressed «start over» on another device after this copy was made: the clean start wins
+  if(!foreign&&re>epochMs(S.epoch)){wipeLocal({marks:{},lk:S.lk});merged=false}
+  const first=isLive&&!merged,rm=JSON.parse(JSON.stringify(isObj(data.marks)?data.marks:{}));
+  for(const id in rm){const m=BAD_K.has(id)?null:cleanMark(rm[id]);if(m)rm[id]=m;else delete rm[id]}
+  // the first fresh copy: anything this device has that the server never got goes up (nothing on the server is overwritten)
+  if(first)for(const id in S.marks){const lm=S.marks[id];if(!isObj(lm))continue;const r=rm[id]||(rm[id]={});
+    for(const f in lm){if(lm[f]==null||(f in r))continue;r[f]=lm[f];pend(id,f,null,lm[f])}}
+  for(const k in pending){const i=k.indexOf("|"),id=k.slice(0,i),fp=k.slice(i+1),j=fp.indexOf("/"),r=rm[id]=isObj(rm[id])?{...rm[id]}:{};
+    if(j<0)r[fp]=pending[k];else{const f=fp.slice(0,j);r[f]={...(isObj(r[f])?r[f]:{}),[fp.slice(j+1)]:pending[k]}}}
+  let need=false;const dt=cleanS(Object.assign({marks:{}},...TOPF.filter(f=>data[f]!==undefined).map(f=>({[f]:data[f]}))));
+  TOPF.forEach(f=>{
+    const rv=dt[f];
+    if(f==="epoch"){if(rv)S.epoch=rv;return}
+    if(rv==null){if(first&&S[f]!=null&&S[f]!==false&&!(f in pendingTop)){pendingTop[f]=S[f];need=true}return}
+    const M=MERGE[f];
+    if(M){const lv=S[f];
+      if(lv==null||lv===false){if(!(f in pendingTop))S[f]=rv;return}
+      if(lv===rv)return;
+      const mv=M.merge(lv,rv);
+      if(M.eq(mv,rv)&&!(f in pendingTop)){S[f]=rv;return}
+      S[f]=mv;pendingTop[f]=mv;need=true;return}
+    if(!(f in pendingTop))S[f]=rv;
+  });
+  S.marks=rm;
+  if(isLive){merged=true;canW=true;achReady=true;if(key)S.lk=key;try{localStorage.removeItem(LINK_LS)}catch(e){}}
+  savePend();cache();render();
+  if(isLive&&(need||pendN()))schedFlush();else pump();
+}
+// a fresh copy of the server (after the connection comes back), then whatever was waiting goes up
+let resyncing=false;
+async function resync(){
+  if(!remote||resyncing)return;resyncing=true;
+  try{const s=await remote.get();applyRemote({exists:!!s.exists,data:()=>s.data(),metadata:{fromCache:false}})}
+  catch(e){if(offErr(e))setTimeout(resync,20000);else console.warn(e)}finally{resyncing=false}
 }
 const FB_LS="uqu-fb";
 const FB_VER="10.12.2";
@@ -1405,25 +1567,29 @@ const fbSaved=()=>{try{const o=JSON.parse(localStorage.getItem(FB_LS)||"null");r
 const b64e=s=>btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const b64d=s=>atob(s.replace(/-/g,"+").replace(/_/g,"/"));
 window.addEventListener("hashchange",()=>{if(/^#sync=/.test(location.hash))location.reload()});
+// data already on this device that predates linking it to this sync is merged in, never thrown away
+const markLink=key=>{try{if(S.lk!==key)localStorage.setItem(LINK_LS,"1")}catch(e){}};
 (function importLink(){
   const m=location.hash.match(/^#sync=([A-Za-z0-9_-]+)$/);if(!m)return;
-  try{const o=JSON.parse(b64d(m[1]));if(o.c&&o.k)localStorage.setItem(FB_LS,JSON.stringify({config:o.c,key:o.k}))}catch(e){}
+  try{const o=JSON.parse(b64d(m[1]));if(isObj(o.c)&&typeof o.k==="string"&&/^[A-Za-z0-9_-]{20,}$/.test(o.k)){const prev=fbSaved();if(!prev||prev.key!==o.k)markLink(o.k);localStorage.setItem(FB_LS,JSON.stringify({config:o.c,key:o.k}))}}catch(e){}
   try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
 })();
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
-function fbAdapter(ref){
-  const isObj=v=>v&&typeof v==="object"&&!Array.isArray(v);
-  // Realtime Database replaces whole children on update, so send leaf paths; null → false (keeps the key)
-  const flat=(o,pre="",out={})=>{for(const k in o){const v=o[k],p=pre?pre+"/"+k:k;
-    if(isObj(v)&&Object.keys(v).length)flat(v,p,out);else out[p]=isObj(v)?false:(v??false)}return out};
-  const clean=v=>isObj(v)?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,clean(x)])):(v??false);
+function fbAdapter(ref,db){
+  // values go to exact paths (marks/<id>/<field>), so a write never replaces a whole lecture; null → false (keeps the key)
+  const clean=v=>isObj(v)?Object.fromEntries(Object.entries(v).filter(([k,x])=>x!==undefined).map(([k,x])=>[k,clean(x)])):(v??false);
   return{
     get:async()=>{const s=await ref.get();return{exists:s.exists(),data:()=>s.val()}},
     set:d=>ref.set(clean(d)),
-    update:p=>ref.update(flat(p)),
+    updatePaths:p=>ref.update(clean(p)),
     onSnapshot:(next,err)=>{const cb=s=>next({exists:s.exists(),data:()=>s.val()||{},metadata:{fromCache:false,hasPendingWrites:false}});
-      ref.on("value",cb,e=>err&&err(e));return()=>ref.off("value",cb)}
+      ref.on("value",cb,e=>err&&err(e));return()=>ref.off("value",cb)},
+    onConn:cb=>{try{db.ref(".info/connected").on("value",s=>cb(!!(s&&s.val())))}catch(e){}}
   };
+}
+function claudeAdapter(doc){
+  const nest=p=>{const o={};for(const k in p){const ks=k.split("/");let x=o;for(let i=0;i<ks.length-1;i++)x=x[ks[i]]=isObj(x[ks[i]])?x[ks[i]]:{};x[ks[ks.length-1]]=p[k]}return o};
+  return{get:()=>doc.get(),set:d=>doc.set(d),updatePaths:p=>doc.update(nest(p)),onSnapshot:(n,e)=>doc.onSnapshot(n,e)};
 }
 async function connectClaude(){
   try{
@@ -1431,13 +1597,15 @@ async function connectClaude(){
     const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
     if(!db||!user)return false;
     const uid=await user.id();if(!uid)return false;
-    remote=db.doc("data/users/"+uid+"/state");live="claude";renderSync();
-    remote.onSnapshot(applyRemote,()=>{live=false;remote=null;renderSync()});
-    pump();return true;
+    remote=claudeAdapter(db.doc("data/users/"+uid+"/state"));live="claude";canW=false;renderSync();
+    remote.onSnapshot(applyRemote,()=>{live=false;remote=null;canW=false;renderSync()});
+    return true;
   }catch(e){return false}
 }
+let fbRetry=null;
 async function connectFirebase(){
   const c=fbSaved();if(!c){renderSync();return}
+  if(remote||live==="connecting")return;
   live="connecting";syncErr="";renderSync();
   try{
     if(!window.firebase||!window.firebase.database){
@@ -1446,21 +1614,28 @@ async function connectFirebase(){
     }
     const cfg={...c.config};
     if(!cfg.databaseURL&&cfg.projectId)cfg.databaseURL=`https://${cfg.projectId}-default-rtdb.firebaseio.com`;
-    const app=firebase.apps.length?firebase.app():firebase.initializeApp(cfg);
-    const ref=app.database().ref("users/"+c.key);fbAudioRef=app.database().ref("audio/"+c.key);
-    remote=fbAdapter(ref);remoteExists=false;merged=false;live="fb";renderSync();
-    remote.onSnapshot(applyRemote,e=>{live=false;remote=null;
+    const app=firebase.apps.length?firebase.app():firebase.initializeApp(cfg),db=app.database();
+    const ref=db.ref("users/"+c.key);fbAudioRef=db.ref("audio/"+c.key);
+    remote=fbAdapter(ref,db);remoteExists=false;merged=false;canW=false;live="fb";renderSync();
+    remote.onSnapshot(applyRemote,e=>{live=false;remote=null;canW=false;
       syncErr=/permission/i.test(String(e&&(e.code||e.message)))?"رفض Firebase الوصول. تأكد إنك نشرت القواعد (Rules).":"انقطع الاتصال بـ Firebase.";renderSync()});
-    pump();
-  }catch(e){live=false;remote=null;syncErr="تعذّر الاتصال بـ Firebase. تأكد من الإعدادات والإنترنت.";renderSync()}
+    // offline: nothing is written (the changes wait on the device); back online: a fresh copy first, then they go up
+    remote.onConn(on=>{fbOn=on;if(on)resync();else canW=false;renderSync()});
+  }catch(e){live=false;remote=null;syncErr="تعذّر الاتصال بـ Firebase. تأكد من الإعدادات والإنترنت.";renderSync();
+    clearTimeout(fbRetry);fbRetry=setTimeout(connectFirebase,30000)}
 }
-async function connect(){if(!(await connectClaude())){await connectFirebase();if(!remote){achReady=true;render()}}}
+window.addEventListener("online",()=>{if(!remote&&fbSaved())connectFirebase();else if(remote&&!canW)resync()});
+async function connect(){
+  setTimeout(()=>{if(!achReady){achReady=true;render()}},4000);   // no answer from the server (offline): the page still works fully
+  if(!(await connectClaude())){await connectFirebase();if(!remote){achReady=true;render()}}
+}
 function renderSync(){
-  const on=live==="claude"||live==="fb";
-  const el=$("#sync");el.classList.toggle("live",on);
-  el.lastElementChild.textContent=live==="claude"?"مزامنة مباشرة بين أجهزتك":live==="fb"?"مزامنة مباشرة (Firebase)":live==="connecting"?"جاري الاتصال…":syncErr||"محفوظ على هذا الجهاز فقط";
+  const on=live==="claude"||live==="fb",off=live==="fb"&&fbOn===false,n=new Set(Object.keys(pending).map(k=>k.split("|")[0])).size+Object.keys(pendingTop).length,nT=cnt(n,"تغيير واحد","تغييرين","تغييرات");
+  const el=$("#sync");if(!el)return;el.classList.toggle("live",on&&!off);
+  el.lastElementChild.textContent=off?`بدون إنترنت · ${n?`محفوظ هنا وينتظر النت: ${nT}`:"كل شي محفوظ هنا"}`
+    :live==="claude"?"مزامنة مباشرة بين أجهزتك":live==="fb"?`مزامنة مباشرة (Firebase)${n?` · ⏳ يرفع ${nT}`:""}`:live==="connecting"?"جاري الاتصال…":(syncErr?syncErr+(n?` · بانتظار الرفع: ${nT}`:""):"محفوظ على هذا الجهاز فقط");
   $("#syncBtn").hidden=live==="claude";
-  $("#tasksSub").innerHTML=`<span class="sdot${on?" live":""}"></span>`;
+  $("#tasksSub").innerHTML=`<span class="sdot${on&&!off?" live":""}${off?" off":""}" title="${off?"بدون إنترنت":on?"متزامن":""}"></span>`;
 }
 function parseCfg(txt){
   const o={};const re=/["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g;let m;while((m=re.exec(txt)))o[m[1]]=m[2];
@@ -1478,7 +1653,7 @@ function saveSetup(){
   let key=$("#fbKey").value.trim();
   if(!key){key=newKey();$("#fbKey").value=key}
   if(!/^[A-Za-z0-9_-]{20,}$/.test(key)){$("#fbMsg").textContent="رمز المزامنة لازم يكون 20 حرف أو أكثر (حروف إنجليزية وأرقام). اضغط «رمز جديد».";return}
-  try{localStorage.setItem(FB_LS,JSON.stringify({config:cfg,key}))}catch(e){}
+  try{const prev=fbSaved();if(!prev||prev.key!==key)markLink(key);localStorage.setItem(FB_LS,JSON.stringify({config:cfg,key}))}catch(e){}
   location.reload();
 }
 function stopSync(){try{localStorage.removeItem(FB_LS)}catch(e){}location.reload()}
@@ -1640,6 +1815,9 @@ function taskHTML(x){
     if(w.fined){worth+=` · <span class="late">⚠️ انخصم منك ${n(w.fined)}${w.next?`، وبعد ${hh(w.next.at)} ينخصم ${n(w.next.a)} زيادة`:""}</span>`;lateShown=true}
     if(w.rescue)worth+=` · <span class="rescue">🛟 خلّصها قبل ${dayName(isoOf(new Date(w.rescue.until)))} ويرجع لك ${n(w.rescue.a)}</span>`;
     if(!w.fined&&w.next&&w.next.at-Date.now()<=12*36e5)worth+=` · <span class="warn">⏳ بعد ${hh(w.next.at)} ينخصم ${n(w.next.a)} من رصيدك</span>`}
+  // a task the energy budget pushed to a later day, but whose fine lands before that day ends: say so, don't let the plan hide it
+  if(x.on&&!x.done){const w2=taskWorth({...x,on:null}),end=new Date(x.on+"T23:59:59").getTime();
+    if(w2&&(w2.fined||(w2.next&&w2.next.at<end)))worth=` · <span class="late">⚠️ ${w2.fined?`عليها غرامة ${w2.fined} للحين`:`لو استنيت ليومها ينخصم ${w2.next.a}`}، سوّها قبل لو تقدر</span>`}
   const rvSt=x.done&&!x.hard?(x.t===R1_T?"r1":x.t===R2_T?"r2":null):null,rv=rvSt&&!hasRec(x.b.id,rvSt)?`<button class="rvrec" data-rvrec="${x.b.id}|${rvSt}" aria-label="أضف تسجيل ${REC_ST[rvSt]}">🎙️ سجّل</button>`:"";
   const chk=study?(live?`<button class="tcheck live" aria-label="خلّصت المذاكرة: ${esc(label(x.b))}" data-task="${key}">✓</button>`
       :`<button class="tcheck play${rtvLocked()?" lock":""}" aria-label="ابدأ المذاكرة: ${esc(label(x.b))}" data-task="${key}">${rtvLocked()?"🔒":"▶"}</button>`)
@@ -1702,35 +1880,28 @@ function tickTask(x){
   else if(x.t===KNOT_T)setKnot(id,x.knot.k,{...stripK(x.knot),d:x.done?false:todayISO,at:x.done?false:Date.now()});
 }
 // top-level settings (daily cap, finished pre-sleep replays) saved and synced like marks
-const pendingTop={};
 function setTop(f,v){
-  S[f]=v;pendingTop[f]=v;cache();
-  if(!remote&&!syncPlanned()){delete pendingTop[f];savePend();return}
-  savePend();
-  jobs.push(async()=>{
-    if(!remoteExists){const s=await remote.get();remoteExists=s.exists}
-    if(remoteExists)await remote.update({[f]:v});else{await remote.set(fullDoc());remoteExists=true}
-    if(pendingTop[f]===v)delete pendingTop[f];savePend();
-  });pump();
+  S[f]=v;cache();
+  if(!remote&&!syncPlanned())return;
+  pendingTop[f]=v;savePend();schedFlush();
 }
 // sync is set up on this device → changes made offline or before the first snapshot wait in a queue that survives a reload
 const syncPlanned=()=>{try{return!!fbSaved()||!!(window.claude&&typeof window.claude.use==="function")}catch(e){return false}};
 const PEND_LS="uqu-pend";
-function savePend(){try{const has=Object.keys(pending).length||Object.keys(pendingTop).length;if(has)localStorage.setItem(PEND_LS,JSON.stringify({m:pending,t:pendingTop}));else localStorage.removeItem(PEND_LS)}catch(e){}}
+function savePend(){try{if(pendN()||resetPend)localStorage.setItem(PEND_LS,JSON.stringify({m:pending,t:pendingTop,r:resetPend||false}));else localStorage.removeItem(PEND_LS)}catch(e){}}
 (function restorePend(){
   if(!syncPlanned())return;let o=null;try{o=JSON.parse(localStorage.getItem(PEND_LS)||"null")}catch(e){}
-  if(!o||typeof o!=="object")return;Object.assign(pending,o.m||{});Object.assign(pendingTop,o.t||{});
-  if(!Object.keys(pending).length&&!Object.keys(pendingTop).length)return;
-  // one job delivers everything that was waiting; it runs as soon as the connection is up
-  jobs.push(async()=>{
-    const snapM={...pending},snapT={...pendingTop},patch={};
-    for(const k in snapM){const i=k.indexOf("|"),id=k.slice(0,i),f=k.slice(i+1);((patch.marks=patch.marks||{})[id]=patch.marks[id]||{})[f]=snapM[k]}
-    for(const f in snapT)patch[f]=snapT[f];
-    if(!remoteExists){const s=await remote.get();remoteExists=s.exists}
-    if(remoteExists)await remote.update(patch);else{await remote.set(fullDoc());remoteExists=true}
-    for(const k in snapM)if(pending[k]===snapM[k])delete pending[k];for(const f in snapT)if(pendingTop[f]===snapT[f])delete pendingTop[f];savePend();
-  });
+  if(!isObj(o))return;
+  if(isObj(o.m))for(const k in o.m)if(k.indexOf("|")>0)pending[k]=o.m[k];
+  if(isObj(o.t))for(const f in o.t)if(TOPF.includes(f))pendingTop[f]=o.t[f];
+  if(typeof o.r==="string"&&epochMs(o.r))resetPend=o.r;
+  // nothing is sent yet: it goes up right after the first fresh copy of the server (so an old change can't undo a newer «start over»)
 })();
+// another tab of the site on this device changed something: take its copy so neither tab undoes the other
+window.addEventListener("storage",e=>{
+  if(e.key!==LS||!e.newValue)return;
+  try{const r=JSON.parse(e.newValue);if(r&&r.marks){S=cleanS(r);LV++;render()}}catch(_){}
+});
 function setPts(n){n=Math.max(3,Math.min(30,n));if(n===(S.pts||10))return;setTop("pts",n);renderTasks()}
 
 // ---------- mark actions ----------
@@ -1810,11 +1981,12 @@ function bindPrompts(root){
 let sheetCleanup=null;
 function openSheet(html,bind){
   closeSheet(true);
-  const o=$("#ov");o.innerHTML=`<div class="ovbox" role="dialog" aria-modal="true"><button class="ovx" aria-label="إغلاق">×</button>${html}</div>`;
+  const o=$("#ov");o.dataset.t0=Date.now();o.innerHTML=`<div class="ovbox" role="dialog" aria-modal="true"><button class="ovx" aria-label="إغلاق">×</button>${html}</div>`;
   o.hidden=false;document.documentElement.classList.add("noscroll");
   o.querySelector(".ovx").onclick=closeSheet;
   if(bind)bind(o.querySelector(".ovbox"));
 }
+const freshTap=()=>{const o=$("#ov");if(o)o.dataset.t0=Date.now()};
 function closeSheet(replacing){
   if(sheetCleanup){try{sheetCleanup()}catch(e){}sheetCleanup=null}
   const o=$("#ov");if(!o.hidden){o.hidden=true;o.innerHTML="";if(!focusOpen())document.documentElement.classList.remove("noscroll");scheduleAch();if(st.page!=="main")renderPage()}
@@ -2186,7 +2358,7 @@ function sheetCards(id){
     <div class="sh-act"><button class="btn primary big" id="cSave">حفظ</button></div>`,box=>{
     const n=box.querySelector("#cN"),ev=box.querySelector("#cEval"),err=box.querySelector("#cErr");
     n.oninput=()=>{ev.innerHTML=cardEval(parseInt(n.value,10)||0,h)};
-    const save=()=>{const v=parseInt(n.value,10)||0;if(v<1){err.hidden=false;err.textContent="اكتب عدد البطاقات.";return}
+    const save=()=>{const v=parseInt(n.value,10)||0;if(v<1){err.hidden=false;err.textContent="اكتب عدد البطاقات.";return}if(v>999){err.hidden=false;err.textContent="الرقم كبير بشكل غريب، تأكد منه.";return}
       savePatch(id,{anki:m.anki||todayISO,cards:v,...(m.anki?{}:{ankiAt:Date.now()})});closeSheet();toast(v/h>HEALTHY[1]?"انحفظ. انتبه للتضخم 🔴":"انحفظ عدد البطاقات 🃏")};
     box.querySelector("#cSave").onclick=save;n.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();save()}};n.focus();
   });
@@ -2233,37 +2405,39 @@ setInterval(()=>{if(!sleepRun)return;const t=$("#slT");const left=Math.ceil((sle
 
 // ================= v6 =================
 // ---------- top-level fields that sync like the daily cap ----------
-const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin"];
 const fullDoc=()=>{const d={v:3,marks:S.marks};TOPF.forEach(f=>{if(S[f]!==undefined)d[f]=S[f]});return d};
-const jget=(f,def)=>{try{const v=S[f];return v?JSON.parse(v):def}catch(e){return def}};
+// a JSON field read back with the shape the caller expects (a broken or foreign value gives the default)
+const jget=(f,def)=>{try{const v=S[f];if(!v)return def;const o=typeof v==="string"?JSON.parse(v):v;return Array.isArray(def)?(Array.isArray(o)?o:def):isObj(def)?(isObj(o)?o:def):(o??def)}catch(e){return def}};
 
 // ---------- 1) study session: «ابدأ المذاكرة» → «ذاكرتها» measures the minutes ----------
 const activeSession=()=>{let best=null;for(const id in S.marks){const m=S.marks[id];if(m&&m.startAt&&!m.studied&&BY_ID[id]&&(!best||m.startAt>best.at))best={id,at:m.startAt}}return best};
 const hms=ms=>{const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return `${h}:${String(m).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
 function finishStudy(id){
-  const m=mk(id),ms=sessMs(id),measured=ms>=30000?Math.max(1,Math.round(ms/6e4)):null;
+  endPause(id);const m=mk(id),ms=sessMs(id),measured=ms>=30000?Math.max(1,Math.round(ms/6e4)):null;
   const rec=closeSitting(id,"fin");if(rec)st.pendingReceipt=rec;
-  const patch={studied:todayISO,sAt:Date.now(),startAt:false,pz:false,acc:false,bm:false};if(measured){patch.mins=measured;patch.ss=m.ss||m.startAt||Date.now()-ms}
+  // more than 12 hours is almost surely a session left running: the time is shown but you type the real one (your speed stats stay clean)
+  const patch={studied:todayISO,sAt:Date.now(),startAt:false,pz:false,acc:false,bm:false};if(measured){if(measured<=720)patch.mins=measured;patch.ss=m.ss||m.startAt||Date.now()-ms}
   savePatch(id,patch);focusSync();if(FS&&FS.id===id)hideFocus();sheetTime(id,true,measured);
 }
 function renderSession(){
   const s=activeSession(),bar=$("#sessBar");
   document.body.classList.toggle("has-sess",!!s);
   if(!s){bar.hidden=true;return}
-  const m=mk(s.id),c=clipsOf(s.id),p=c?cprOf(s.id):null,paused=!!m.pz;
+  const m=mk(s.id),c=clipsOf(s.id),p=c?cprOf(s.id):null,paused=!!m.pz,op=paused?openPause(s.id):null;
   bar.hidden=false;
-  bar.innerHTML=`<span class="sb-dot${paused?" pz":""}"></span><span class="sb-t"><b class="en">${esc(label(BY_ID[s.id]))}</b><span class="num" id="sbClock">${hms(sessMs(s.id))}</span>${c?`<small>🎬 ${Math.min(p.i+1,c.c.length)}/${c.c.length}${paused?" · ☕ استراحة":""}</small>`:paused?`<small>☕ موقوفة</small>`:""}</span>
-    ${fsndType()!=="off"&&!paused&&(fsBlocked||!fsAudio||fsAudio.paused)?`<button class="sb-park" id="sbSnd" aria-label="شغّل صوت التركيز">🔈</button>`:""}
-    ${c?`<button class="btn sm sb-open" id="sbOpen">${paused?"▶ كمّل":"🎬 افتح"}</button>`:paused?`<button class="btn sm sb-open" id="sbRes">▶ كمّل</button>`:""}
-    <button class="sb-park" id="sbPark" aria-label="فرّغ فكرة">💭</button><button class="btn primary sm" id="sbDone">✓ ذاكرتها</button><button class="sb-x" id="sbStop" aria-label="وقّف هنا">🔖</button>`;
+  bar.innerHTML=`<span class="sb-dot${paused?" pz":""}"></span><span class="sb-t"><b class="en">${esc(label(BY_ID[s.id]))}</b><span class="num" id="sbClock">${hms(sessMs(s.id))}</span>${op?`<small>⏸ <span class="num" id="sbPz">${mmss((Date.now()-op.s)/1000)}</span> · ${esc(op.r)}</small>`:c?`<small>🎬 ${Math.min(p.i+1,c.c.length)}/${c.c.length}${paused?" · ☕ استراحة":""}</small>`:paused?`<small>☕ موقوفة</small>`:""}</span>
+    <span class="sb-btns">${fsndType()!=="off"&&!paused?`<button class="sb-park" id="sbSnd" aria-label="صوت التركيز: تشغيل أو كتم">${fsIcon()}</button>`:""}
+    ${paused?`<button class="btn sm sb-open" id="sbRes">▶ استأنف</button>`:`${c?`<button class="btn sm sb-open" id="sbOpen">🎬 افتح</button>`:""}<button class="sb-park" id="sbPause" aria-label="إيقاف مؤقت">⏸</button>`}
+    <button class="sb-park" id="sbPark" aria-label="فرّغ فكرة">💭</button><button class="btn primary sm" id="sbDone">✓ ذاكرتها</button><button class="sb-x" id="sbStop" aria-label="وقّف هنا">🔖</button></span>`;
   $("#sbDone").onclick=()=>finishStudy(s.id);
   $("#sbStop").onclick=()=>sheetBookmark(s.id);
   $("#sbPark").onclick=openPark;
   const so=$("#sbOpen");if(so)so.onclick=()=>openFocus(s.id);
-  const sr=$("#sbRes");if(sr)sr.onclick=()=>resumeSession(s.id);
-  const sn=$("#sbSnd");if(sn)sn.onclick=()=>{fsBlocked=false;focusSync();setTimeout(renderSession,300)};
+  const sr=$("#sbRes");if(sr)sr.onclick=()=>{resumeSession(s.id);if(c){openFocus(s.id);if(FS&&FS.mode==="break"){FS.mode="read";drawFocus()}}};
+  const sp=$("#sbPause");if(sp)sp.onclick=()=>sheetPause(s.id);
+  const sn=$("#sbSnd");if(sn)sn.onclick=()=>{if(!fsMuted()&&!fsPlaying()){fsBlocked=false;focusSync();setTimeout(renderSession,300)}else fsToggleMute()};
 }
-setInterval(()=>{const s=activeSession(),c=$("#sbClock");if(s&&c)c.textContent=hms(sessMs(s.id))},1000);
+setInterval(()=>{const s=activeSession(),c=$("#sbClock");if(s&&c)c.textContent=hms(sessMs(s.id));const z=$("#sbPz"),op=s&&openPause(s.id);if(z&&op)z.textContent=mmss((Date.now()-op.s)/1000)},1000);
 
 // ---------- 8) energy points instead of a flat task count ----------
 const costOf=x=>x.t.kind==="study"?(hrs(x.b)<=1?2:hrs(x.b)===2?3:4):x.t.kind==="r1"?2:x.t.kind==="prime"?0:1;
@@ -2357,13 +2531,15 @@ const FINE=[[24,.4],[36,.3]];          // hours after the due moment → share o
 const HR=36e5;
 const tsOf=(iso,ms,h=12)=>ms||(iso?new Date(`${iso}T${String(h).padStart(2,"0")}:00:00`).getTime():0);
 // fines only count for tasks that fell due after the ledger started (your clean start); older backlog is forgiven
-const ledgerStart=()=>+S.since||(S.epoch?parseInt(S.epoch,36):0)||Date.now();
+const ledgerStart=()=>Math.min(Date.now(),+S.since||epochMs(S.epoch)||Date.now());   // a device with its clock in the future can't push the start ahead
 const sleepNights=()=>new Set((S.sleepLog||"").split(",").filter(Boolean)).size;
 const clock=ms=>{const d=new Date(ms);return`<span class="en">${h12(d.getHours())||12}:${String(d.getMinutes()).padStart(2,"0")}</span> ${ap(d.getHours())}`};
 
 // ---------- ☀️ offers (the data part; the screens live with the pages) ----------
 const OFFER_MIN=10,OFFER_N=3,NAP_MS=36e5;
-const offersList=()=>{const l=jget("offers",[]);return Array.isArray(l)?l.filter(o=>o&&o.id):[]};
+const offersList=()=>{const l=jget("offers",[]).filter(o=>isObj(o)&&o.id),best={};
+  l.forEach(o=>{if(!o.first)return;const b=best[o.day];if(!b||(!!o.s!==!!b.s?!!o.s:(o.s?+o.s<+b.s:+o.at<+b.at)))best[o.day]=o});
+  return l.filter(o=>!o.first||best[o.day]===o)};
 const offerEnd=o=>o.s?o.s+OFFER_MIN*6e4:0;
 const offerWaitEnd=o=>Math.min(+o.until||0,(+o.at||0)+10*6e4);
 const offerState=o=>{const n=Date.now();return o.s?(n<offerEnd(o)?"live":"done"):(n<offerWaitEnd(o)?"wait":"gone")};
@@ -2371,7 +2547,8 @@ const liveOffer=()=>offersList().find(o=>offerState(o)==="live");
 // the first 3 things you finished (or started, for a new lecture) inside the 10 minutes
 function offerHits(o){
   if(!o.s)return[];const a=o.s,z=offerEnd(o),inW=t=>!!t&&t>=a&&t<=z,h=[];
-  ALL.filter(needsStudy).forEach(b=>{const m=mk(b.id),started=m.ss||(m.startAt&&!m.studied?m.startAt:0);
+  const sitS={};sitsList().forEach(x=>(sitS[x.id]=sitS[x.id]||[]).push(+x.s));
+  ALL.filter(needsStudy).forEach(b=>{const m=mk(b.id),started=[+m.ss,m.startAt&&!m.studied?+m.startAt:0,...(sitS[b.id]||[])].find(inW)||0;   // a bookmarked lecture you pick up again counts too
     if(inW(started))h.push({at:started,done:m.studied?tsOf(m.studied,m.sAt,18):0,p:PTS.study,t:"ذاكرتها",b});
     if(inW(m.againAt))h.push({at:m.againAt,done:m.againAt,p:PTS.again,t:"مراجعة صعبة",b});
     if(inW(m.rev1At))h.push({at:m.rev1At,done:m.rev1At,p:PTS.r1,t:"مراجعة أولى",b});
@@ -2420,6 +2597,7 @@ function ledger(){
     const bl=sjson(m.bml,[]);(Array.isArray(bl)?bl:[]).filter(x=>x&&x.r&&x.r-x.at<=24*HR).slice(0,3).forEach(x=>add(+x.r,PTS.bmk,"🔖 رجعت لعلامتك وهي طازجة",n,"earn",id));
   });
   rtvDaysList().forEach(x=>add(+x.at,PTS.rtvAll,"🌅 خلّصت الاسترجاع كامل","","bonus"));
+  Object.values(prayDays()).forEach(l=>l.slice(0,5).forEach(p=>add(+p.e,PTS.pray,"🕌 صلاة وقت المذاكرة",BY_ID[p.id]?label(BY_ID[p.id]):"","bonus",p.id)));
   offersList().forEach(o=>{if(o.first&&o.s&&o.sh&&o.s-o.sh<=30000)add(+o.s,PTS.fast,"⚡ بداية صاروخية","","bonus")});
   boxLedger(add);
   E.sort((a,b)=>a.at-b.at);let bal=0,earn=0,fine=0,spend=0;
@@ -2594,14 +2772,16 @@ let AC=null;
 function ac(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{AC=new C()}catch(e){return null}}if(AC.state==="suspended")AC.resume().catch(()=>{});return AC}
 // Safari only lets sound start inside a tap, so wake the audio on the first touch
 ["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(sfxOn())ac()},{once:true,capture:true}));
+let SREC=null;   // while set, tone()/noise() record notes instead of playing them
 function tone(f,at,dur,{type="sine",g=.16,f2=0}={}){
+  if(SREC){SREC.push({k:"t",f,at,dur,type,g,f2});return}
   const c=ac();if(!c)return;const t=c.currentTime+at,o=c.createOscillator(),v=c.createGain();
   o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
   v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.012);v.gain.exponentialRampToValueAtTime(.0008,t+dur);
   o.connect(v);v.connect(c.destination);o.start(t);o.stop(t+dur+.05);
 }
 let noiseBuf=null;
-function noise(at,dur,g=.05,hz=3000){const c=ac();if(!c)return;
+function noise(at,dur,g=.05,hz=3000){if(SREC){SREC.push({k:"n",at,dur,g,hz});return}const c=ac();if(!c)return;
   if(!noiseBuf){noiseBuf=c.createBuffer(1,c.sampleRate*.3,c.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
   const t=c.currentTime+at,s=c.createBufferSource(),bp=c.createBiquadFilter(),v=c.createGain();
   s.buffer=noiseBuf;bp.type="bandpass";bp.frequency.value=hz;bp.Q.value=.8;v.gain.setValueAtTime(g,t);v.gain.exponentialRampToValueAtTime(.0008,t+dur);
@@ -2617,13 +2797,53 @@ const SFX={
   x:()=>{[523,659,784,1047,1319,1568,2093].forEach((f,i)=>tone(f,i*.07,.45,{g:.13}));[0,.1,.2,.3,.4].forEach(t=>tone(2637,.5+t,.12,{g:.05,type:"triangle"}))},
   card:()=>{tone(400,0,.22,{type:"triangle",g:.1,f2:1300});noise(0,.18,.03,2500)},
 };
-function sfx(k,a){if(!sfxOn())return;try{SFX[k]&&SFX[k](a)}catch(e){}}
+// iPad/iPhone silence Web Audio when the device is on silent; media playback isn't silenced, so effects are pre-rendered to WAV
+const SMODE_LS="uqu-sfxmedia";
+const sfxMedia=()=>{try{return localStorage.getItem(SMODE_LS)!=="0"}catch(e){return true}};
+function renderSfx(ev){
+  const sr=32000,len=Math.ceil((Math.max(...ev.map(e=>e.at+e.dur))+.08)*sr),out=new Float32Array(len);
+  ev.forEach(e=>{const s0=Math.round(e.at*sr),n=Math.max(1,Math.round(e.dur*sr));
+    if(e.k==="t"){let ph=0;const att=Math.round(.012*sr);
+      for(let i=0;i<n&&s0+i<len;i++){const t=i/sr,f=e.f2?e.f*Math.pow(e.f2/e.f,t/e.dur):e.f;ph+=2*Math.PI*f/sr;
+        const w=e.type==="triangle"?(2/Math.PI)*Math.asin(Math.sin(ph)):Math.sin(ph),env=i<att?e.g*i/att:e.g*Math.pow(.0008/e.g,(i-att)/Math.max(1,n-att));out[s0+i]+=w*env}}
+    else{const w0=2*Math.PI*e.hz/sr,al=Math.sin(w0)/1.6,a0=1+al,a1=-2*Math.cos(w0),a2=1-al;let x1=0,x2=0,y1=0,y2=0;
+      for(let i=0;i<n&&s0+i<len;i++){const x=Math.random()*2-1,y=(al*x-al*x2-a1*y1-a2*y2)/a0;x2=x1;x1=x;y2=y1;y1=y;out[s0+i]+=y*e.g*Math.pow(.0008/e.g,i/n)}}});
+  for(let i=0;i<len;i++)out[i]=Math.tanh(out[i]*2.4)*.9;
+  return encodeWav(out,sr);
+}
+const SURL={},SPOOL=[];let spI=0,sUnlocked=false;
+function spool(){if(!SPOOL.length)for(let i=0;i<6;i++){const a=new Audio();a.preload="auto";a.setAttribute("playsinline","");SPOOL.push(a)}return SPOOL}
+// the first touch "unlocks" each player so later effects (after a delay) are allowed to play
+function unlockSfx(){if(sUnlocked)return;sUnlocked=true;try{const u=URL.createObjectURL(encodeWav(new Float32Array(400),8000));spool().forEach(a=>{a.src=u;a.muted=true;const p=a.play();const done=()=>{a.pause();a.muted=false};if(p&&p.then)p.then(done,done);else done()})}catch(e){}}
+["pointerdown","touchend","keydown"].forEach(ev=>document.addEventListener(ev,unlockSfx,{capture:true}));
+function sfx(k,a){
+  if(!sfxOn()||!SFX[k])return;
+  if(sfxMedia()&&window.Audio){
+    try{const key=k+"|"+(a??"");
+      if(!SURL[key]){SREC=[];SFX[k](a);const ev=SREC;SREC=null;if(!ev.length)return;SURL[key]=URL.createObjectURL(renderSfx(ev))}
+      const el=spool()[spI++%SPOOL.length];el.muted=false;el.src=SURL[key];const p=el.play();if(p&&p.catch)p.catch(()=>{try{SFX[k](a)}catch(_){}});return}
+    catch(e){SREC=null}
+  }
+  try{SFX[k](a)}catch(e){}
+}
 function vib(p){if(!hapOn())return;try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
-const reduceMotion=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
+const MOTION_LS="uqu-motion";
+const reduceMotion=()=>{try{return localStorage.getItem(MOTION_LS)==="low"}catch(e){return false}};
+const applyMotion=()=>document.documentElement.classList.toggle("lowmo",reduceMotion());applyMotion();
+// stronger visual feedback: sparks from a point, a shake, a full-screen flash
+function burstAt(x,y,n=16,set=["✨","⭐","💫","🎉"],dist=110,size=20){
+  if(reduceMotion())return;const d=document.createElement("div");d.className="burst at";d.style.left=x+"px";d.style.top=y+"px";d.setAttribute("aria-hidden","true");
+  d.innerHTML=Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2+Math.random()*.5,r=dist*(.6+Math.random()*.7);
+    return`<i style="--dx:${(Math.cos(a)*r).toFixed(0)}px;--dy:${(Math.sin(a)*r).toFixed(0)}px;--r:${Math.floor(Math.random()*540)}deg;font-size:${size}px">${set[i%set.length]}</i>`}).join("");
+  document.body.appendChild(d);setTimeout(()=>d.remove(),1300);
+}
+const centerOf=el=>{const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]};
+function shake(el,lvl){if(reduceMotion()||!el)return;el.classList.remove("shk1","shk2","shk3");void el.offsetWidth;el.classList.add("shk"+Math.min(3,lvl));setTimeout(()=>el.classList.remove("shk"+Math.min(3,lvl)),450)}
+function flashScreen(col){if(reduceMotion())return;const f=document.createElement("div");f.className="flashscr";f.style.setProperty("--tc",col||"#fff");document.body.appendChild(f);setTimeout(()=>f.remove(),700)}
 // a small burst around the "+N" when a task is done
-function burst(n=14){
+function burst(n=20){
   if(reduceMotion())return;const d=document.createElement("div");d.className="burst";d.setAttribute("aria-hidden","true");
-  d.innerHTML=Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2+Math.random()*.4,r=70+Math.random()*60;
+  d.innerHTML=Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2+Math.random()*.4,r=90+Math.random()*90;
     return`<i style="--dx:${(Math.cos(a)*r).toFixed(0)}px;--dy:${(Math.sin(a)*r-30).toFixed(0)}px;--r:${Math.floor(Math.random()*360)}deg">${["✨","⭐","🟢","🟣","🔵","💫"][i%6]}</i>`}).join("");
   document.body.appendChild(d);setTimeout(()=>d.remove(),1200);
 }
@@ -2655,7 +2875,9 @@ function sheetBox(key,opt={}){
     bt.onclick=()=>{
       const now=Date.now();if(opened||now-last<140)return;last=now;taps++;
       bt.classList.add("tapped");bt.classList.remove("wig");void bt.offsetWidth;bt.classList.add("wig");
-      em.style.setProperty("--s",(1+.22*taps).toFixed(2));dots.forEach((d,i)=>d.classList.toggle("on",i<taps));
+      em.style.setProperty("--s",(1+.3*taps).toFixed(2));dots.forEach((d,i)=>d.classList.toggle("on",i<taps));
+      {const [cx,cy]=centerOf(em);burstAt(cx,cy,[8,12,18][taps-1],big&&taps>=2?["✨","⭐","💫",t.ic]:["✨","⭐","💫"],70+taps*30,16+taps*3)}
+      shake(box,taps);em.classList.remove("squash");void em.offsetWidth;em.classList.add("squash");
       if(big&&taps>=2)em.classList.add(taps>=3?"glow2":"glow");
       sfx("tap",taps-1);vib(18*taps);
       hint.textContent=taps===1?"مرة كمان! 👆":taps===2?"آخر وحدة… 😳":"🎉";
@@ -2664,23 +2886,24 @@ function sheetBox(key,opt={}){
     function open(){
       opened=true;
       const all=boxesAll();if(all[key]){all[key].o=Date.now();setTop("boxes",JSON.stringify(all))}
-      sfx("pop");em.classList.add("burst");const fl=box.querySelector("#bxFlash");fl.style.setProperty("--tc",t.col);fl.classList.add("go");
+      sfx("pop");const [cx,cy]=centerOf(em);em.classList.add("burst");const fl=box.querySelector("#bxFlash");fl.style.setProperty("--tc",t.col);fl.classList.add("go");
+      flashScreen(t.col);shake(box,3);burstAt(cx,cy,big?40:26,big?["🎉","✨","⭐",t.ic,"💥","🎊"]:["🎉","✨","⭐","🎊"],big?260:190,big?26:22);
       timers.push(setTimeout(()=>{sfx(x.t);vib(x.t==="x"?[40,40,40,40,120]:x.t==="j"?[40,40,90]:30);reveal()},reduceMotion()?60:420));
     }
     function reveal(){
       const left=opt.then?0:boxesWaiting().filter(w=>w.key!==key).length,cardPts=c?(had?CARD_DUP:RAR[c.r].pts):0;
       const head=x.t==="x"?"صندوق ذهبي!! 🤯":x.t==="j"?"جاكبوت! النقاط ×2 🔥":x.t==="g"?"حلو! 😎":"يا سلام! 🎉";
-      s1.hidden=true;s3.hidden=false;
-      s3.innerHTML=`<span class="scr-ic big pop">${t.ic}</span><h2 class="sh-t">${head}</h2><p class="bx-pts num"><span class="en" id="bxCount">+0</span> نقطة</p><p class="sh-note">${t.n}</p>
+      s1.hidden=true;s3.hidden=false;freshTap();
+      s3.innerHTML=`<div class="rays" style="--tc:${t.col}" aria-hidden="true"></div><span class="scr-ic big pop">${t.ic}</span><h2 class="sh-t">${head}</h2><p class="bx-pts num"><span class="en" id="bxCount">+0</span> نقطة</p><p class="sh-note">${t.n}</p>
         ${c?`${gcardHTML(c,{anim:1,big:1,fact:1})}<p class="sh-note">${had?`مكررة، عندك منها · +${CARD_DUP} نقاط`:`🆕 بطاقة جديدة لمجموعتك${RAR[c.r].pts?` · +${RAR[c.r].pts} نقطة`:""}`}</p>`:""}
         <div class="sh-act"><button class="btn primary big" id="bxOk">${opt.then?"خذها، والتالي ▶":"خذها 👌"}</button>${left?`<button class="btn" id="bxNext">🎁 افتح الجاي (${left})</button>`:""}${c?`<button class="btn sm" id="bxCards">🃏 شوف مجموعتي</button>`:""}</div>`;
       // every box is a little party; the rare ones are a big one
       const conf=box.querySelector("#bxConf"),gold=x.t==="x"||c&&c.r==="l";
-      conf.innerHTML=reduceMotion()?"":confettiHTML(x.t==="x"?46:x.t==="j"||c&&c.r!=="c"?32:x.t==="g"?22:14,gold?["🟡","✨","⭐","👑","💛","🎉"]:x.t==="j"?["🎉","✨","⭐","🟣","🔵","💫"]:["🎉","✨","⭐","🟢","💚","🎊"]);
+      conf.innerHTML=reduceMotion()?"":confettiHTML(x.t==="x"?70:x.t==="j"||c&&c.r!=="c"?55:x.t==="g"?40:30,gold?["🟡","✨","⭐","👑","💛","🎉"]:x.t==="j"?["🎉","✨","⭐","🟣","🔵","💫"]:["🎉","✨","⭐","🟢","💚","🎊"]);
       if(c)timers.push(setTimeout(()=>sfx("card"),300));
       // the points count up instead of just appearing
       const cnt0=box.querySelector("#bxCount"),total=+x.p||0,t0=performance.now(),dur=reduceMotion()?1:Math.min(1100,350+total*12);
-      const step=n=>{const k=Math.min(1,(n-t0)/dur),v=Math.round(total*(1-Math.pow(1-k,3)));if(cnt0)cnt0.textContent="+"+v;if(k<1)raf=requestAnimationFrame(step);else if(cardPts)cnt0.textContent=`+${total} (+${cardPts} 🃏)`};
+      const step=n=>{const k=Math.min(1,(n-t0)/dur),v=Math.round(total*(1-Math.pow(1-k,3)));if(cnt0)cnt0.textContent="+"+v;if(k<1)raf=requestAnimationFrame(step);else{if(cardPts)cnt0.textContent=`+${total} (+${cardPts} 🃏)`;const pe=cnt0.closest(".bx-pts");if(pe){pe.classList.add("popnum");const [px,py]=centerOf(pe);burstAt(px,py,14,["✨","⭐","🪙"],90,18);sfx("done")}}};
       raf=requestAnimationFrame(step);
       s3.querySelector("#bxOk").onclick=()=>{if(opt.then)opt.then();else closeSheet()};
       const nx=s3.querySelector("#bxNext");if(nx)nx.onclick=()=>{const w=boxesWaiting();if(w.length)sheetBox(w[0].key);else closeSheet()};
@@ -2722,7 +2945,7 @@ function sheetCard(id){const c=CARD_BY[id],own=ownedCards()[id];if(!c||!own)retu
   openSheet(`${gcardHTML(c,{anim:1,big:1,fact:1,n:own.length})}<p class="sh-note">${RAR[c.r].set} · لقيتها أول مرة ${fmt(isoOf(new Date(own[0].o)))}</p><div class="sh-act"><button class="btn primary big" id="gcOk">تمام</button></div>`,
     box=>{box.querySelector("#gcOk").onclick=closeSheet})}
 // ================= v14: 🎬 المقاطع · 🧠 الاسترجاع · 🔖 علامة الكتاب · 🎧 صوت التركيز · 🧾 الإيصال · 📈 الجاهزية · 🏋️ الأرقام · 🧬 العادة · 🌱 الأسبوع · 💎 التخفيف =================
-Object.assign(PTS,{clip:3,rtv:10,rtvAll:15,link:3,fast:5,bmk:5});
+Object.assign(PTS,{clip:3,rtv:10,rtvAll:15,link:3,fast:5,bmk:5,pray:5});
 const CLIP_BOX_P=.35,RESCUE_MS=7*864e5,OFFER_WAIT=10*6e4,BREAK_MS=15*6e4,CLIPS_PER_BREAK=4;
 // a study day runs 4 am → 4 am, so a late night still belongs to the day you started it
 const DAY_CUT=4;
@@ -2877,14 +3100,47 @@ function startSession(id){
   if(cur&&cur.id!==id){stopSession(cur.id,"switch");toast(`وقّفت جلسة ${label(BY_ID[cur.id])} وحفظت وقتها`)}
   const m=mk(id),now=Date.now();
   st.sit={id,s:now,acc0:+m.acc||0,rd0:rdVal()};saveSitLocal();
+  if(fiveRun){fiveRun=null;renderFive()}   // the real session takes over from the 5-minute starter
   savePatch(id,{startAt:now,pz:false,ss:m.ss||now});
   closeSheet(true);sfx("chime");focusSync();
 }
 function pauseSession(id){const m=mk(id);if(!m.startAt||m.pz)return;const now=Date.now();savePatch(id,{acc:sessMs(id),startAt:now,pz:now});focusSync()}
-function resumeSession(id){const m=mk(id);if(!m.startAt||!m.pz)return;savePatch(id,{startAt:Date.now(),pz:false});sfx("chime");focusSync()}
+function resumeSession(id){const m=mk(id);if(!m.startAt||!m.pz)return;endPause(id);savePatch(id,{startAt:Date.now(),pz:false});sfx("chime");focusSync()}
+// ---------- ⏸ a pause needs a real reason; prayer earns points ----------
+const PRAY_R="🕌 الصلاة",DEFAULT_REASONS=[PRAY_R,"🏠 أعمال المنزل","☕ راحة"],PRAY_MIN=4*6e4;
+const pausesList=()=>{const l=jget("pauses",[]);return Array.isArray(l)?l.filter(x=>x&&x.s&&x.id):[]};
+const reasonsList=()=>{const l=jget("preasons",[]).filter(r=>typeof r==="string"&&r&&!DEFAULT_REASONS.includes(r));return[...DEFAULT_REASONS,...l.slice(-12)]};
+const openPause=id=>pausesList().filter(p=>p.id===id&&!p.e).sort((a,b)=>b.s-a.s)[0];
+// closes the open pause (and any leftover open one for the same lecture, with no time, so it can't count as a long prayer)
+function endPause(id){const L=pausesList(),op=L.filter(x=>x.id===id&&!x.e);if(!op.length)return;const now=Date.now(),last=Math.max(...op.map(x=>+x.s));
+  op.forEach(p=>{p.e=+p.s===last?Math.max(now,+p.s):+p.s});setTop("pauses",JSON.stringify(L.slice(-400)))}
+// a pause whose session isn't paused any more (it was resumed or finished on another device) is closed where it really ended
+function fixPauses(){const L=pausesList(),now=Date.now();let ch=false;
+  L.forEach(p=>{if(p.e)return;const m=mk(p.id);if((m.startAt&&m.pz)||now-p.s<2*6e4)return;p.e=+m.startAt&&+m.startAt>=+p.s?+m.startAt:+p.s;ch=true});
+  if(ch)setTop("pauses",JSON.stringify(L.slice(-400)))}
+const brkPause=id=>{const m=mk(id);return!!(m.startAt&&m.pz&&!openPause(id))};   // paused with no reason = the break after 4 clips
+const prayDays=()=>{const by={};pausesList().filter(p=>p.r===PRAY_R&&p.e&&p.e-p.s>=PRAY_MIN).sort((a,b)=>a.s-b.s).forEach(p=>{const d=dayKeyOf(p.s);(by[d]=by[d]||[]).push(p)});return by};
+function sheetPause(id){
+  const a=activeSession();if(!a||a.id!==id||mk(id).pz)return;
+  const today=(prayDays()[curDay()]||[]).length,rs=reasonsList();
+  openSheet(`<div class="sh-ic">⏸</div><h2 class="sh-t">إيقاف مؤقت</h2><p class="sh-s en">${esc(label(BY_ID[id]))}</p>
+    <p class="sh-s">وش السبب؟ الوقت يوقف لين ترجع، والإيقاف بدون سبب مقنع يكسر التركيز اللي بنيته.</p>
+    <div class="reasons">${rs.map((r,i)=>`<button class="btn rsn" data-ri="${i}">${esc(r)}${r===PRAY_R?` <small>+${PTS.pray}</small>`:""}</button>`).join("")}</div>
+    <details class="rsn-new"><summary>سبب ثاني؟</summary><div class="frow"><input id="rsnIn" class="fin" maxlength="40" placeholder="اكتب سبب مقنع (يضاف للقائمة)"><button class="btn primary" id="rsnGo">أوقف</button></div><p class="perr" id="rsnErr" hidden></p></details>
+    <p class="sh-note">🕌 الصلاة تعطيك +${PTS.pray} (لو الإيقاف ${PRAY_MIN/6e4} دقايق أو أكثر، لين 5 صلوات باليوم)${today?` · اليوم: ${today}/5`:""}</p>`,box=>{
+    const go=r=>{const a2=activeSession();if(!a2||a2.id!==id||mk(id).pz){closeSheet();return}
+      const now=Date.now(),L=pausesList();L.forEach(p=>{if(p.id===id&&!p.e)p.e=+p.s});
+      setTop("pauses",JSON.stringify([...L,{id,s:now,e:0,r}].slice(-400)));pauseSession(id);closeSheet();
+      toast(r===PRAY_R?"تقبّل الله 🕌 الوقت موقوف لين ترجع":`⏸ موقوفة · ${r}`);if(FS&&FS.id===id)drawFocus()};
+    box.querySelectorAll("[data-ri]").forEach(b=>b.onclick=()=>{const r=rs[+b.dataset.ri];if(r)go(r)});
+    box.querySelector("#rsnGo").onclick=()=>{const v=box.querySelector("#rsnIn").value.trim().replace(/\s+/g," "),err=box.querySelector("#rsnErr");
+      if(v.length<4||/^(.)\1*$/.test(v)){err.hidden=false;err.textContent="اكتب سبب واضح ومقنع (4 حروف أو أكثر).";return}
+      const r="📝 "+v,old=jget("preasons",[]).filter(x=>typeof x==="string");if(!DEFAULT_REASONS.includes(r))setTop("preasons",JSON.stringify([...old.filter(x=>x!==r),r]));go(r)};
+  });
+}
 // ends the sitting and banks its time; returns the receipt data
 function stopSession(id,how){
-  const ms=sessMs(id),rec=closeSitting(id,how);
+  endPause(id);const ms=sessMs(id),rec=closeSitting(id,how);
   savePatch(id,{acc:ms,startAt:false,pz:false});focusSync();if(FS&&FS.id===id)hideFocus();return rec;
 }
 function closeSitting(id,how){
@@ -2902,23 +3158,37 @@ function closeSitting(id,how){
 const FSND_LS="uqu-fsnd";
 const fsndType=()=>{try{const v=localStorage.getItem(FSND_LS);return v==="rain"||v==="off"?v:"brown"}catch(e){return"brown"}};
 const fsndUrl={};let fsAudio=null,fsBlocked=false;
+// long files (4 min brown / 3 min rain) so the loop point comes rarely, and the end flows into the start
 function makeNoiseWav(type){
-  const sr=22050,sec=16,N=sr*sec,fade=sr,buf=new Float32Array(N+fade);
+  const sr=11025,sec=type==="rain"?180:240,N=sr*sec,fade=sr*3,buf=new Float32Array(N+fade);
   if(type==="rain"){let b0=0,b1=0,b2=0;for(let i=0;i<buf.length;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099046;b1=.963*b1+w*.2965164;b2=.57*b2+w*1.0526913;buf[i]=(b0+b1+b2+w*.1848)*.11}
-    for(let k=0;k<sec*10;k++){const at=Math.floor(Math.random()*(buf.length-400)),amp=.05+Math.random()*.14,f=1800+Math.random()*3200;for(let j=0;j<300;j++)buf[at+j]+=amp*Math.exp(-j/36)*Math.sin(2*Math.PI*f*j/sr)}}
+    // a soft low "roof" rumble plus scattered droplets
+    let lp=0;for(let i=0;i<buf.length;i++){lp+=(buf[i]-lp)*.05;buf[i]=buf[i]*.8+lp*1.6}
+    for(let k=0;k<sec*14;k++){const at=Math.floor(Math.random()*(buf.length-300)),amp=.02+Math.random()*.05,f=1200+Math.random()*3200;for(let j=0;j<220;j++)buf[at+j]+=amp*Math.exp(-j/28)*Math.sin(2*Math.PI*f*j/sr)}}
   else{let b=0;for(let i=0;i<buf.length;i++){b=(b+.02*(Math.random()*2-1))/1.02;buf[i]=b*3.5}}
-  for(let i=0;i<fade;i++){const g=i/fade;buf[i]=buf[i]*g+buf[N+i]*(1-g)}   // the tail flows into the head: no click at the loop
-  let pk=0;for(let i=0;i<N;i++)pk=Math.max(pk,Math.abs(buf[i]));const g=(type==="rain"?.34:.4)/(pk||1),pcm=new Float32Array(N);for(let i=0;i<N;i++)pcm[i]=buf[i]*g;
+  for(let i=0;i<fade;i++){const g=i/fade;buf[i]=buf[i]*Math.sqrt(g)+buf[N+i]*Math.sqrt(1-g)}
+  // loudness by average energy (not by the loudest spike), then a gentle soft-clip
+  let e=0;for(let i=0;i<N;i++)e+=buf[i]*buf[i];const g=(type==="rain"?.17:.2)/Math.sqrt(e/N||1),pcm=new Float32Array(N);
+  for(let i=0;i<N;i++)pcm[i]=Math.tanh(buf[i]*g*1.2)/1.2;
   return encodeWav(pcm,sr);
 }
-function focusAudio(){if(!fsAudio){fsAudio=new Audio();fsAudio.loop=true;fsAudio.preload="auto";fsAudio.setAttribute("playsinline","")}return fsAudio}
+const FSMUTE_LS="uqu-fsmute";
+const fsMuted=()=>{try{return localStorage.getItem(FSMUTE_LS)==="1"}catch(e){return false}};
+function fsToggleMute(){const m=!fsMuted();try{localStorage.setItem(FSMUTE_LS,m?"1":"0")}catch(e){}if(!m)fsBlocked=false;focusSync();toast(m?"🔇 صوت التركيز مقفّل":"🔊 صوت التركيز شغّال");renderSession();if(focusOpen())drawFocus();if(fiveRun)renderFive()}
+const fsPlaying=()=>!!(fsAudio&&!fsAudio.paused);
+const fsIcon=()=>fsMuted()?"🔇":fsPlaying()?"🔊":"🔈";
+function focusAudio(){if(!fsAudio){fsAudio=new Audio();fsAudio.loop=true;fsAudio.preload="auto";fsAudio.setAttribute("playsinline","");
+  // the lock screen / Control Center button pauses it like the 🔇 in the page
+  try{if("mediaSession" in navigator){navigator.mediaSession.setActionHandler("pause",()=>{if(!fsMuted())fsToggleMute()});navigator.mediaSession.setActionHandler("play",()=>{if(fsMuted())fsToggleMute()})}}catch(e){}}
+  return fsAudio}
 const focusWanted=()=>{const a=activeSession();return!!((a&&!mk(a.id).pz)||(fiveRun&&!fiveRun.done))};
 function focusSync(){
-  const want=focusWanted()&&fsndType()!=="off"&&!st.recOn;let el;try{el=focusAudio()}catch(e){return}
+  const want=focusWanted()&&fsndType()!=="off"&&!fsMuted()&&!st.recOn;let el;try{el=focusAudio()}catch(e){return}
   if(!want){if(!el.paused)el.pause();if(fsBlocked){fsBlocked=false;renderSession()}return}
   const tp=fsndType();try{if(!fsndUrl[tp])fsndUrl[tp]=URL.createObjectURL(makeNoiseWav(tp))}catch(e){return}
   if(el.dataset.tp!==tp){el.src=fsndUrl[tp];el.dataset.tp=tp}
-  if(el.paused){const p=el.play();if(p&&p.then)p.then(()=>{if(fsBlocked){fsBlocked=false;renderSession()}}).catch(()=>{if(!fsBlocked){fsBlocked=true;renderSession()}})}
+  try{if("mediaSession" in navigator&&window.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:tp==="rain"?"🌧️ صوت التركيز: مطر":"🟤 صوت التركيز","artist":"جدول المذاكرة"})}catch(e){}
+  if(el.paused){const p=el.play();if(p&&p.then)p.then(()=>{fsBlocked=false;renderSession()}).catch(()=>{fsBlocked=true;renderSession()})}
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")focusSync()});
 SFX.tap=i=>{const f=[523,659,784][i]||880;tone(f,0,.24,{type:"triangle",g:.16});tone(f*2,.015,.14,{g:.05});noise(0,.05,.035,2600)};
@@ -2932,7 +3202,8 @@ const focusOpen=()=>!!(FS&&fsEl()&&!fsEl().hidden);
 function openFocus(id,mode){
   const c=clipsOf(id);if(!c)return;const p=cprOf(id),a=activeSession();
   const keep=FS&&FS.id===id;
-  FS={id,i:p.i,mode:mode||(p.i>=c.c.length?"done":a&&mk(id).pz?"break":"read"),sel:new Set(),sb:keep?FS.sb:0,cd:0,brk:keep&&FS.brk?FS.brk:(a&&mk(id).pz?Date.now()+BREAK_MS:0),gain:null,hem:keep&&FS.hem};
+  const brk=a&&a.id===id&&brkPause(id);
+  FS={id,i:p.i,mode:mode||(p.i>=c.c.length?"done":brk?"break":"read"),sel:new Set(),sb:keep?FS.sb:0,cd:0,brk:keep&&FS.brk?FS.brk:(brk?+mk(id).pz+BREAK_MS:0),gain:null,hem:keep&&FS.hem,modeAt:Date.now()};
   const e=fsEl();e.hidden=false;document.documentElement.classList.add("noscroll");drawFocus();
 }
 function hideFocus(){const e=fsEl();if(e){e.hidden=true;e.innerHTML=""}if($("#ov").hidden)document.documentElement.classList.remove("noscroll");renderSession()}
@@ -2945,7 +3216,7 @@ function drawFocus(){
   const dots=c.c.map((_,k)=>`<i class="${p.r[k]||""}${k===i&&FS.mode!=="done"?" cur":""}"></i>`).join("");
   const head=`<div class="fx-top"><button class="fx-ic" data-fx="min" aria-label="صغّر">⌄</button>
     <div class="fx-t"><b class="en">${esc(label(b))}</b><small><span class="num" id="fxClock">${hms(sessMs(id))}</span>${chest?` · 🎁×${chest}`:""}${rd?` · 📈 ${pct(Math.round(rd.v))}`:""}</small></div>
-    <button class="fx-ic" data-fx="park" aria-label="فرّغ فكرة">💭</button></div><div class="fx-dots" aria-label="المقاطع">${dots}</div>`;
+    <span class="fx-r">${fsndType()!=="off"?`<button class="fx-ic" data-fx="snd" aria-label="صوت التركيز">${fsIcon()}</button>`:""}<button class="fx-ic" data-fx="park" aria-label="فرّغ فكرة">💭</button></span></div><div class="fx-dots" aria-label="المقاطع">${dots}</div>`;
   let body="";
   if(FS.mode==="read"&&x){
     body=`<p class="fx-k">المقطع ${i+1} من ${n}${x.mi?` · ≈ ${x.mi} دقيقة`:""}</p>
@@ -2953,8 +3224,8 @@ function drawFocus(){
       <h2 class="fx-h en">${esc(x.h)}</h2>${x.ar?`<p class="fx-ar">${esc(x.ar)}</p>`:""}
       ${x.hk?`<div class="hookbox">🪝 <b>خلّك في بالك وانت تقرأ:</b> ${esc(x.hk)}</div>`:""}
       ${FS.hem?`<p class="ce mid">📖 حيلة همنغواي: اقرأ أول شريحتين بس، وبعدها اضغط «🔖 وقّف هنا».</p>`:""}
-      ${paused?`<p class="fx-note">☕ الجلسة موقوفة</p><button class="btn primary big fx-main" data-fx="resume">▶ كمّل</button>`:`<button class="btn primary big fx-main" data-fx="read">✓ خلّصت المقطع</button>`}
-      <div class="fx-row"><button class="btn sm" data-fx="stop">🔖 وقّف هنا</button><button class="btn sm" data-fx="finish">✓ ذاكرتها كاملة</button></div>`;
+      ${paused?(()=>{const op=openPause(id);return`<p class="fx-note">⏸ موقوفة${op?`: ${esc(op.r)} · من ${ago(op.s)}`:""}</p><button class="btn primary big fx-main" data-fx="resume">▶ استأنف</button>`})():`<button class="btn primary big fx-main" data-fx="read">✓ خلّصت المقطع</button>`}
+      <div class="fx-row">${paused?"":`<button class="btn sm" data-fx="pause">⏸ إيقاف مؤقت</button>`}<button class="btn sm" data-fx="stop">🔖 وقّف هنا</button><button class="btn sm" data-fx="finish">✓ ذاكرتها كاملة</button></div>`;
   }else if(FS.mode==="blurt"&&x){
     body=`<p class="fx-k">${CLIP_T[x.y]} · المقطع ${i+1}</p><h2 class="fx-h">🗣️ فرّغ بدون ما تشوف</h2>
       <div class="fx-prompt">${esc(x.p)}</div>
@@ -2992,16 +3263,20 @@ function drawFocus(){
     body=`<div class="sh-ic">🎉</div><h2 class="fx-h">خلّصت كل المقاطع!</h2><p class="fx-note">${cnt(n,"مقطع","مقطعين","مقاطع")} · <span class="en">✅${ok} 🟡${md} ❌${hd}</span></p>
       <button class="btn primary big fx-main" data-fx="finish">✓ سجّلها «ذاكرتها»</button>`;
   }
+  const sig=FS.mode+"|"+i;if(FS.drawn!==sig){FS.drawn=sig;FS.modeAt=Date.now()}
   e.innerHTML=`<div class="fx-box" role="dialog" aria-modal="true" aria-label="وضع التركيز">${head}<div class="fx-body">${body}</div></div>`;
   e.querySelectorAll("[data-fx]").forEach(bt=>bt.onclick=()=>focusAct(bt.dataset.fx,bt));
   e.querySelectorAll("[data-key]").forEach(bt=>bt.onclick=()=>{const j=+bt.dataset.key;FS.sel.has(j)?FS.sel.delete(j):FS.sel.add(j);drawFocus()});
   e.querySelectorAll("[data-rate]").forEach(bt=>bt.onclick=()=>clipRate(bt.dataset.rate));
   const tx=e.querySelector("#fxTxt");if(tx)tx.oninput=()=>{FS.txt=tx.value};
 }
+const FX_STEP=["read","check","redo","go","resume","brkEnd","brkSkip","finish","knot"];
 function focusAct(a,bt){
   const id=FS&&FS.id;if(!id)return;
+  if(FX_STEP.includes(a)&&Date.now()-(FS.modeAt||0)<320)return;
   if(a==="min"){hideFocus();return}
   if(a==="park"){openPark();return}
+  if(a==="snd"){if(!fsMuted()&&!fsPlaying()){fsBlocked=false;focusSync();setTimeout(drawFocus,300)}else fsToggleMute();return}
   if(a==="read"){FS.mode="blurt";FS.txt="";drawFocus();return}   // no auto-focus: blurting out loud shouldn't pop the keyboard
   if(a==="check"){FS.mode="check";FS.sel=new Set();drawFocus();return}
   if(a==="redo"){FS.mode="read";FS.sel=new Set();FS.txt="";drawFocus();return}
@@ -3010,6 +3285,7 @@ function focusAct(a,bt){
   if(a==="go"){FS.cd=0;FS.mode="read";FS.hem=false;drawFocus();return}
   if(a==="hold"){FS.cd=0;drawFocus();return}
   if(a==="stop"){sheetBookmark(id);return}
+  if(a==="pause"){sheetPause(id);return}
   if(a==="resume"){resumeSession(id);FS.mode="read";drawFocus();return}
   if(a==="brkEnd"){resumeSession(id);FS.brk=0;FS.brkRang=0;FS.mode="read";drawFocus();return}
   if(a==="brkSkip"){if(bt.dataset.sure!=="1"){bt.dataset.sure="1";bt.textContent="متأكد؟ الاستراحة تثبّت";setTimeout(()=>{if(bt.isConnected){bt.dataset.sure="";bt.textContent="تخطي الاستراحة"}},3000);return}
@@ -3019,6 +3295,7 @@ function focusAct(a,bt){
     finishStudy(id);return}
 }
 function clipRate(g){
+  if(Date.now()-(FS.modeAt||0)<320)return;
   const id=FS.id,c=clipsOf(id),p=cprOf(id),i=FS.i,x=c&&c.c[i];if(!x)return;
   const rd0=rdVal(),first=!p.t[i],key=`${id}|clip|${i}`,had=!!boxesAll()[key];
   p.r[i]=g;if(first)p.t[i]=Date.now();if(g!=="h")p.i=Math.max(p.i,i+1);
@@ -3066,7 +3343,8 @@ function sheetBookmark(id){
       savePatch(id,{bm:JSON.stringify(bm)});
       if(rec)sheetReceipt(rec);else{closeSheet();toast("انحفظت علامتك 🔖")}};
     const dr=box.querySelector("#bmDrop");dr.onclick=()=>{if(dr.dataset.sure!=="1"){dr.dataset.sure="1";dr.textContent="متأكد؟ وقت هالجلسة بينشال";return}
-      st.sit=null;saveSitLocal();savePatch(id,{startAt:false,pz:false});focusSync();if(FS&&FS.id===id)hideFocus();closeSheet();toast("ألغيت الجلسة")};
+      endPause(id);const acc0=st.sit&&st.sit.id===id?(+st.sit.acc0||0):(+mk(id).acc||0);
+      st.sit=null;saveSitLocal();savePatch(id,{startAt:false,pz:false,acc:acc0||false});focusSync();if(FS&&FS.id===id)hideFocus();closeSheet();toast("ألغيت الجلسة")};
   });
 }
 function latestBookmark(){let best=null;ALL.forEach(b=>{if(!needsStudy(b))return;const m=mk(b.id);if(m.studied||m.startAt)return;
@@ -3107,9 +3385,10 @@ function rtvBoundary(){
   return B;
 }
 function rtvQueue(){
-  const B=rtvBoundary(),now=Date.now(),from=Math.max(B-48*HR,ledgerStart()-1);
+  const B=rtvBoundary(),now=Date.now(),from=Math.max(B-48*HR,appStart()-1);
+  // a lecture belongs to the night it was STARTED in (3:30 → 4:40 am is still last night), and comes back 6 h after you finished it
   return ALL.filter(needsStudy).map(b=>({b,m:mk(b.id)})).filter(({m})=>m.studied&&!m.rv&&!m.rev1)
-    .map(({b,m})=>({b,t:studiedAt(m)})).filter(x=>x.t<B&&x.t>=from&&now-x.t>=6*HR).sort((x,y)=>x.t-y.t);
+    .map(({b,m})=>{const t=studiedAt(m);return{b,t,t0:m.sAt&&m.mins?Math.min(t,+m.sAt-m.mins*6e4):t}}).filter(x=>x.t0<B&&x.t0>=from&&now-x.t>=6*HR).sort((x,y)=>x.t0-y.t0);
 }
 const rtvLocked=()=>rtvQueue().length>0;
 const rtvDoneNow=()=>{const B=rtvBoundary();return ALL.filter(b=>{const m=mk(b.id);return m.rv&&(+m.rvAt||0)>=B}).length};
@@ -3133,20 +3412,20 @@ function sheetRtv(){
   const top=`<p class="sh-note">🧠 الاسترجاع ${k} من ${total}</p><h2 class="sh-t en">${esc(label(b))}</h2>`;
   openSheet(`<div id="rvBox" class="rvbox"></div>`,box=>{
     const R=box.querySelector("#rvBox");
-    const step1=()=>{R.innerHTML=`<div class="sh-ic">🧠</div>${top}
+    const step1=()=>{freshTap();R.innerHTML=`<div class="sh-ic">🧠</div>${top}
       <p class="sh-s">ذاكرتها ${dayAr(isoOf(new Date(t)))} ${clock(t)}. غمّض عينك واسترجعها كاملة بدون ما تشوف: الأقسام، الآليات، الأرقام، الأمثلة. قلها بصوتك أو في راسك.</p>
       ${c?`<div class="rtv-map"><b>🗺️ عناوين المقاطع بس (كمفاتيح):</b><ol>${c.c.map(x=>`<li class="en">${esc(x.h)}</li>`).join("")}</ol></div>`:""}
       ${hs.length?`<div class="hints"><b>تلميحاتك:</b>${hs.slice(-3).map(h=>`<span>${hintLine(h)}</span>`).join("")}</div>`:""}
       <div class="sh-act"><button class="btn primary big" id="rv1">خلّصت، خلني أقارن 👀</button><button class="btn sm" id="rvLater">بعدين</button></div>`;
       R.querySelector("#rv1").onclick=step2;R.querySelector("#rvLater").onclick=()=>closeSheet()};
-    const step2=()=>{R.innerHTML=`${top}<p class="sh-s">${c?"قارن باللي طلّعته من راسك:":"افتح الشرائح وقلّبها بسرعة: وش نسيت؟"}</p>
+    const step2=()=>{freshTap();R.innerHTML=`${top}<p class="sh-s">${c?"قارن باللي طلّعته من راسك:":"افتح الشرائح وقلّبها بسرعة: وش نسيت؟"}</p>
       ${c?`<div class="rv-keys">${c.c.map((x,i)=>`<div class="rv-k"><b class="en">${i+1}. ${esc(x.h)}</b>${x.k.length?`<ul>${x.k.map(y=>`<li class="en">${esc(y)}</li>`).join("")}</ul>`:""}</div>`).join("")}</div>`:""}
       <div class="pchips rvr">
         <button class="rt e" data-g="e">تذكرت أغلبها<small>✅</small></button>
         <button class="rt m" data-g="m">نص نص<small>🟡 تقدر تربط اللي طار</small></button>
         <button class="rt h" data-g="h">بصعوبة<small>🔴 المراجعة الأولى تقرب يوم</small></button></div>`;
       R.querySelectorAll("[data-g]").forEach(x=>x.onclick=()=>{g=x.dataset.g;g==="e"?finish({}):step3()})};
-    const step3=()=>{R.innerHTML=`${top}<div class="sh-ic">🔗</div><h2 class="sh-t">ليش طارت؟</h2>${LINK_HTML}
+    const step3=()=>{freshTap();R.innerHTML=`${top}<div class="sh-ic">🔗</div><h2 class="sh-t">ليش طارت؟</h2>${LINK_HTML}
       <div class="sh-act"><button class="btn primary big" id="rvSave">احفظ الربط وكمّل</button><button class="btn" id="rvSkip">${g==="h"?"تخطي":"ما طار شي مهم"}</button></div>`;
       R.querySelector("#rvSave").onclick=()=>{const f=R.querySelector("#lkF").value.trim(),l=R.querySelector("#lkL").value.trim();if(!f){toast("اكتب المعلومة اللي طارت، أو اضغط تخطي");return}finish(hintPatch(id,f,l,"rtv"))};
       R.querySelector("#rvSkip").onclick=()=>finish({})};
@@ -3236,7 +3515,7 @@ function sheetReceipt(rec){
       <div class="rc-row"><span>⏱️ تركيز</span><b>${mins?durFmt(mins):"أقل من دقيقة"}</b></div>
       ${rec.cl?`<div class="rc-row"><span>🎬 مقاطع</span><b><span class="en">✅${rec.ok} 🟡${rec.md} ❌${rec.hd}</span> · ${rec.cl}</b></div>`:""}
       ${dRd!=null?`<div class="rc-row"><span>📈 جاهزيتك للـ <span class="en">${rd.e.short}</span></span><b><span class="en">${rec.rd0.toFixed(1)}%</span> ← <span class="en">${rd.v.toFixed(1)}%</span> <em class="en ${dRd>=0?"plus":"neg"}">${dRd>=0?"+":""}${dRd.toFixed(1)}</em></b></div>`:""}
-      ${wk.target?`<div class="rc-row"><span>🎯 هدف الأسبوع</span><b>${wk.done}/${wk.target} مقطع</b></div>`:wk.done?`<div class="rc-row"><span>🎬 هالأسبوع</span><b>${cnt(wk.done,"مقطع","مقطعين","مقاطع")}</b></div>`:""}
+      ${wk.target?`<div class="rc-row"><span>🎯 هدف الأسبوع</span><b>${wk.done}/${wk.target} مقطع</b></div>`:wk.done?`<div class="rc-row"><span>🎬 هالأسبوع</span><b>${cnt(wk.done,"مقطع واحد","مقطعين","مقاطع")}</b></div>`:""}
       <div class="rc-row"><span>🧬 عادتك</span><b>${pct(Math.round(hb.A*100))} · 🔥 ${hb.chain}</b></div>
     </div>
     ${prs.map(p=>`<div class="bgot"><span class="bic">🏆</span><span><b>رقم قياسي جديد: ${p.n}</b><small>${p.txt}</small></span></div>`).join("")}
@@ -3260,6 +3539,9 @@ function weekInfo(){
 
 // ---------- 🧬 habit strength (Lally 2010) + "never miss twice" ----------
 const HAB_K=Math.log(20)/66;
+// when you really started (your first study activity): moving the ledger start for fines doesn't wipe your habit, rewards phase or retrieval
+let AS=0,ASk=-1;
+const appStart=()=>{if(ASk!==LV){ASk=LV;const v=Object.values(habitDays());AS=Math.min(ledgerStart(),...v.filter(x=>x>1e12))}return AS};
 function habitDays(){
   const D={},put=ms=>{ms=+ms;if(!ms)return;const d=dayKeyOf(ms);if(!D[d]||ms<D[d])D[d]=ms},putIso=iso=>{if(typeof iso==="string"&&/^\d{4}-\d\d-\d\d$/.test(iso)&&!D[iso])D[iso]=new Date(iso+"T18:00:00").getTime()};
   for(const id in S.marks){const m=S.marks[id];if(!m||!BY_ID[id])continue;
@@ -3274,7 +3556,7 @@ function habitDays(){
   return D;
 }
 function habit(){
-  const D=habitDays(),rest=new Set(restList()),start=dayKeyOf(ledgerStart()),today=curDay(),hrsL=[];
+  const D=habitDays(),rest=new Set(restList()),start=dayKeyOf(appStart()),today=curDay(),hrsL=[];
   let A=0,chain=0,best=0,miss=0,days=0;
   for(let d=start,g=0;d<=today&&g<400;d=addDays(d,1),g++){
     if(D[d]){const h=(D[d]-dayStartMs(d))/HR;let w=1;if(hrsL.length>=3){const s=[...hrsL].sort((a,b)=>a-b),med=s[Math.floor(s.length/2)];w=Math.abs(h-med)<=2?1:.7}
@@ -3292,6 +3574,30 @@ function setRest(d,on){
 }
 
 // ---------- 🌱 a fresh start every Sunday ----------
+// ---------- 🤔 a session left running while the page was closed for hours: ask, don't guess ----------
+const SEEN_LS="uqu-lastseen";
+let prevSeen=(()=>{try{return+localStorage.getItem(SEEN_LS)||0}catch(e){return 0}})();
+const markSeen=()=>{try{localStorage.setItem(SEEN_LS,String(Date.now()))}catch(e){}};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){try{prevSeen=+localStorage.getItem(SEEN_LS)||prevSeen}catch(e){}}else markSeen()});
+window.addEventListener("pagehide",markSeen);
+setInterval(()=>{if(document.visibilityState==="visible")markSeen()},30000);
+function forgotCheck(){
+  const a=activeSession();if(!a||!st.sit||st.sit.id!==a.id)return false;const m=mk(a.id);
+  if(m.pz||!prevSeen||st.sit.s>=prevSeen||Date.now()-prevSeen<3*HR)return false;   // only a sitting started here, and running while the page was away
+  const k=a.id+"|"+prevSeen;if(st.forgot===k)return false;st.forgot=k;
+  const last=Math.max(prevSeen,+m.startAt);
+  openSheet(`<div class="sh-ic">🤔</div><h2 class="sh-t">الجلسة شغّالة من ${ago(+m.startAt)}</h2><p class="sh-s en">${esc(label(BY_ID[a.id]))}</p>
+    <p class="sh-s">آخر مرة كان الموقع مفتوح هنا قبل ${ago(last)} (${clock(last)}). كنت تذاكر طول هالوقت، ولا نسيت توقفها؟</p>
+    <div class="sh-act"><button class="btn primary big" id="fgKeep">📚 كنت أذاكر، كمّل</button><button class="btn" id="fgStop">😅 نسيتها: احسب لين ${clock(last)}</button></div>`,box=>{
+    box.querySelector("#fgKeep").onclick=()=>closeSheet();
+    box.querySelector("#fgStop").onclick=()=>{const m2=mk(a.id);if(!m2.startAt||m2.pz){closeSheet();return}
+      const st0=+m2.startAt,acc=(+m2.acc||0)+Math.max(0,last-st0);savePatch(a.id,{acc,startAt:last,pz:last});
+      const c=clipsOf(a.id),p=c?cprOf(a.id):null,cur=c&&p?c.c[p.i]:null,bm=sjson(mk(a.id).bm,null);stopSession(a.id,"stale");
+      if(!bm||bm.r)savePatch(a.id,{bm:JSON.stringify({at:last,i:p?p.i:0,w:cur?`المقطع ${p.i+1}: ${cur.h}`:"",q:cur&&cur.hk||"",s:""})});
+      closeSheet();toast(`حسبت وقتك لين ${new Date(last).getHours()%12||12}:${String(new Date(last).getMinutes()).padStart(2,"0")} وحفظت علامتك 🔖`)};
+  });
+  return true;
+}
 function staleCheck(){
   const a=activeSession();if(!a)return;const m=mk(a.id);if(!m.pz||Date.now()-m.pz<2*HR)return;
   const c=clipsOf(a.id),p=c?cprOf(a.id):null,cur=c&&p?c.c[p.i]:null,bm=sjson(m.bm,null);
@@ -3327,7 +3633,7 @@ function sheetWeek(){
 }
 
 // ---------- 💎 reward thinning: rewards build the habit, then they get rarer (and bigger) so it sticks ----------
-function thinPhase(){const d=(Date.now()-ledgerStart())/864e5;return d<=14?{ph:0,p:1}:d<=28?{ph:1,p:.7}:{ph:2,p:.5}}
+function thinPhase(){const d=(Date.now()-appStart())/864e5;return d<=14?{ph:0,p:1}:d<=28?{ph:1,p:.7}:{ph:2,p:.5}}
 function thinCheck(){
   const t=thinPhase();if(t.ph<=(+S.thin||0))return false;setTop("thin",t.ph);
   openSheet(`<div class="sh-ic">💎</div><h2 class="sh-t">مرحلة جديدة: الصناديق صارت أندر وأكبر</h2>
@@ -3364,8 +3670,8 @@ function ringSVG(done,n){const r=17,C=2*Math.PI*r,p=n?done/n:0;
 function renderHub(){
   const el=$("#hub");if(!el)return;
   const a=activeSession(),q=rtvQueue(),bmL=!a?latestBookmark():null,rd=rdToday(),hb=habit(),wk=weekInfo();let card="";
-  if(a&&clipsOf(a.id)){const c=clipsOf(a.id),p=cprOf(a.id);
-    card=`<section class="hubc"><div class="hc-h"><b>⏱️ تذاكر الحين</b><span class="num">🎬 ${Math.min(p.i+1,c.c.length)}/${c.c.length}</span></div><p class="hc-t en">${esc(label(BY_ID[a.id]))}</p><button class="btn primary big" data-hub="focus">🎬 افتح وضع التركيز</button></section>`}
+  if(a&&clipsOf(a.id)){const c=clipsOf(a.id),p=cprOf(a.id),pz=!!mk(a.id).pz,op=pz?openPause(a.id):null;
+    card=`<section class="hubc"><div class="hc-h"><b>${pz?`⏸ موقوفة${op?``:" · ☕ استراحة"}`:"⏱️ تذاكر الحين"}</b><span class="num">🎬 ${Math.min(p.i+1,c.c.length)}/${c.c.length}</span></div><p class="hc-t en">${esc(label(BY_ID[a.id]))}</p>${op?`<small class="hc-r">${esc(op.r)} · من ${ago(op.s)}</small>`:""}<button class="btn primary big" data-hub="focus">${pz&&op?"▶ استأنف":"🎬 افتح وضع التركيز"}</button></section>`}
   else if(!a&&q.length){const x=q[0],done=rtvDoneNow();
     card=`<section class="hubc rtvc"><div class="hc-h"><b>🧠 الاسترجاع</b><span class="num">${done+1} من ${done+q.length}</span></div><p class="hc-t en">${esc(label(x.b))}</p>
       <small>ذاكرتها ${dayAr(isoOf(new Date(x.t)))} ${clock(x.t)}${hintsOf(x.b.id).length?" · 💡 عندك تلميح":""}</small>
@@ -3381,7 +3687,7 @@ function renderHub(){
     ${wk.deload&&!hb.restToday?`<p class="hub-warn soft">🛌 الأيام اللي فاتت كانت ثقيلة. وش رايك يوم خفيف؟ <button class="linkbtn" data-hub="rest">خلّه يوم راحة</button></p>`:""}`;
   el.innerHTML=card+strip;
   el.querySelectorAll("[data-hub]").forEach(x=>x.onclick=()=>{const k=x.dataset.hub;
-    if(k==="focus"&&a)openFocus(a.id);else if(k==="rtv")sheetRtv();else if(k==="bm")startFlow(x.dataset.id);
+    if(k==="focus"&&a){if(mk(a.id).pz&&openPause(a.id))resumeSession(a.id);openFocus(a.id)}else if(k==="rtv")sheetRtv();else if(k==="bm")startFlow(x.dataset.id);
     else if(k==="radar")setPage("radar");else if(k==="career"){st.achTab="c";setPage("career")}else if(k==="rest")setRest(curDay(),true)});
 }
 
@@ -3393,10 +3699,10 @@ function careerExtrasHTML(){
     :`<div class="frow"><button class="btn sm" data-rest="${today}|1">🛌 اليوم يوم راحة</button>${weekStartOf(tmr)===weekStartOf(today)?`<button class="btn sm" data-rest="${tmr}|1">🛌 بكرة يوم راحة</button>`:""}</div>`;
   return`<section class="cx"><div class="kh gk">🎯 هدف الأسبوع</div>
       ${wk.target?`<p class="note" style="margin:0"><b class="num">${wk.done}/${wk.target}</b> مقطع ${wk.deload?"· 🛌 أسبوع أخف بعد أسبوع ثقيل":"· زيادة بسيطة عن الأسبوع اللي فات (Progressive overload)"}</p>${pbar(Math.min(100,Math.round(wk.done/wk.target*100)),"lvbar")}`
-        :`<p class="note" style="margin:0">هالأسبوع نقيس: ${cnt(wk.done,"مقطع","مقطعين","مقاطع")} للحين. من الأسبوع الجاي يصير لك هدف يزيد شوي شوي زي التحميل التدريجي في الجيم.</p>`}
+        :`<p class="note" style="margin:0">هالأسبوع نقيس: ${cnt(wk.done,"مقطع واحد","مقطعين","مقاطع")} للحين. من الأسبوع الجاي يصير لك هدف يزيد شوي شوي زي التحميل التدريجي في الجيم.</p>`}
     </section>
     <section class="cx"><div class="kh gk">🧬 قوة عادتك <span class="num">${pct(Math.round(hb.A*100))}</span></div>${pbar(Math.round(hb.A*100),"lvbar")}
-      <p class="note" style="margin:0">العادة تاخذ في المتوسط 66 يوم لين تصير تلقائية (Lally 2010). كل يوم تذاكر فيه يرفعها، وأسرع لو كان في نفس وقتك المعتاد. ذاكرت ${cnt(hb.days,"يوم","يومين","أيام")} للحين.</p>
+      <p class="note" style="margin:0">العادة تاخذ في المتوسط 66 يوم لين تصير تلقائية (Lally 2010). كل يوم تذاكر فيه يرفعها، وأسرع لو كان في نفس وقتك المعتاد. ذاكرت ${cnt(hb.days,"يوم واحد","يومين","أيام")} للحين.</p>
       <p class="note" style="margin:0">🔥 السلسلة ما تنكسر بيوم واحد، تنكسر لو فوّت <b>يومين ورا بعض</b>. ويوم الراحة المخطط (واحد في الأسبوع) ما ينحسب عليك. يحمي سلسلتك وعادتك، بس المهام اللي موعدها فيه تمشي غراماتها عادي.</p>${restBtn}
     </section>
     <section class="cx"><div class="kh gk">🏋️ أرقامك القياسية</div><div class="prgrid">${tiles}</div></section>`;
@@ -3408,15 +3714,16 @@ const LEGEND=(()=>{const LL=BASE_ALL.filter(needsStudy),n=LL.length,H=LL.reduce(
 const LEVELS=CAREER.map((c,i)=>i===0?0:Math.round(LEGEND*Math.pow(i/(CAREER.length-1),1.7)/10)*10);
 function levelOf(xp){let l=0;while(l+1<LEVELS.length&&xp>=LEVELS[l+1])l++;const lo=LEVELS[l],hi=LEVELS[l+1]??lo;return{l,c:CAREER[l],title:CAREER[l].n,lo,hi,p:hi>lo?Math.max(0,Math.min(1,(xp-lo)/(hi-lo))):1}}
 const DEFAULT_REWARDS=[{id:"a",n:"☕ قهوة أو مشروبك المفضل",c:150},{id:"b",n:"📺 حلقة من مسلسلك",c:300},{id:"c",n:"🎮 ساعة لعب بدون تأنيب ضمير",c:400},{id:"d",n:"🍔 أكلة تحبها برّا",c:600},{id:"e",n:"🌴 نص يوم راحة كامل",c:1200}];
-const rewardsList=()=>jget("rewards",DEFAULT_REWARDS);
-const redeemsList=()=>jget("redeems",[]);
+const rewardsAll=()=>jget("rewards",DEFAULT_REWARDS).filter(r=>isObj(r)&&r.id);
+const rewardsList=()=>rewardsAll().filter(r=>!r.x&&r.n&&+r.c>0);   // a deleted one stays as a marker so another device can't bring it back
+const redeemsList=()=>jget("redeems",[]).filter(r=>isObj(r)&&+r.c>0);
 const tile=(c,cls="")=>`<span class="tile ${cls}" style="--g1:${c.g[0]};--g2:${c.g[1]}"><span class="te">${c.e}</span>${c.b?`<span class="tb">${c.b}</span>`:""}</span>`;
 let achReady=false,achT=null;
-function scheduleAch(){clearTimeout(achT);achT=setTimeout(()=>{checkAch();try{maybeBox()}catch(e){console.warn(e)}},450)}
+function scheduleAch(){clearTimeout(achT);achT=setTimeout(()=>{try{checkAch()}catch(e){console.error(e)}try{maybeBox()}catch(e){console.warn(e)}},450)}
 function checkAch(){
   if(!achReady||!$("#ov").hidden)return;
   if(!S.since)setTop("since",Date.now());
-  const ent=entered;staleCheck();
+  const ent=entered;fixPauses();staleCheck();if(forgotCheck())return;
   if(!activeSession()&&!fiveRun){if(napCheck())return;if(dayOfferCheck(ent))return;if(weekCheck())return;if(thinCheck())return}else entered=false;
   if(focusOpen()&&FS.mode==="read")return;   // never interrupt a clip you're reading
   checkFines();
@@ -3430,6 +3737,7 @@ function checkAch(){
   setTop("seen",`${Math.max(lv,seenL)}|${got.map(x=>x.id).join(",")}`);celebrate(fresh,up?levelOf(xpTotal()):null);
 }
 function celebrate(badges,lv){
+  setTimeout(()=>{flashScreen(lv?lv.c.g[0]:"#B794F4");burstAt(innerWidth/2,innerHeight*.35,lv?44:30,["🎉","✨","⭐","🏆","🎊"],240,24)},120);
   if(lv){sfx("x");vib([40,40,40,40,120])}else{sfx("j");vib([40,40,90])}
   const conf=Array.from({length:28},(_,i)=>`<i style="--x:${Math.random()*100}%;--d:${(Math.random()*1.2+.8).toFixed(2)}s;--r:${Math.floor(Math.random()*360)}deg">${["🎉","✨","⭐","🟢","🟣","🔵"][i%6]}</i>`).join("");
   openSheet(`<div class="confetti" aria-hidden="true">${conf}</div>
@@ -3482,18 +3790,19 @@ function renderCareerPage(){
   box.querySelectorAll("[data-redeem]").forEach(b=>b.onclick=()=>{const r=rw.find(x=>x.id===b.dataset.redeem);if(!r||coins()<r.c)return;
     if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent=`أكيد؟ 🪙${r.c}`;return}
     setTop("redeems",JSON.stringify([...redeemsList(),{d:todayISO,at:Date.now(),n:r.n,c:r.c}]));toast(`استمتع بـ ${r.n} 🎉 تستاهلها`);renderCareerPage()});
-  box.querySelectorAll("[data-rwdel]").forEach(b=>b.onclick=()=>{setTop("rewards",JSON.stringify(rewardsList().filter(x=>x.id!==b.dataset.rwdel)));renderCareerPage()});
+  box.querySelectorAll("[data-rwdel]").forEach(b=>b.onclick=()=>{setTop("rewards",JSON.stringify(rewardsAll().map(x=>x.id===b.dataset.rwdel?{...x,x:1}:x)));renderCareerPage()});
   const add=box.querySelector("#rwAdd");if(add)add.onclick=()=>{const n=box.querySelector("#rwN").value.trim(),c=parseInt(box.querySelector("#rwC").value,10)||0;
     if(!n||c<10){toast("اكتب اسم المكافأة وسعر 10 أو أكثر");return}
-    setTop("rewards",JSON.stringify([...rewardsList(),{id:"u"+Date.now().toString(36),n,c}]));renderCareerPage()};
+    setTop("rewards",JSON.stringify([...rewardsAll(),{id:"u"+Date.now().toString(36),n,c}]));renderCareerPage()};
 }
 function sheetAch(tab){closeSheet();st.achTab=tab||"c";setPage("career")}
 let xpPopT=null;
 function xpPop(n,quiet){if(!quiet){sfx("done");vib(25);burst()}const e=$("#xpPop");e.textContent=`+${n} نقطة`;e.hidden=false;e.classList.remove("go");void e.offsetWidth;e.classList.add("go");clearTimeout(xpPopT);xpPopT=setTimeout(()=>{e.hidden=true},1600)}
 
 // ---------- ✏️ your schedule on top of the official one: renames, doctors, type, day & hours, added and removed lectures ----------
-const docsExtra=()=>jget("docs",[]);
-const extraList=()=>{const l=jget("extra",[]);return Array.isArray(l)?l.filter(e=>e&&e.id):[]};
+const docsExtra=()=>jget("docs",[]).filter(n=>typeof n==="string"&&n.trim());
+const extraAll=()=>jget("extra",[]).filter(e=>isObj(e)&&e.id);
+const extraList=()=>extraAll().filter(e=>!e.del);   // removed ones stay as markers (with the time) so a stale device can't resurrect them
 const DAY_IDX={};DATA.forEach((w,wi)=>w.days.forEach((d,di)=>DAY_IDX[d.date]=[wi,di]));
 let blkSig=null;
 // rebuild ALL / BY_ID when lectures are added or removed (same arrays, so every view follows)
@@ -3558,8 +3867,8 @@ function sheetEdit(id,draft){
       if(timed&&r.t<r.f){err.hidden=false;err.textContent="وقت النهاية لازم يكون بعد البداية.";return}
       if(!DAY_IDX[r.day]){err.hidden=false;err.textContent="اختر يوم داخل المديول.";return}
       const dr=r.dr==="-"?"":r.dr;let nid=id;
-      if(add){nid="x"+Date.now().toString(36);setTop("extra",JSON.stringify([...extraList(),{id:nid,date:r.day,from:r.f,to:r.t,topic:nm,kind:r.kd,dr}]));render()}
-      else if(b.custom){setTop("extra",JSON.stringify(extraList().map(e=>e.id===id?{...e,date:r.day,from:r.f,to:r.t,topic:nm,kind:r.kd,dr}:e)));render()}
+      if(add){nid="x"+Date.now().toString(36);setTop("extra",JSON.stringify([...extraAll(),{id:nid,date:r.day,from:r.f,to:r.t,topic:nm,kind:r.kd,dr,u:Date.now()}]));render()}
+      else if(b.custom){setTop("extra",JSON.stringify(extraAll().map(e=>e.id===id?{...e,date:r.day,from:r.f,to:r.t,topic:nm,kind:r.kd,dr,u:Date.now()}:e)));render()}
       else{const same=r.day===origDate(b)&&(!timed||(r.f===b.from&&r.t===b.to));
         const p={mv:same?null:`${r.day}|${timed?r.f:0}|${timed?r.t:0}`};
         if(!exam){p.nm=nm===b.topic0?null:nm;p.drx=r.dr===(b.dr0||"-")?null:r.dr;p.knd=r.kd===b.kind0?null:r.kd}
@@ -3571,7 +3880,8 @@ function sheetEdit(id,draft){
     };
     q("#edSave").onclick=save;
     if(q("#edDel"))q("#edDel").onclick=()=>{const d=q("#edDel");if(d.dataset.sure!=="1"){d.dataset.sure="1";d.textContent="متأكد؟ اضغط مرة ثانية";setTimeout(()=>{if(d.isConnected){d.dataset.sure="";d.textContent="🗑️ حذف المحاضرة"}},3000);return}
-      if(b.custom){setTop("extra",JSON.stringify(extraList().filter(e=>e.id!==id)));closeSheet();st.open=null;render();toast("انحذفت المحاضرة")}
+      const a=activeSession();if(a&&a.id===id)stopSession(id,"stop");   // its running time is banked first
+      if(b.custom){setTop("extra",JSON.stringify(extraAll().map(e=>e.id===id?{id,del:1,u:Date.now()}:e)));closeSheet();st.open=null;render();toast("انحذفت المحاضرة")}
       else{closeSheet();st.open=null;savePatch(id,{del:todayISO});toast("انحذفت · ترجّعها من أسفل يومها")}};
   });
 }
@@ -3582,7 +3892,7 @@ function renderAddRow(el,date){
   const def=date||DATA[st.wi].days[st.di].date;
   el.innerHTML=`<button class="btn addbtn" data-add="${def}">＋ إضافة محاضرة${date?` ${dayAr(date)}`:""}</button>${gone.length?`<div class="gone"><span>🗑️ محذوفة:</span>${gone.map(b=>`<button class="pc" data-undel="${b.id}"><span class="en">${esc(b.topic0||KINDS[b.kind0].ar)}</span> · رجّعها ↩︎</button>`).join("")}</div>`:""}`;
   el.querySelectorAll("[data-add]").forEach(x=>x.onclick=()=>sheetEdit(null,{day:x.dataset.add}));
-  el.querySelectorAll("[data-undel]").forEach(x=>x.onclick=()=>{savePatch(x.dataset.undel,{del:null});toast("رجعت المحاضرة ✓")});
+  el.querySelectorAll("[data-undel]").forEach(x=>x.onclick=()=>{const m=mk(x.dataset.undel);savePatch(x.dataset.undel,{del:null,...(m.startAt?{startAt:false,pz:false}:{})});toast("رجعت المحاضرة ✓")});
 }
 
 // ---------- ☰ pages ----------
@@ -3625,11 +3935,16 @@ function renderRadarPage(){
 }
 
 // ---------- 💭 ideas: anything that pops into your head during a lecture or a study session ----------
-const ideasList=()=>{const l=jget("parked",[]);return Array.isArray(l)?l.filter(x=>x&&x.t):[]};
+const ideaKey=x=>x.at?`${x.at}|${x.t||""}`:`${x.d||""}|${x.t||""}`;
+const ideasRaw=()=>jget("parked",[]).filter(x=>isObj(x)&&x.t);
+const ideasList=()=>ideasRaw().filter(x=>!x.del);
 const parkedList=ideasList;
 const saveIdeas=l=>{setTop("parked",JSON.stringify(l));renderHeader();if(st.page==="ideas")renderIdeasPage()};
+// edits keep every idea (a deleted one becomes a small marker) and stamp the change time, so two devices merge cleanly
+const editIdeas=fn=>{const now=Date.now();saveIdeas(ideasRaw().map(x=>{const y=fn(x);return y===x?x:{...y,u:now}}))};
+const ideaGone=x=>({at:x.at||0,d:x.d||"",t:x.t,del:1});
 function nowLectureId(){const a=activeSession();if(a)return a.id;const h=nowH(),b=blocksOn(todayISO).find(b=>b.from&&h>=tStart(b)&&h<tEnd(b));return b?b.id:null}
-function addIdea(t){const lid=nowLectureId();saveIdeas([...ideasList(),{t,d:todayISO,at:Date.now(),l:lid||false,x:false}]);return lid}
+function addIdea(t){const lid=nowLectureId();saveIdeas([...ideasRaw(),{t,d:todayISO,at:Date.now(),l:lid||false,x:false}]);return lid}
 function openPark(){
   const p=$("#parkPop");p.hidden=false;
   p.innerHTML=`<input id="parkIn" maxlength="160" placeholder="💭 وش الفكرة؟ اكتبها وكمّل"><button class="btn primary sm" id="parkSave">احفظها</button><button class="kdel" id="parkX" aria-label="إغلاق">×</button>`;
@@ -3639,9 +3954,9 @@ function openPark(){
   $("#parkSave").onclick=save;$("#parkX").onclick=close;i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();save()}if(e.key==="Escape")close()};
 }
 function renderIdeasPage(){
-  const all=ideasList().map((x,i)=>({...x,i})),open=all.filter(x=>!x.x).reverse(),done=all.filter(x=>x.x).reverse();
+  const all=ideasList().map(x=>({...x,i:ideaKey(x)})),open=all.filter(x=>!x.x).reverse(),done=all.filter(x=>x.x).reverse();
   const row=x=>{const b=x.l&&BY_ID[x.l],tm=x.at?new Date(x.at):null;
-    return`<div class="kn idea${x.x?" ok":""}"><button class="kcheck" role="checkbox" aria-checked="${!!x.x}" data-ix="${x.i}" aria-label="خلّصتها">✓</button><span class="kt">${esc(x.t)}<small class="imeta">${dayAr(x.d)} ${fmt(x.d)}${tm?` · <span class="en">${h12(tm.getHours())}:${String(tm.getMinutes()).padStart(2,"0")}</span> ${ap(tm.getHours())}`:""}${b?` · أثناء <button class="linkbtn en" data-go="${b.id}">${esc(label(b))}</button>`:""}</small></span><button class="kdel" data-idel="${x.i}" aria-label="حذف">×</button></div>`};
+    return`<div class="kn idea${x.x?" ok":""}"><button class="kcheck" role="checkbox" aria-checked="${!!x.x}" data-ix="${esc(x.i)}" aria-label="خلّصتها">✓</button><span class="kt">${esc(x.t)}<small class="imeta">${dayAr(x.d)} ${fmt(x.d)}${tm?` · <span class="en">${h12(tm.getHours())}:${String(tm.getMinutes()).padStart(2,"0")}</span> ${ap(tm.getHours())}`:""}${b?` · أثناء <button class="linkbtn en" data-go="${b.id}">${esc(label(b))}</button>`:""}</small></span><button class="kdel" data-idel="${esc(x.i)}" aria-label="حذف">×</button></div>`};
   const box=$("#pg-ideas");
   box.innerHTML=`<section class="rpage"><div class="rp-h"><b>💭 فرّغ فكرة</b></div><p class="note" style="margin:0">أي فكرة تشتتك وقت المحاضرة أو المذاكرة اكتبها وكمّل تركيزك. زر 💭 فوق موجود في كل صفحة، والفكرة تنربط بالمحاضرة اللي كنت فيها.</p>
       <div class="frow"><input id="ideaIn" maxlength="160" placeholder="وش الفكرة؟"><button class="btn primary" id="ideaAdd">احفظها</button></div></section>
@@ -3649,11 +3964,11 @@ function renderIdeasPage(){
     ${done.length?`<details class="rpage donebox"${st.ideasDone?" open":""}><summary>خلّصتها (${done.length})</summary>${done.map(row).join("")}<button class="btn sm" id="ideaClr">امسح اللي خلّصتها</button></details>`:""}`;
   const inp=$("#ideaIn"),add=()=>{const t=inp.value.trim();if(!t){inp.focus();return}inp.value="";inp.blur();addIdea(t);toast("انحفظت 💭")};
   $("#ideaAdd").onclick=add;inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add()}};
-  box.querySelectorAll("[data-ix]").forEach(b=>b.onclick=()=>{const l=ideasList(),x=l[+b.dataset.ix];if(!x)return;x.x=x.x?false:todayISO;saveIdeas(l)});
-  box.querySelectorAll("[data-idel]").forEach(b=>b.onclick=()=>{const l=ideasList();l.splice(+b.dataset.idel,1);saveIdeas(l)});
+  box.querySelectorAll("[data-ix]").forEach(b=>b.onclick=()=>editIdeas(x=>ideaKey(x)===b.dataset.ix&&!x.del?{...x,x:x.x?false:todayISO}:x));
+  box.querySelectorAll("[data-idel]").forEach(b=>b.onclick=()=>editIdeas(x=>ideaKey(x)===b.dataset.idel&&!x.del?ideaGone(x):x));
   box.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
   const det=box.querySelector(".donebox");if(det)det.ontoggle=()=>{st.ideasDone=det.open};
-  const clr=$("#ideaClr");if(clr)clr.onclick=()=>saveIdeas(ideasList().filter(x=>!x.x));
+  const clr=$("#ideaClr");if(clr)clr.onclick=()=>editIdeas(x=>x.x&&!x.del?ideaGone(x):x);
 }
 
 // ---------- ⚙️ settings: sync + start over ----------
@@ -3665,28 +3980,67 @@ function renderSettingsPage(){
    $("#lsInfo").innerHTML=`بداية سجلك: <b>${dayAr(d)} ${fmt(d)}</b> · ${clock(sn)}${diff>0?` · لو خليته من بداية المديول ينخصم منك تقريبًا <b class="en">${diff}</b> نقطة غرامات (ويرجع نص أي غرامة لو خلّصت مهمتها خلال أسبوع منها)`:" · ما فيه متأخرات معفاة"}`;
    const bm=$("#lsMod");bm.disabled=sn<=modStartMs();bm.dataset.sure="";bm.textContent="خلّه من بداية المديول"}
   const nM=Object.values(S.marks).filter(m=>m&&(m.studied||m.rev1||m.anki||m.pre||m.startAt)).length,nR=Object.keys(S.marks).reduce((a,id)=>a+recsOf(id).length,0);
+  {const u=undoSaved(),el=$("#bkUndo");el.hidden=!u;if(u){el.innerHTML=`↩️ عندك نسخة من بياناتك قبل آخر مسح أو استرجاع (قبل ${ago(u.at)}). <button class="linkbtn" id="bkUndoGo">رجّعها</button>`;$("#bkUndoGo").onclick=()=>sheetRestore(u.data,u.at,"بياناتك قبل آخر مسح")}}
   $("#rsInfo").textContent=`عندك الحين: ${cnt(nM,"محاضرة فيها سجلات","محاضرتين فيها سجلات","محاضرات فيها سجلات")} · ${nR} ملخص · ${ideasList().length} فكرة · ${xpTotal()} نقطة.`;
 }
 function sheetReset(){
   const keep=$("#rsKeep").checked;
   openSheet(`<div class="sh-ic">🗑️</div><h2 class="sh-t">متأكد تبي تبدأ من الصفر؟</h2>
     <p class="sh-s">بينمسح من كل أجهزتك المتزامنة: المذاكرة والمراجعات و ANKI والأوقات والملخصات الصوتية والعُقد والأفكار والنقاط ومسيرتك ومكافآتك.${keep?" تعديلات الجدول بتبقى.":" وتعديلات الجدول (الأسماء والأوقات والمحاضرات اللي أضفتها أو حذفتها) بعد."}</p>
-    <p class="sh-s"><b>ما تقدر ترجّعها بعدين.</b> إعدادات المزامنة بتبقى زي ما هي.</p>
+    <p class="sh-s">لو غلطت: تقدر ترجّعها <b>خلال أسبوع من هالجهاز</b> (الإعدادات ← 📦 نسخة احتياطية). إعدادات المزامنة بتبقى زي ما هي.</p>
     <div class="sh-act"><button class="btn dangerbtn big" id="rsGo">نعم، امسح كل شي</button><button class="btn" id="rsNo">إلغاء</button></div>`,box=>{
     box.querySelector("#rsNo").onclick=closeSheet;box.querySelector("#rsGo").onclick=()=>resetAll(keep)});
 }
 async function clearLocalAudio(){try{await idbDo("readwrite",s=>s.clear())}catch(e){}}
+// everything this device keeps in memory about the old data goes too (sessions, focus screen, queues)
+function wipeLocal(ns){
+  S=ns||{marks:{}};LV++;
+  for(const k in pending)delete pending[k];for(const k in pendingTop)delete pendingTop[k];
+  jobs.splice(busy?1:0);flushQ=false;
+  st.prompt=null;st.open=null;st.primeSkip={};st.boxQ=[];st.sit=null;saveSitLocal();st.pendingReceipt=null;st.resume=null;st.hemDone={};st.mday=null;st.tdraft=null;
+  if(FS){FS=null;hideFocus()}fiveRun=null;blkSig=null;sleepRun=null;
+  try{["uqu-rd0","uqu-fineSeen"].forEach(k=>localStorage.removeItem(k))}catch(e){}
+  clearLocalAudio();savePend();cache();if(!$("#ov").hidden)closeSheet(true);
+}
+// ---------- 📦 backup: one file with everything (no recordings); a restore replaces the data on every synced device ----------
+const UNDO_LS="uqu-lastwipe";
+const snapData=()=>{const d={marks:S.marks};TOPF.forEach(f=>{if(S[f]!==undefined&&S[f]!==false)d[f]=S[f]});return JSON.parse(JSON.stringify(d))};
+const hasData=()=>Object.values(S.marks).some(m=>m&&(m.studied||m.rev1||m.anki||m.clips||m.recs))||!!S.boxes||!!S.parked;
+// whatever was here before a wipe or a restore is kept on this device for a week, so a mistake can be undone
+function keepUndo(){if(!hasData())return;try{localStorage.setItem(UNDO_LS,JSON.stringify({at:Date.now(),data:snapData()}))}catch(e){}}
+const undoSaved=()=>{try{const o=JSON.parse(localStorage.getItem(UNDO_LS)||"null");return o&&isObj(o.data)&&o.at&&Date.now()-o.at<7*864e5?o:null}catch(e){return null}};
+function downloadBackup(){
+  const blob=new Blob([JSON.stringify({app:"uqu-backup",v:17,at:Date.now(),data:snapData()})],{type:"application/json"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=`جدول-المذاكرة-${todayISO}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+  toast("نزّلت النسخة 📦 احفظها في الملفات أو iCloud")}
+function restoreData(d,when){
+  keepUndo();
+  const ns=cleanS(JSON.parse(JSON.stringify(d)));ns.lk=S.lk;ns.epoch=Date.now().toString(36);
+  wipeLocal(ns);
+  if(remote||syncPlanned()){resetPend=ns.epoch;savePend()}
+  if(remote&&canW){pushReset();pump()}
+  closeSheet(true);focusSync();render();toast(`رجعت بياناتك${when?` من ${when}`:""} ✓`);
+}
+function sheetRestore(d,at,src){
+  if(!isObj(d)||!isObj(d.marks)){toast("الملف هذا مو نسخة من الموقع");return}
+  const n=Object.values(d.marks).filter(m=>m&&m.studied).length,day=at?isoOf(new Date(at)):"";
+  openSheet(`<div class="sh-ic">📥</div><h2 class="sh-t">ترجّع هالنسخة؟</h2>
+    <p class="sh-s">${src}${day?` · ${dayAr(day)} ${fmt(day)} · ${clock(at)}`:""}</p>
+    <p class="sh-s">فيها ${cnt(n,"محاضرة مذاكرة","محاضرتين مذاكرة","محاضرات مذاكرة")}. بتحل محل بياناتك الحالية على هالجهاز وكل أجهزتك المتزامنة (والحالية تنحفظ أسبوع عشان تقدر ترجع لها).</p>
+    <div class="sh-act"><button class="btn primary big" id="bkGo">نعم، رجّعها</button><button class="btn" id="bkNo">إلغاء</button></div>`,box=>{
+    box.querySelector("#bkNo").onclick=closeSheet;box.querySelector("#bkGo").onclick=()=>restoreData(d,day?fmt(day):"")});
+}
 async function resetAll(keep){
+  keepUndo();
   const marks={};
   if(keep)for(const id in S.marks){const m=S.marks[id];if(!m)continue;const k={};["nm","drx","knd","mv","del"].forEach(f=>{if(m[f])k[f]=m[f]});if(Object.keys(k).length)marks[id]=k}
-  const ns={marks};TOPF.forEach(f=>ns[f]=false);ns.epoch=Date.now().toString(36);ns.since=Date.now();
+  const ns={marks,lk:S.lk};TOPF.forEach(f=>ns[f]=false);ns.epoch=Date.now().toString(36);ns.since=Date.now();
   if(keep){ns.docs=S.docs||false;ns.extra=S.extra||false}
-  for(const k in pending)delete pending[k];for(const k in pendingTop)delete pendingTop[k];savePend();
-  if(busy)jobs.splice(1);else jobs.length=0;
-  S=ns;cache();await clearLocalAudio();
-  if(fbAudioRef){try{await fbAudioRef.remove()}catch(e){}}
-  if(remote){epochPush=true;const doc=fullDoc();jobs.push(async()=>{await remote.set(doc);remoteExists=true;epochPush=false});pump()}
-  st.prompt=null;st.open=null;st.primeSkip={};st.boxQ=[];st.sit=null;saveSitLocal();st.pendingReceipt=null;st.resume=null;st.hemDone={};if(FS){FS=null;hideFocus()}try{localStorage.removeItem("uqu-rd0")}catch(e){}st.mday=null;st.tdraft=null;fiveRun=null;blkSig=null;
+  wipeLocal(ns);
+  // the clean start waits on the device until the server has it (it also survives a reload while offline)
+  if(remote||syncPlanned()){resetPend=ns.epoch;savePend()}
+  if(fbAudioRef){try{const r=fbAudioRef.remove();if(r&&r.catch)r.catch(()=>{})}catch(e){}}
+  if(remote&&canW){pushReset();pump()}
   closeSheet(true);focusSync();render();toast("انمسح كل شي. بداية نظيفة 🌱");
 }
 
@@ -3740,8 +4094,10 @@ function sheetOffer(id,fresh){
   });
 }
 function startOffer(id){
-  const l=offersList(),o=l.find(x=>x.id===id);if(!o||o.s||offerState(o)!=="wait")return;
+  const l=offersList(),o=l.find(x=>x.id===id);if(!o){closeSheet();toast("العرض هذا انفتح من جهازك الثاني");return}if(o.s||offerState(o)!=="wait")return;
   if(liveOffer()){toast("عندك عرض شغّال الحين");return}
+  // already studying: the ×2 window starts, no need for the 5-minute starter
+  if(activeSession()){o.s=Date.now();if(!o.sh)o.sh=o.s;saveOffers(l);closeSheet();toast("بدأ العرض ☀️ ×2 لمدة 10 دقايق · كمّل جلستك");return}
   const x=offerTask(o);if(!x){toast("ما فيه مهمة للعرض الحين");return}
   const now=Date.now(),prevFast=prValues({offer:id}).fast;o.s=now;if(!o.sh)o.sh=now;saveOffers(l);closeSheet();
   const sp=(now-o.sh)/1000;
@@ -3876,7 +4232,7 @@ function renderFive(top){
   if(top!==undefined)fiveTop=top;
   const bar=$("#fiveBar");if(!bar)return;
   if(fiveRun&&!fiveRun.done){bar.hidden=false;bar.className="fivebar run";
-    bar.innerHTML=`<span class="fv-l">🌱 <b class="num" id="fvClock">5:00</b> · ${fiveRun.study?"افتح السلايدات واقرأ أول سلايدين من":"اقرأ عناوين"} <span class="en">${esc(fiveRun.t)}</span></span><span class="fv-x" data-fx="1" role="button" aria-label="إيقاف">×</span>`;
+    bar.innerHTML=`${fsndType()!=="off"?`<span class="fv-x" data-fsm="1" role="button" aria-label="صوت التركيز">${fsIcon()}</span>`:""}<span class="fv-l">🌱 <b class="num" id="fvClock">5:00</b> · ${fiveRun.study?"افتح السلايدات واقرأ أول سلايدين من":"اقرأ عناوين"} <span class="en">${esc(fiveRun.t)}</span></span><span class="fv-x" data-fx="1" role="button" aria-label="إيقاف">×</span>`;
     tickFive();return}
   bar.style.removeProperty("--p");
   if(fiveRun&&fiveRun.done){bar.hidden=false;bar.className="fivebar end";
@@ -3895,6 +4251,7 @@ function tickFive(){
 setInterval(tickFive,250);
 function fiveAct(e){
   const bar=$("#fiveBar");
+  if(e.target.closest("[data-fsm]")){if(!fsMuted()&&!fsPlaying()){fsBlocked=false;focusSync();setTimeout(renderFive,300)}else fsToggleMute();return}
   if(e.target.closest("[data-fx]")){fiveRun=null;renderFive();focusSync();return}
   if(e.target.closest("[data-fgo]")){const r=fiveRun;fiveRun=null;renderFive();focusSync();if(r.study)startFlow(r.id);else go(r.id);return}
   if(!fiveRun&&bar.dataset.id)startFive(bar.dataset.id,!!bar.dataset.study,bar.dataset.t);
@@ -4215,23 +4572,24 @@ function go(id){
 let deferred=false;
 const typing=()=>{const a=document.activeElement;return!!(a&&(a.tagName==="INPUT"||a.tagName==="TEXTAREA")&&(a.id==="knotIn"||a.id==="fxTxt"||a.closest(".prompt")||a.closest(".pg")))};
 document.addEventListener("focusout",()=>setTimeout(()=>{if(deferred&&!typing()){deferred=false;render()}},350));
+const safe=f=>{try{f()}catch(e){console.error(e)}};
 function render(){
   // don't wipe a knot the user is typing; repaint when they leave the field
   if(typing()){deferred=true;return}
-  applyEdits();
-  lastSig=timeSig();
-  ensureSit();renderHeader();renderSession();renderOfferBar();renderPage();
-  if(st.page==="main")renderHub();
-  if(focusOpen())drawFocus();
+  safe(applyEdits);
+  safe(()=>{lastSig=timeSig()});
+  [ensureSit,renderHeader,renderSession,renderOfferBar,renderPage].forEach(safe);
+  if(st.page==="main")safe(renderHub);
+  if(focusOpen())safe(drawFocus);
   if(st.page==="main"){
     $("#vDay").setAttribute("aria-pressed",st.view==="day");$("#vWeek").setAttribute("aria-pressed",st.view==="week");$("#vDoc").setAttribute("aria-pressed",st.view==="doc");
-    renderTasks();renderChips();
+    safe(renderTasks);safe(renderChips);
     $("#weeks").hidden=st.view==="doc";
-    if(!$("#weeks").hidden)renderWeeks();
+    if(!$("#weeks").hidden)safe(renderWeeks);
     $("#dayView").hidden=st.view!=="day";
     $("#weekView").hidden=st.view!=="week";
     $("#docView").hidden=st.view!=="doc";
-    if(st.view==="day"){renderDays();renderDay()}else if(st.view==="week")renderWeek();else renderDocs();
+    safe(()=>{if(st.view==="day"){renderDays();renderDay()}else if(st.view==="week")renderWeek();else renderDocs()});
   }
   scheduleAch();
 }
@@ -4249,9 +4607,16 @@ bindSwipe($("#days"),()=>weekStep(1),()=>weekStep(-1));bindSwipe($("#dayView .da
 $("#burger").onclick=()=>{if($("#drawer").hidden)openDrawer();else{$("#drawer").hidden=true;$("#burger").setAttribute("aria-expanded","false")}};
 $("#drawer").onclick=e=>{if(e.target.id==="drawer"){$("#drawer").hidden=true;$("#burger").setAttribute("aria-expanded","false")}};
 $("#fiveBar").onclick=fiveAct;
-$("#sfxOn").checked=sfxOn();$("#hapOn").checked=hapOn();
+$("#sfxOn").checked=sfxOn();$("#hapOn").checked=hapOn();$("#sfxMed").checked=sfxMedia();$("#moHi").checked=!reduceMotion();
+$("#sfxMed").onchange=e=>{try{localStorage.setItem(SMODE_LS,e.target.checked?"1":"0")}catch(_){}sfx("g")};
+$("#moHi").onchange=e=>{try{localStorage.setItem(MOTION_LS,e.target.checked?"high":"low")}catch(_){}applyMotion();if(e.target.checked){const r=e.target.getBoundingClientRect();burstAt(r.left+20,r.top,20)}};
 $("#lsMod").onclick=e=>{const b=e.currentTarget;if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟ اضغط مرة ثانية";return}
   const before=xpTotal();setTop("since",modStartMs());LV++;render();const lost=before-xpTotal();toast(lost>0?`صار السجل من بداية المديول · انخصم ${lost} نقطة غرامات ⚠️`:"صار السجل من بداية المديول")};
+$("#bkDown").onclick=downloadBackup;$("#bkUp").onclick=()=>$("#bkFile").click();
+$("#bkFile").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+  try{const o=JSON.parse(await f.text());if(o&&o.app==="uqu-backup")sheetRestore(o.data,o.at,"نسخة من ملف");else sheetRestore(o,0,"نسخة من ملف")}catch(_){toast("ما قدرت أقرأ الملف، تأكد إنه نسخة من الموقع")}};
+// ask the browser not to clear this site's storage on its own (Safari can empty it after a week away)
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()}).catch(()=>{})}catch(e){}
 $("#lsNow").onclick=()=>{setTop("since",Date.now());LV++;render();toast("صار السجل من الحين · المتأخر من قبل معفى")};
 const drawFsnd=()=>document.querySelectorAll("[data-fsnd]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.fsnd===fsndType()));drawFsnd();
 document.querySelectorAll("[data-fsnd]").forEach(b=>b.onclick=()=>{try{localStorage.setItem(FSND_LS,b.dataset.fsnd)}catch(e){}drawFsnd();focusSync()});
@@ -4268,7 +4633,11 @@ window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(PAGE
 // repaint only when the clock changes something: a lecture ends, the day turns, the 9 pm window opens, or every 30 min for memory decay
 const timeSig=()=>`${curDay()}|${rtvQueue().length}|${todayISO}|${ALL.reduce((n,b)=>n+(hasEnded(b)?1:0),0)}|${sleepDay()||""}|${Math.floor(Date.now()/18e5)}|${ledger().E.filter(e=>e.k==="fine").length}`;
 let lastSig="";
-setInterval(()=>{todayISO=isoOf(new Date());if(timeSig()!==lastSig)render()},60000);
+setInterval(()=>{todayISO=isoOf(new Date());try{if(timeSig()!==lastSig)render()}catch(e){console.error(e)}},60000);
+// the date is read fresh at every tap, so something done at 00:00:30 isn't filed under yesterday
+["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{todayISO=isoOf(new Date())},true));
+// a double tap can't land on the next screen's button: taps in the first moment after a sheet appears are ignored
+$("#ov").addEventListener("click",e=>{if(e.isTrusted&&Date.now()-(+$("#ov").dataset.t0||0)<320){e.stopPropagation();e.preventDefault()}},true);
 renderSync();renderNext();render();connect();
 </script>
 
