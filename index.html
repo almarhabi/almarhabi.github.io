@@ -448,7 +448,9 @@ body.has-sess{padding-bottom:96px}body.has-sess .toast{bottom:90px}
 .badge .bic{font-size:28px}.badge b{font-size:13px}.badge small{font-size:11px;color:var(--muted)}.badge .pbar{max-width:none;width:100%}.bpr{font-size:11px;font-weight:700}
 .rws{display:flex;flex-direction:column;gap:6px}
 .rw{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:start}
-.rw.past{opacity:.7}.rwn{flex:1;font-size:13.5px;min-width:0;overflow-wrap:anywhere}.rw .btn{flex:none}.kt,.hc-t,.tlb,.lg-m{min-width:0;overflow-wrap:anywhere}.rwc{font-size:12.5px;font-weight:700;white-space:nowrap}
+.rw.past{opacity:.7}.pzchip{align-self:flex-start;text-align:start;white-space:normal}.pznote{width:100%;box-sizing:border-box;font:inherit;min-height:76px;resize:vertical}
+.hookbox.back{border-inline-start-color:var(--s-study)}.frogt{color:var(--s-study);font-weight:700}
+.rwn{flex:1;font-size:13.5px;min-width:0;overflow-wrap:anywhere}.rw .btn{flex:none}.kt,.hc-t,.tlb,.lg-m{min-width:0;overflow-wrap:anywhere}.rwc{font-size:12.5px;font-weight:700;white-space:nowrap}
 .rwadd input{flex:1 1 120px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px 10px;font:inherit}
 .xpb{display:flex;flex-direction:column;gap:4px;text-align:start}
 .ladder{display:flex;flex-direction:column;gap:3px;font-size:12.5px;text-align:start}
@@ -1241,7 +1243,7 @@ html.lowmo .burst.at,html.lowmo .flashscr,html.lowmo .rays{display:none}html.low
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">17</b> · مزامنة تدمج بدل ما تضيّع 🔀 ونسخة احتياطية 📦</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">18</b> · 🐸 الأصعب أول في الصبح و🧠 صفّر ذهنك قبل الصلاة</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1376,12 +1378,12 @@ const MARKS=[
 ];
 const LS="uqu-state-v2";
 // top-level fields that sync like the daily cap
-const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons"];
+const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp"];
 // ---------- 🛡️ whatever comes from storage or another device is checked before it's used (a broken value can't take the page down) ----------
 const isISO=v=>typeof v==="string"&&/^\d{4}-\d\d-\d\d$/.test(v)&&!isNaN(Date.parse(v+"T12:00:00Z"));
 const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
-const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards"],
-  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg"],MK_OBJ=["knots","recs","pre"];
+const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards","ltAt","akc"],
+  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak"],MK_OBJ=["knots","recs","pre"];
 function cleanMark(m){
   if(!isObj(m))return null;
   MK_DATE.forEach(f=>{const v=m[f];if(v==null||v===false||isISO(v))return;
@@ -1398,7 +1400,7 @@ function cleanMark(m){
   return m;
 }
 const BAD_K=new Set(["__proto__","constructor","prototype"]);
-const TOP_NUM=["pts","cap","since","nap","thin"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons"];
+const TOP_NUM=["pts","cap","since","nap","thin","goal"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","xplan","akp"];
 function cleanS(o){
   if(!isObj(o))o={marks:{}};
   if(!isObj(o.marks))o.marks={};
@@ -1408,6 +1410,7 @@ function cleanS(o){
     if(TOP_JSON.includes(f)){if(typeof v==="object")o[f]=JSON.stringify(v);else if(typeof v!=="string")delete o[f];return}
     if(typeof v!=="string")delete o[f]});
   if(o.pts!=null&&!(o.pts>=3&&o.pts<=30))delete o.pts;
+  if(o.goal!=null&&o.goal!==false&&!(o.goal>=30&&o.goal<=100))delete o.goal;
   return o;
 }
 let S={marks:{}};
@@ -1490,6 +1493,10 @@ function mapM(pick){return{
   merge(a,b){const A=pj(a,{}),B=pj(b,{}),o=isObj(B)?{...B}:{};if(isObj(A))for(const k in A)o[k]=k in o?pick(o[k],A[k]):A[k];return JSON.stringify(o)},
   eq:(a,b)=>{const c=s=>{const o=pj(s,{});return canon(isObj(o)?o:{})};return c(a)===c(b)}}}
 const selfM=merge=>({merge,eq:(a,b)=>merge(a,a)===merge(b,b)});
+// one object per day (or week): the newer day wins; on the same day the first one made stays (or the one you already answered)
+const pickM=cmp=>selfM((a,b)=>{const A=pj(a,null),B=pj(b,null);if(!isObj(A))return isObj(B)?b:a;if(!isObj(B))return a;return cmp(A,B)===A?a:b});
+const dayWin=(k,pref)=>(A,B)=>{const a=String(A[k]||""),b=String(B[k]||"");if(a!==b)return a>b?A:B;const p=pref&&pref(A,B);if(p)return p;
+  const ta=+A.at||0,tb=+B.at||0;return ta!==tb?(ta<tb?A:B):tie(A,B)};
 const boxRank=x=>!isObj(x)?0:x.n?1:x.o?3:2;
 const pickBox=(a,b)=>{const ra=boxRank(a),rb=boxRank(b);if(ra!==rb)return ra>rb?a:b;if(ra===3&&+a.o!==+b.o)return+a.o<+b.o?a:b;if(+a.c!==+b.c)return+a.c<+b.c?a:b;return tie(a,b)};
 const isoList=s=>String(s||"").split(",").filter(isISO);
@@ -1502,6 +1509,11 @@ const MERGE={
   sits:listM(x=>x.s&&x.id?`${x.id}|${x.s}`:null,(a,b)=>(+a.ms||0)!==(+b.ms||0)?((+a.ms||0)>(+b.ms||0)?a:b):tie(a,b),L=>L.sort(srtN("s")).slice(-150)),
   pauses:listM(x=>x.s&&x.id?`${x.id}|${x.s}`:null,(a,b)=>{const ea=+a.e||0,eb=+b.e||0;if(!ea!==!eb)return ea?a:b;if(ea!==eb)return ea<eb?a:b;return tie(a,b)},L=>L.sort(srtN("s")).slice(-400)),
   rtvDays:listM(x=>isISO(x.d)?x.d:null,(a,b)=>(+a.at||0)!==(+b.at||0)?((+a.at||0)<(+b.at||0)?a:b):tie(a,b),L=>L.sort(srtS("d")).slice(-120)),
+  frogs:listM(x=>isISO(x.d)?x.d:null,(a,b)=>(+a.at||0)!==(+b.at||0)?((+a.at||0)<(+b.at||0)?a:b):tie(a,b),L=>L.sort(srtS("d")).slice(-60)),
+  cases:listM(x=>isISO(x.d)?x.d:null,(a,b)=>(+a.at||0)!==(+b.at||0)?((+a.at||0)<(+b.at||0)?a:b):tie(a,b),L=>L.sort(srtS("d")).slice(-90)),
+  aicoach:pickM(dayWin("d")),xplan:pickM(dayWin("d")),aiwk:pickM(dayWin("ws")),
+  // today's case: the one you already started answering stays (the furthest answered, then the first)
+  aicase:pickM(dayWin("d",(A,B)=>{const na=isObj(A.r)&&Array.isArray(A.r.ans)?A.r.ans.length:0,nb=isObj(B.r)&&Array.isArray(B.r.ans)?B.r.ans.length:0;return na!==nb?(na>nb?A:B):null})),
   preasons:strM,docs:strM,
   boxes:mapM(pickBox),bt:mapM((a,b)=>minNZ(a,b)),
   seen:selfM((a,b)=>{const p=s=>{const [l,i]=String(s||"").split("|");return{l:+l||0,i:(i||"").split(",").filter(Boolean)}},x=p(a),y=p(b);return`${Math.max(x.l,y.l)}|${[...new Set([...x.i,...y.i])].sort().join(",")}`}),
@@ -1664,10 +1676,15 @@ async function copyLink(){
 }
 
 // ---------- recall: forgetting curve R(t)=1/(1+t/(9·S)); every review raises stability S ----------
-function recall(id){
-  const m=mk(id);if(!m.studied)return null;
+// light reviews from the exam plan (every date counts, not only the last one)
+const ltList=m=>String((m&&m.lt)||"").split(",").filter(isISO);
+function recall(id){return recallM(mk(id))}
+// the same curve for any moment (now by default) and with extra planned events — the forecast and the exam plan use it
+function recallM(m,now,extra,raw){
+  if(!m||!m.studied)return null;
   const ORD={s:0,v:.5,a:1,l:2,r1:3,r2:4};
-  const ev=[[m.studied,"s"]];if(m.rv)ev.push([m.rv,"v"]);if(m.again)ev.push([m.again,"a"]);if(m.rev1)ev.push([m.rev1,"r1"]);if(m.rev2)ev.push([m.rev2,"r2"]);if(m.lite)ev.push([m.lite,"l"]);
+  const ev=[[m.studied,"s"]];if(m.rv)ev.push([m.rv,"v"]);if(m.again)ev.push([m.again,"a"]);if(m.rev1)ev.push([m.rev1,"r1"]);if(m.rev2)ev.push([m.rev2,"r2"]);
+  new Set([m.lite,...ltList(m)].filter(isISO)).forEach(d=>ev.push([d,"l"]));if(extra)extra.forEach(e=>ev.push(e));
   ev.sort((x,y)=>x[0].localeCompare(y[0])||ORD[x[1]]-ORD[y[1]]);
   // st = stability (days), r0 = how much you could actually retrieve at the last event
   let st=0,r0=1,last=m.studied;
@@ -1681,8 +1698,8 @@ function recall(id){
     last=d;
   }
   if(m.anki)st*=1.1;if(m.ankiS)st*=1.3;                            // writing cards helps a bit, answering them helps more
-  const t=Math.max(0,(Date.now()-new Date(last+"T18:00:00").getTime())/864e5);
-  return Math.round(100*r0/(1+t/(9*st)));
+  const t=Math.max(0,((now??Date.now())-new Date(last+"T18:00:00").getTime())/864e5),v=100*r0/(1+t/(9*st));
+  return raw?v:Math.round(v);
 }
 const rcClass=r=>r>=85?"good":r>=65?"mid":"low";
 const rcChip=id=>{const r=recall(id);return r==null?"":`<span class="rc ${rcClass(r)}" title="نسبة التذكر المتوقعة الآن">تذكّر ${pct(r)}</span>`};
@@ -1760,6 +1777,9 @@ function tasksDue(day,uptoToday){
       else if(inDay(due))out.push({b,t:KNOT_T,due,done:false,knot:k,base:esc(k.t)});
     }
   }
+  // 🗓️ the exam plan's light reviews for today (the plan is redrawn every morning from how much you remember)
+  if(uptoToday){const xp=xplanToday();if(xp)xp.ids.forEach(id=>{const b=BY_ID[id],m=S.marks[id];if(!b||!m||!m.studied||!needsStudy(b))return;
+    const r=xp.r&&xp.r[id];out.push({b,t:LITE_T,due:todayISO,done:ltList(m).includes(todayISO),plan:1,base:`🗓️ خطة ${esc(xp.short)}${r!=null?` · بدونها تدخل الاختبار بتذكّر ${pct(r)}`:""}`})})}
   return out;
 }
 
@@ -1815,6 +1835,7 @@ function taskHTML(x){
     if(w.fined){worth+=` · <span class="late">⚠️ انخصم منك ${n(w.fined)}${w.next?`، وبعد ${hh(w.next.at)} ينخصم ${n(w.next.a)} زيادة`:""}</span>`;lateShown=true}
     if(w.rescue)worth+=` · <span class="rescue">🛟 خلّصها قبل ${dayName(isoOf(new Date(w.rescue.until)))} ويرجع لك ${n(w.rescue.a)}</span>`;
     if(!w.fined&&w.next&&w.next.at-Date.now()<=12*36e5)worth+=` · <span class="warn">⏳ بعد ${hh(w.next.at)} ينخصم ${n(w.next.a)} من رصيدك</span>`}
+  if(x.t===STUDY_T&&!x.done&&!x.on){const fs=frogState();if(fs.on&&fs.task&&fs.task.b.id===x.b.id)worth+=` · <span class="frogt">🐸 +${PTS.frog} لو بدأت فيها أول</span>`}
   // a task the energy budget pushed to a later day, but whose fine lands before that day ends: say so, don't let the plan hide it
   if(x.on&&!x.done){const w2=taskWorth({...x,on:null}),end=new Date(x.on+"T23:59:59").getTime();
     if(w2&&(w2.fined||(w2.next&&w2.next.at<end)))worth=` · <span class="late">⚠️ ${w2.fined?`عليها غرامة ${w2.fined} للحين`:`لو استنيت ليومها ينخصم ${w2.next.a}`}، سوّها قبل لو تقدر</span>`}
@@ -1824,7 +1845,7 @@ function taskHTML(x){
     :`<button class="tcheck" role="checkbox" aria-checked="${x.done}" aria-label="${x.t.ar}: ${esc(label(x.b))}" data-task="${key}">✓</button>`;
   return `<div class="task${x.done?" done":""}" style="${sv(x.t.c)}"><span class="pts num" title="نقاط طاقة">⚡${costOf(x)}</span>
     ${chk}
-    <button class="tmain" data-go="${x.b.id}">
+    <button class="tmain" data-go="${x.b.id}"${!x.done&&!x.on&&x.t!==STUDY_T?` data-gk="${x.t.kind}"`:""}>
       <span class="tline"><span class="tlabel">${live?"⏱️ تذاكرها الحين":x.t.ar}</span><span class="ttopic${x.b.topic?" en":""}">${esc(label(x.b))}</span></span>
       <span class="tmeta">${tw?`<span class="ttime">🕓 ${tRange(tw.s,tw.e)}</span> · `:""}${lowOn()&&!x.done?(()=>{const r=recall(x.b.id);return r==null?`<span class="rc low">جديدة · ${pct(0)}</span> `:`<span class="rc ${rcClass(r)}">تذكّر ${pct(r)}</span> `})():""}${x.base}${x.done?(x.hard?"":" · أنجزتها اليوم"):!lateShown&&late>0?` · <span class="late">متأخرة ${dayWord(late)}</span>`:""}${est?` · ≈ ${minTxt(est)}`:""}${worth}${blocked?` · <span class="late">🚧 حل عُقد الفهم أول</span>`:""}${(x.t===R1_T||x.t===R2_T)&&!x.done&&hintsOf(x.b.id).length?(h=>` · <span class="hint">${hintLine(h)}</span>`)(hintsOf(x.b.id).slice(-1)[0]):""}${study&&!live&&rtvLocked()?` · <span class="late">🔒 بعد الاسترجاع</span>`:""}${study&&!live&&clipsOf(x.b.id)?` · 🎬 ${clipsRated(x.b.id)}/${clipsOf(x.b.id).c.length}`:""}</span>
     </button>${rv}</div>${pr}`;
@@ -1856,7 +1877,7 @@ function renderTasks(){
   const det=$("#tlist details");if(det)det.ontoggle=()=>{st.laterOpen=det.open};
   const all=[...rows,...p.later];
   $("#tlist").querySelectorAll("[data-task]").forEach(btn=>btn.onclick=()=>{const x=all.find(y=>taskKey(y)===btn.dataset.task);if(x)tickTask(x)});
-  $("#tlist").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+  $("#tlist").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>b.dataset.gk?frogGate(b.dataset.gk,b.dataset.go,()=>go(b.dataset.go)):go(b.dataset.go));
   bindPrompts($("#tlist"));
   $("#tlist").querySelectorAll("[data-rvrec]").forEach(b=>b.onclick=()=>{const [id,stg]=b.dataset.rvrec.split("|");sheetSummary(id,stg)});
   $("#tlist").querySelectorAll("[data-pod]").forEach(b=>b.onclick=()=>sheetPodcast(b.dataset.pod));
@@ -1866,11 +1887,12 @@ function renderTasks(){
   const lb=$("#lowBtn");lb.setAttribute("aria-pressed",lowOn());
   $("#lowNote").hidden=!lowOn();
 }
-function tickTask(x){
+function tickTask(x,ok){
   const id=x.b.id,m=mk(id);
+  if(!ok&&!x.done&&x.t!==STUDY_T){frogGate(x.t.kind,id,()=>tickTask(x,true));return}   // 🐸 a light task first thing in the morning? ask once
   if(x.t===STUDY_T){const a=activeSession();if(x.done)unsetStudied(id);else if(a&&a.id===id)finishStudy(id);else startFlow(id)}
   else if(x.t===SOLVE_T){if(!x.done&&openKnots(id).length){go(id);flashLock(id)}else savePatch(id,{ankiS:x.done?null:todayISO,ankiSAt:x.done?null:Date.now()})}
-  else if(x.t===LITE_T)savePatch(id,{lite:x.done?null:todayISO});
+  else if(x.t===LITE_T){const L=ltList(m).filter(d=>d!==todayISO);if(!x.done)L.push(todayISO);L.sort();savePatch(id,{lt:L.slice(-12).join(",")||null,ltAt:x.done?null:Date.now()})}
   else if(x.t===R1_T){
     if(x.done){if(x.hard){if(!m.rev1)savePatch(id,{again:null,againAt:null})}else if(!blockUndo(id,"rev1"))savePatch(id,{rev1:null,g1:null,rev1At:null})}
     else if(openKnots(id).length){go(id);flashLock(id)}
@@ -1916,8 +1938,9 @@ function flashLock(id){
   const el=document.querySelector(`#c-${CSS.escape(id)} .lockmsg`);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
   setTimeout(()=>{if(st.lockFlash===id)st.lockFlash=null},1600);
 }
-function clickMark(id,f){
-  const m=mk(id),on=!!m[f];
+function clickMark(id,f,ok){
+  const m=mk(id),on=!!m[f],gk={rev1:"r1",rev2:"r2",ankiS:"solve"}[f];
+  if(!ok&&!on&&gk){frogGate(gk,id,()=>clickMark(id,f,true));return}
   if(!on&&LOCKED.includes(f)&&openKnots(id).length){flashLock(id);return}
   if(f==="studied"){if(on)unsetStudied(id);else{const a=activeSession();if(!(a&&a.id===id)&&rtvLocked()){sheetLocked(id);return}finishStudy(id)}return}   // the retrieval lock has no side door
   if(f==="anki"){if(on){if(!blockUndo(id,"anki"))savePatch(id,{anki:null,cards:null,ankiAt:null})}else sheetCards(id);return}
@@ -2342,24 +2365,42 @@ function sheetSummary(id,stage){
 }
 
 // ---------- ANKI: how many cards, and is that healthy? ----------
-const HEALTHY=[15,25];
-function cardEval(n,h){
-  if(!n||!h)return"";const d=n/h,lo=HEALTHY[0]*h,hi=HEALTHY[1]*h;
-  if(d>HEALTHY[1])return`<div class="ce bad">🔴 تضخم: <b class="num">${Math.round(d)}</b> بطاقة لكل ساعة. الصحي لهالمحاضرة <b class="num en">${lo}–${hi}</b> بطاقة. احذف المكرر والتفاصيل الثانوية، وخلّ البطاقة سؤال عن فكرة وحدة.</div>`;
-  if(d<HEALTHY[0])return`<div class="ce mid">🟡 أقل من المعدل الصحي (<b class="num en">${lo}–${hi}</b>). تأكد إنك غطيت النقاط المهمة والفروق بين المفاهيم.</div>`;
-  return`<div class="ce good">🟢 ممتاز: <b class="num">${Math.round(d)}</b> بطاقة لكل ساعة، ضمن المعدل الصحي.</div>`;
+// v19 (your ANKI rules): MCQ cards follow your daily review time, not a flat number per hour:
+// reviews/day = minutes × 60 ÷ seconds per review → new cards/day = reviews ÷ 10 (÷ 15 at retention ≥ 0.93) → cap = new ÷ lectures/day,
+// shared by the lecture's hours (a 3-hour lecture gets more than a 1-hour one, same daily total). Under 7 days to its exam: half, Tier 1 only.
+// Counts saved before v19 keep the old 15–25 per hour, so nothing you earned changes.
+const HEALTHY=[15,25],V19=Date.parse("2026-10-19T00:00:00+03:00");
+const AVG_H=(()=>{const L=BASE_ALL.filter(needsStudy);return L.length?L.reduce((a,b)=>a+Math.max(1,hrs(b)),0)/L.length:1.5})();
+function ankiCap(b,days){const P=akp(),rev=Math.floor(P.min*60/P.sec),nw=rev/(P.ret>=.93?15:10),share=Math.max(.5,Math.min(2.5,Math.max(1,hrs(b))/AVG_H));
+  let cap=Math.max(3,Math.floor(nw/P.lpd*share));const crunch=days!=null&&days<7;if(crunch)cap=Math.max(2,Math.floor(cap/2));
+  return{cap,rev,nw:Math.round(nw*10)/10,share:Math.round(share*100)/100,crunch,days,P}}
+const oldCards=m=>{if(!m||!m.cards||m.akc)return false;const t=+m.ankiAt||(isISO(m.anki)?Date.parse(m.anki+"T20:00:00"):0);return!!t&&t<V19};
+function cardsRange(b,m){if(oldCards(m)){const h=hrs(b);return{lo:HEALTHY[0]*h,hi:HEALTHY[1]*h,old:1}}
+  const c=+(m&&m.akc)||ankiCap(b,daysToExamOf(b)).cap;return{lo:Math.max(1,Math.round(c*.4)),hi:Math.ceil(c*1.15),cap:c}}
+const cardsOk=(b,m)=>{if(!m||!m.cards)return false;const r=cardsRange(b,m);return m.cards>=r.lo&&m.cards<=r.hi};
+const cardsOver=(b,m)=>!!(m&&m.cards)&&m.cards>cardsRange(b,m).hi;
+function cardEval(n,b,m){
+  if(!n||!b)return"";const r=cardsRange(b,{...m,cards:n});
+  if(r.old){const h=hrs(b),d=n/h;
+    if(d>HEALTHY[1])return`<div class="ce bad">🔴 تضخم: <b class="num">${Math.round(d)}</b> بطاقة لكل ساعة. الصحي لهالمحاضرة <b class="num en">${r.lo}–${r.hi}</b> بطاقة. احذف المكرر والتفاصيل الثانوية، وخلّ البطاقة سؤال عن فكرة وحدة.</div>`;
+    if(d<HEALTHY[0])return`<div class="ce mid">🟡 أقل من المعدل الصحي (<b class="num en">${r.lo}–${r.hi}</b>). تأكد إنك غطيت النقاط المهمة والفروق بين المفاهيم.</div>`;
+    return`<div class="ce good">🟢 ممتاز: <b class="num">${Math.round(d)}</b> بطاقة لكل ساعة، ضمن المعدل الصحي.</div>`}
+  if(n>r.hi)return`<div class="ce bad">🔴 تضخم: <b class="num">${n}</b> بطاقة، وحدّك لهالمحاضرة <b class="num">${r.cap}</b> (من وقت مراجعتك اليومي). خلّ الأعلى عائد، وكل بطاقة فكرة وحدة.</div>`;
+  if(n<r.lo)return`<div class="ce mid">🟡 قليلة شوي (الصحي <b class="num en">${r.lo}–${r.hi}</b>). تأكد إن كل Tier 1 (الأساسيات والفروق اللي تتلخبط فيها) له بطاقة.</div>`;
+  return`<div class="ce good">🟢 ممتاز: <b class="num">${n}</b> بطاقة ضمن حدّك (<b class="num en">${r.lo}–${r.hi}</b>).</div>`;
 }
 function sheetCards(id){
-  const b=BY_ID[id],h=hrs(b),m=mk(id);
+  const b=BY_ID[id],m=mk(id),old=oldCards(m),cp=ankiCap(b,daysToExamOf(b)),r=cardsRange(b,m.cards?m:{});
   openSheet(`<div class="sh-ic">🃏</div><h2 class="sh-t">كم بطاقة ANKI سويت؟</h2><p class="sh-s en">${esc(label(b))}</p>
-    <p class="sh-s">المحاضرة ${durTxt(b)}، والمعدل الصحي <b class="num en">${HEALTHY[0]*h}–${HEALTHY[1]*h}</b> بطاقة.</p>
+    <p class="sh-s">المحاضرة ${durTxt(b)}، ${old?`والمعدل الصحي <b class="num en">${r.lo}–${r.hi}</b> بطاقة.`:`وحدّها الصحي <b class="num">${cp.cap}</b> بطاقة MCQ (من ${cp.P.min} دقيقة مراجعة باليوم${cp.crunch?"، ونصّيتها لأن الاختبار قريب":""}).`}</p>
     <input type="number" inputmode="numeric" min="1" max="999" id="cN" class="bignum" value="${m.cards||""}" placeholder="0">
-    <div id="cEval">${cardEval(m.cards,h)}</div><p class="perr" id="cErr" hidden></p>
+    <div id="cEval">${cardEval(m.cards,b,m)}</div><p class="perr" id="cErr" hidden></p>
     <div class="sh-act"><button class="btn primary big" id="cSave">حفظ</button></div>`,box=>{
     const n=box.querySelector("#cN"),ev=box.querySelector("#cEval"),err=box.querySelector("#cErr");
-    n.oninput=()=>{ev.innerHTML=cardEval(parseInt(n.value,10)||0,h)};
+    n.oninput=()=>{const v=parseInt(n.value,10)||0;ev.innerHTML=cardEval(v,b,old&&v===m.cards?m:{...m,akc:cp.cap})};
     const save=()=>{const v=parseInt(n.value,10)||0;if(v<1){err.hidden=false;err.textContent="اكتب عدد البطاقات.";return}if(v>999){err.hidden=false;err.textContent="الرقم كبير بشكل غريب، تأكد منه.";return}
-      savePatch(id,{anki:m.anki||todayISO,cards:v,...(m.anki?{}:{ankiAt:Date.now()})});closeSheet();toast(v/h>HEALTHY[1]?"انحفظ. انتبه للتضخم 🔴":"انحفظ عدد البطاقات 🃏")};
+      const keep=old&&v===m.cards,p={anki:m.anki||todayISO,cards:v,...(m.anki?{}:{ankiAt:Date.now()}),...(keep?{}:{akc:cp.cap})};
+      savePatch(id,p);closeSheet();toast(cardsOver(b,{...m,...p})?"انحفظ. انتبه للتضخم 🔴":"انحفظ عدد البطاقات 🃏")};
     box.querySelector("#cSave").onclick=save;n.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();save()}};n.focus();
   });
 }
@@ -2413,7 +2454,7 @@ const jget=(f,def)=>{try{const v=S[f];if(!v)return def;const o=typeof v==="strin
 const activeSession=()=>{let best=null;for(const id in S.marks){const m=S.marks[id];if(m&&m.startAt&&!m.studied&&BY_ID[id]&&(!best||m.startAt>best.at))best={id,at:m.startAt}}return best};
 const hms=ms=>{const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return `${h}:${String(m).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
 function finishStudy(id){
-  endPause(id);const m=mk(id),ms=sessMs(id),measured=ms>=30000?Math.max(1,Math.round(ms/6e4)):null;
+  endPause(id);st.back=null;const m=mk(id),ms=sessMs(id),measured=ms>=30000?Math.max(1,Math.round(ms/6e4)):null;
   const rec=closeSitting(id,"fin");if(rec)st.pendingReceipt=rec;
   // more than 12 hours is almost surely a session left running: the time is shown but you type the real one (your speed stats stay clean)
   const patch={studied:todayISO,sAt:Date.now(),startAt:false,pz:false,acc:false,bm:false};if(measured){if(measured<=720)patch.mins=measured;patch.ss=m.ss||m.startAt||Date.now()-ms}
@@ -2578,7 +2619,7 @@ function ledger(){
     if(m.again)add(tsOf(m.again,m.againAt,19),PTS.again,"🔁 مراجعة صعبة",n,"earn",id);
     if(m.studied){const t1=m.rev1?tsOf(m.rev1,m.rev1At,19):0;if(m.rev1)add(t1,PTS.r1,"🔁 مراجعة أولى",n,"earn",id);fines(E,dueDayMs(r1Due({...m,rev1:null})),t1,PTS.r1,"المراجعة الأولى",n,id)}
     if(m.rev1){const t2=m.rev2?tsOf(m.rev2,m.rev2At,19):0;if(m.rev2)add(t2,PTS.r2,"🔁 مراجعة ثانية",n,"earn",id);fines(E,dueDayMs(r2Due(m)),t2,PTS.r2,"المراجعة الثانية",n,id)}
-    if(m.anki){const ta=tsOf(m.anki,m.ankiAt,20);add(ta,PTS.anki,"🃏 سويت ANKI",n,"earn",id);if(m.cards){const d=m.cards/hrs(b);if(d>=HEALTHY[0]&&d<=HEALTHY[1])add(ta,PTS.ankiOk,"🃏 بطاقات بعدد صحي",n,"earn",id)}}
+    if(m.anki){const ta=tsOf(m.anki,m.ankiAt,20);add(ta,PTS.anki,"🃏 سويت ANKI",n,"earn",id);if(cardsOk(b,m))add(ta,PTS.ankiOk,"🃏 بطاقات بعدد صحي",n,"earn",id)}
     if(m.ankiS)add(tsOf(m.ankiS,m.ankiSAt,20),PTS.ankiS,"✅ حليت ANKI",n,"earn",id);
     recsOf(b.id).slice().reverse().forEach((r,i)=>{const at=r.at||parseInt(String(r.k).slice(1),36)||tsOf(r.d);if(i===0)add(at,PTS.voice,"🎙️ ملخص صوتي",n,"earn",id);else if(i<=2)add(at,PTS.rvoice,"🎙️ تسجيل إضافي",n,"earn",id)});
     if(m.pre&&!m.pre.sk){add(tsOf(m.pre.d,m.pre.at,9),PTS.prime,"🧠 تهيئة",n,"earn",id);if(+m.pre.hit>0)add(sAt||tsOf(m.pre.d,m.pre.at,10),PTS.hit*m.pre.hit,`🔮 ${m.pre.hit} من أسئلتك طلعت`,n,"earn",id)}
@@ -2599,6 +2640,12 @@ function ledger(){
   rtvDaysList().forEach(x=>add(+x.at,PTS.rtvAll,"🌅 خلّصت الاسترجاع كامل","","bonus"));
   Object.values(prayDays()).forEach(l=>l.slice(0,5).forEach(p=>add(+p.e,PTS.pray,"🕌 صلاة وقت المذاكرة",BY_ID[p.id]?label(BY_ID[p.id]):"","bonus",p.id)));
   offersList().forEach(o=>{if(o.first&&o.s&&o.sh&&o.s-o.sh<=30000)add(+o.s,PTS.fast,"⚡ بداية صاروخية","","bonus")});
+  frogsList().forEach(x=>{const b=BY_ID[x.id],m=mk(x.id);if(b&&m.studied)add(tsOf(m.studied,m.sAt,18)+1,PTS.frog,"🐸 بدأت يومك بالأصعب",label(b),"bonus",x.id)});
+  // v19: the retrieval game, the exam plan's light reviews, today's clinical case
+  ALL.filter(needsStudy).forEach(b=>{const m=mk(b.id),n=label(b),id=b.id;
+    const g=rvqOf(m);if(g&&g.p>0)add(g.at,g.p,`🎯 أسئلة الاسترجاع ${g.s}%`,n,"earn",id);
+    const L=ltList(m);L.slice(0,6).forEach((d,i)=>add(i===L.length-1&&+m.ltAt&&isoOf(new Date(+m.ltAt))===d?+m.ltAt:tsOf(d,0,19),PTS.lite,"🗓️ مراجعة خطة الاختبار",n,"earn",id))});
+  casesList().forEach(x=>{if(x.ok){const b=BY_ID[x.lid];add(+x.at,PTS.case,`🩺 حليت حالة اليوم ${x.n}/3`,b?label(b):"","bonus",b?x.lid:"")}});
   boxLedger(add);
   E.sort((a,b)=>a.at-b.at);let bal=0,earn=0,fine=0,spend=0;
   E.forEach(e=>{bal+=e.a;e.bal=bal;if(e.k==="fine")fine+=e.a;else if(e.k==="spend")spend+=e.a;else earn+=e.a});
@@ -2608,7 +2655,7 @@ const xpTotal=()=>ledger().career;       // career rank: what you earned minus f
 const coins=()=>ledger().bal;            // balance: after fines and purchases
 // what a task pays, fines already taken, and the next fine coming
 function taskWorth(x){
-  const k=x.t.kind,full=k==="study"?PTS.study:k==="r1"||k==="r2"?PTS[k]:k==="solve"?PTS.ankiS:k==="knot"?PTS.knot:0;
+  const k=x.t.kind,full=k==="study"?PTS.study:k==="r1"||k==="r2"?PTS[k]:k==="solve"?PTS.ankiS:k==="knot"?PTS.knot:k==="lite"&&x.plan?PTS.lite:0;
   if(!full)return null;
   if(k!=="study"&&k!=="r1"&&k!=="r2")return{p:full,fined:0,next:null};
   const due=k==="study"?endMsOf(x.b):dueDayMs(x.due),now=Date.now();
@@ -2626,7 +2673,7 @@ function checkFines(){
 function activityDates(){
   const s=new Set();
   for(const id in S.marks){const m=S.marks[id];if(!m)continue;
-    ["studied","rev1","rev2","anki","ankiS","again","lite"].forEach(f=>{if(typeof m[f]==="string")s.add(m[f])});
+    ["studied","rev1","rev2","anki","ankiS","again","lite"].forEach(f=>{if(typeof m[f]==="string")s.add(m[f])});ltList(m).forEach(d=>s.add(d));
     knotsOf(id).forEach(k=>{if(k.d)s.add(k.d)});recsOf(id).forEach(r=>s.add(r.d));if(m.pre&&m.pre.d)s.add(m.pre.d)}
   (S.sleepLog||"").split(",").filter(Boolean).forEach(d=>s.add(d));
   return s;
@@ -2642,7 +2689,7 @@ function badgeDefs(){
   const steel=L.filter(b=>M(b).rev2&&(recall(b.id)||0)>=90).length;
   const knots=L.reduce((a,b)=>a+knotsOf(b.id).filter(k=>k.d).length,0);
   const voice=L.reduce((a,b)=>a+recsOf(b.id).length,0);
-  const ankiOk=L.filter(b=>{const m=M(b);if(!m.cards)return false;const d=m.cards/hrs(b);return d>=HEALTHY[0]&&d<=HEALTHY[1]}).length;
+  const ankiOk=L.filter(b=>cardsOk(b,M(b))).length;
   const primes=L.filter(b=>M(b).pre&&!M(b).pre.sk).length;
   const punctual=L.reduce((a,b)=>{const m=M(b);let n=0;if(m.rev1&&lateInfo("r1",b,m)<=24)n++;if(m.rev2&&m.rev1&&lateInfo("r2",b,m)<=24)n++;return a+n},0);
   const cycle=L.filter(b=>{const m=M(b);return m.studied&&m.rev1&&m.rev2&&m.anki&&m.ankiS}).length;
@@ -2669,6 +2716,8 @@ function badgeDefs(){
     {id:"mid",ic:"🎯",n:"جاهز للـ MID",d:"ذاكر كل محاضرات الـ MID قبل موعده",cur:midDone,g:mid?mid.scope.length:1,xp:300},
     {id:"rtv5",ic:"🌅",n:"ذاكرة الصباح",d:"خلّص قائمة الاسترجاع كاملة 5 أيام",cur:rtvDaysList().length,g:5,xp:150},
     {id:"clips50",ic:"🎬",n:"50 مقطع",d:"خلّص 50 مقطع بالتفريغ",cur:clipTimes().length,g:50,xp:150},
+    {id:"cases5",ic:"🩺",n:"طبيب الحالات",d:"حل 5 حالات يومية",cur:casesList().filter(x=>x.ok).length,g:5,xp:100},
+    {id:"quiz5",ic:"🎯",n:"قنّاص الأسئلة",d:"جاوب أسئلة الاسترجاع الثلاث كلها صح 5 مرات",cur:L.filter(b=>{const g=rvqOf(M(b));return g&&g.s>=100}).length,g:5,xp:100},
     {id:"eyeset",ic:"👁️",n:"عين كاملة",d:"اجمع كل بطاقات أجزاء العين",cur:ownN("c"),g:CARDS.filter(c=>c.r==="c").length,xp:100},
     {id:"legends",ic:"🎖️",n:"قاعة الأساطير",d:"اجمع كل البطاقات الأسطورية",cur:ownN("l"),g:CARDS.filter(c=>c.r==="l").length,xp:250},
   ];
@@ -2724,8 +2773,9 @@ function boxAlive(key){const [id,k,kn]=key.split("|"),b=BY_ID[id];if(!b||!needsS
   if(k==="knot"){const x=(m.knots||{})[kn];return!!(x&&x.d)}
   if(k==="clip")return!!cprOf(id).t[+kn];
   if(k==="rtv")return!!m.rv;
+  if(k==="case")return casesList().some(x=>x.d===kn&&x.ok&&x.lid===id);
   return!!m[KIND_F[k]]}
-const boxWhat=key=>{const [,k,x]=key.split("|");return k==="knot"?"حل العُقدة":k==="clip"?`المقطع ${+x+1}`:k==="rtv"?"الاسترجاع":BOXF[KIND_F[k]]?BOXF[KIND_F[k]][2]:"المهمة"};
+const boxWhat=key=>{const [,k,x]=key.split("|");return k==="knot"?"حل العُقدة":k==="clip"?`المقطع ${+x+1}`:k==="rtv"?"الاسترجاع":k==="case"?"حالة اليوم 🩺":BOXF[KIND_F[k]]?BOXF[KIND_F[k]][2]:"المهمة"};
 // n = the roll came up empty (thinning); kept so the same task can't be rolled twice
 const boxList=()=>Object.entries(boxesAll()).filter(([k,v])=>v&&typeof v==="object"&&!v.n&&boxAlive(k)).map(([key,v])=>({key,...v}));
 const boxesWaiting=()=>boxList().filter(x=>!x.o).sort((a,b)=>a.c-b.c);
@@ -2945,7 +2995,7 @@ function sheetCard(id){const c=CARD_BY[id],own=ownedCards()[id];if(!c||!own)retu
   openSheet(`${gcardHTML(c,{anim:1,big:1,fact:1,n:own.length})}<p class="sh-note">${RAR[c.r].set} · لقيتها أول مرة ${fmt(isoOf(new Date(own[0].o)))}</p><div class="sh-act"><button class="btn primary big" id="gcOk">تمام</button></div>`,
     box=>{box.querySelector("#gcOk").onclick=closeSheet})}
 // ================= v14: 🎬 المقاطع · 🧠 الاسترجاع · 🔖 علامة الكتاب · 🎧 صوت التركيز · 🧾 الإيصال · 📈 الجاهزية · 🏋️ الأرقام · 🧬 العادة · 🌱 الأسبوع · 💎 التخفيف =================
-Object.assign(PTS,{clip:3,rtv:10,rtvAll:15,link:3,fast:5,bmk:5,pray:5});
+Object.assign(PTS,{clip:3,rtv:10,rtvAll:15,link:3,fast:5,bmk:5,pray:5,frog:10,lite:10,case:10});
 const CLIP_BOX_P=.35,RESCUE_MS=7*864e5,OFFER_WAIT=10*6e4,BREAK_MS=15*6e4,CLIPS_PER_BREAK=4;
 // a study day runs 4 am → 4 am, so a late night still belongs to the day you started it
 const DAY_CUT=4;
@@ -2976,7 +3026,9 @@ function clipsOf(id){
   clipCache.set(s,v);return v;
 }
 function cprOf(id){const o=sjson(mk(id).cpr,null)||{},n=(clipsOf(id)||{c:[]}).c.length;
-  const r=Array.isArray(o.r)?o.r.slice():[],t=Array.isArray(o.t)?o.t.slice():[];return{r,t,i:Math.max(0,Math.min(n,Number.isInteger(o.i)?o.i:0))}}
+  const r=Array.isArray(o.r)?o.r.slice():[],t=Array.isArray(o.t)?o.t.slice():[],mm=Array.isArray(o.m)?o.m.map(x=>Array.isArray(x)?x.filter(Number.isInteger):[]):[];return{r,t,m:mm,i:Math.max(0,Math.min(n,Number.isInteger(o.i)?o.i:0))}}
+// m = per clip, the key points you did NOT tick in the check (what the ANKI generator and the questions aim at)
+const cprEnc=p=>JSON.stringify({i:p.i,r:p.r,t:p.t,...(p.m&&p.m.some(x=>x&&x.length)?{m:p.m}:{})});
 const clipsRated=id=>{const c=clipsOf(id);if(!c)return 0;const p=cprOf(id);return c.c.filter((_,i)=>p.t[i]).length};
 // half-studied lectures count toward readiness by how well each finished clip was blurted
 function clipPartial(id){const c=clipsOf(id);if(!c)return null;const p=cprOf(id);let s=0,n=0;c.c.forEach((_,i)=>{if(p.r[i]){s+=clipQ[p.r[i]]||0;n++}});return n?100*s/c.c.length:null}
@@ -3101,11 +3153,22 @@ function startSession(id){
   const m=mk(id),now=Date.now();
   st.sit={id,s:now,acc0:+m.acc||0,rd0:rdVal()};saveSitLocal();
   if(fiveRun){fiveRun=null;renderFive()}   // the real session takes over from the 5-minute starter
+  // 🐸 a new theory lecture started in the first two hours of the day (or picked from the nudge): +10 once it's done
+  const b=BY_ID[id];if(b&&!m.studied&&!frogToday()&&(st.frogPick===id||(b.kind==="lec"&&inFrogWin()&&!lowOn()&&!crunchNow())))setTop("frogs",JSON.stringify([...frogsList(),{d:curDay(),id,at:now}].slice(-60)));
+  st.frogPick=null;
   savePatch(id,{startAt:now,pz:false,ss:m.ss||now});
   closeSheet(true);sfx("chime");focusSync();
 }
 function pauseSession(id){const m=mk(id);if(!m.startAt||m.pz)return;const now=Date.now();savePatch(id,{acc:sessMs(id),startAt:now,pz:now});focusSync()}
-function resumeSession(id){const m=mk(id);if(!m.startAt||!m.pz)return;endPause(id);savePatch(id,{startAt:Date.now(),pz:false});sfx("chime");focusSync()}
+function resumeSession(id){const m=mk(id);if(!m.startAt||!m.pz)return;const op=openPause(id);endPause(id);savePatch(id,{startAt:Date.now(),pz:false});sfx("chime");focusSync();
+  // the thought you parked before praying is the first thing you see when you're back
+  if(op&&op.n){st.back={id,t:op.n};setTimeout(()=>sheetBack(id,op),60)}}
+function sheetBack(id,op){
+  openSheet(`<div class="sh-ic">🔁</div><h2 class="sh-t">${op.r===PRAY_R?"تقبّل الله · رجعت!":"رجعت!"}</h2>
+    <div class="hookbox">📍 <b>كنت عند:</b> ${esc(op.n)}</div>
+    <p class="sh-s">اقرأها، خذ نفس، وكمّل من نفس النقطة بالضبط.</p>
+    <div class="sh-act"><button class="btn primary big" id="bkOk">▶ كمّل من هنا</button></div>`,box=>{box.querySelector("#bkOk").onclick=()=>closeSheet()});
+}
 // ---------- ⏸ a pause needs a real reason; prayer earns points ----------
 const PRAY_R="🕌 الصلاة",DEFAULT_REASONS=[PRAY_R,"🏠 أعمال المنزل","☕ راحة"],PRAY_MIN=4*6e4;
 const pausesList=()=>{const l=jget("pauses",[]);return Array.isArray(l)?l.filter(x=>x&&x.s&&x.id):[]};
@@ -3122,17 +3185,29 @@ const brkPause=id=>{const m=mk(id);return!!(m.startAt&&m.pz&&!openPause(id))};  
 const prayDays=()=>{const by={};pausesList().filter(p=>p.r===PRAY_R&&p.e&&p.e-p.s>=PRAY_MIN).sort((a,b)=>a.s-b.s).forEach(p=>{const d=dayKeyOf(p.s);(by[d]=by[d]||[]).push(p)});return by};
 function sheetPause(id){
   const a=activeSession();if(!a||a.id!==id||mk(id).pz)return;
-  const today=(prayDays()[curDay()]||[]).length,rs=reasonsList();
-  openSheet(`<div class="sh-ic">⏸</div><h2 class="sh-t">إيقاف مؤقت</h2><p class="sh-s en">${esc(label(BY_ID[id]))}</p>
+  const today=(prayDays()[curDay()]||[]).length,rs=reasonsList(),c=clipsOf(id),p=c?cprOf(id):null,cur=c&&p?c.c[Math.min(p.i,c.c.length-1)]:null;
+  const hint=cur?`المقطع ${Math.min(p.i,c.c.length-1)+1}: ${cur.h}${cur.f?` · من شريحة ${cur.f} لـ ${cur.t}`:""}`:"";
+  openSheet(`<div id="pzA"><div class="sh-ic">⏸</div><h2 class="sh-t">إيقاف مؤقت</h2><p class="sh-s en">${esc(label(BY_ID[id]))}</p>
     <p class="sh-s">وش السبب؟ الوقت يوقف لين ترجع، والإيقاف بدون سبب مقنع يكسر التركيز اللي بنيته.</p>
     <div class="reasons">${rs.map((r,i)=>`<button class="btn rsn" data-ri="${i}">${esc(r)}${r===PRAY_R?` <small>+${PTS.pray}</small>`:""}</button>`).join("")}</div>
     <details class="rsn-new"><summary>سبب ثاني؟</summary><div class="frow"><input id="rsnIn" class="fin" maxlength="40" placeholder="اكتب سبب مقنع (يضاف للقائمة)"><button class="btn primary" id="rsnGo">أوقف</button></div><p class="perr" id="rsnErr" hidden></p></details>
-    <p class="sh-note">🕌 الصلاة تعطيك +${PTS.pray} (لو الإيقاف ${PRAY_MIN/6e4} دقايق أو أكثر، لين 5 صلوات باليوم)${today?` · اليوم: ${today}/5`:""}</p>`,box=>{
-    const go=r=>{const a2=activeSession();if(!a2||a2.id!==id||mk(id).pz){closeSheet();return}
-      const now=Date.now(),L=pausesList();L.forEach(p=>{if(p.id===id&&!p.e)p.e=+p.s});
-      setTop("pauses",JSON.stringify([...L,{id,s:now,e:0,r}].slice(-400)));pauseSession(id);closeSheet();
+    <p class="sh-note">🕌 الصلاة تعطيك +${PTS.pray} (لو الإيقاف ${PRAY_MIN/6e4} دقايق أو أكثر، لين 5 صلوات باليوم)${today?` · اليوم: ${today}/5`:""}</p></div>
+    <div id="pzB" hidden><div class="sh-ic">🧠</div><h2 class="sh-t">صفّر ذهنك قبل الصلاة 🕌</h2>
+      <p class="sh-s">اكتب وين وقفت أو آخر فكرة في راسك. تنحفظ هنا، فتصلي وبالك فاضي، ولما ترجع تلقاها تنتظرك.</p>
+      ${hint?`<button class="btn sm pzchip" id="pzChip">📍 ${esc(hint)}</button>`:""}
+      <textarea id="pzNote" class="fin pznote" rows="3" maxlength="220" placeholder="مثلًا: وصلت لـ Alternative pathway، والجاي ليش C3b يلصق في البكتيريا"></textarea>
+      <div class="sh-act"><button class="btn primary big" id="pzGo">🕌 احفظها وأوقف</button><button class="btn sm" id="pzSkip">أوقف بدون كتابة</button></div></div>`,box=>{
+    const go=(r,note)=>{const a2=activeSession();if(!a2||a2.id!==id||mk(id).pz){closeSheet();return}
+      const now=Date.now(),L=pausesList(),n=String(note||"").trim().replace(/\s+/g," ").slice(0,220);L.forEach(p=>{if(p.id===id&&!p.e)p.e=+p.s});
+      setTop("pauses",JSON.stringify([...L,{id,s:now,e:0,r,...(n?{n}:{})}].slice(-400)));pauseSession(id);closeSheet();
       toast(r===PRAY_R?"تقبّل الله 🕌 الوقت موقوف لين ترجع":`⏸ موقوفة · ${r}`);if(FS&&FS.id===id)drawFocus()};
-    box.querySelectorAll("[data-ri]").forEach(b=>b.onclick=()=>{const r=rs[+b.dataset.ri];if(r)go(r)});
+    const A=box.querySelector("#pzA"),B=box.querySelector("#pzB"),ta=box.querySelector("#pzNote");
+    box.querySelectorAll("[data-ri]").forEach(b=>b.onclick=()=>{const r=rs[+b.dataset.ri];if(!r)return;
+      if(r===PRAY_R){A.hidden=true;B.hidden=false;freshTap();ta.focus();return}go(r)});
+    const ch=box.querySelector("#pzChip");if(ch)ch.onclick=()=>{ta.value=(ta.value.trim()?ta.value.trim()+" · ":"")+hint;ta.focus()};
+    box.querySelector("#pzGo").onclick=()=>{if(!ta.value.trim()){ta.focus();ta.placeholder="اكتب ولو كلمتين، أو اضغط «أوقف بدون كتابة»";return}go(PRAY_R,ta.value)};
+    box.querySelector("#pzSkip").onclick=()=>go(PRAY_R,"");
+    ta.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();box.querySelector("#pzGo").click()}};
     box.querySelector("#rsnGo").onclick=()=>{const v=box.querySelector("#rsnIn").value.trim().replace(/\s+/g," "),err=box.querySelector("#rsnErr");
       if(v.length<4||/^(.)\1*$/.test(v)){err.hidden=false;err.textContent="اكتب سبب واضح ومقنع (4 حروف أو أكثر).";return}
       const r="📝 "+v,old=jget("preasons",[]).filter(x=>typeof x==="string");if(!DEFAULT_REASONS.includes(r))setTop("preasons",JSON.stringify([...old.filter(x=>x!==r),r]));go(r)};
@@ -3140,7 +3215,7 @@ function sheetPause(id){
 }
 // ends the sitting and banks its time; returns the receipt data
 function stopSession(id,how){
-  endPause(id);const ms=sessMs(id),rec=closeSitting(id,how);
+  endPause(id);st.back=null;const ms=sessMs(id),rec=closeSitting(id,how);
   savePatch(id,{acc:ms,startAt:false,pz:false});focusSync();if(FS&&FS.id===id)hideFocus();return rec;
 }
 function closeSitting(id,how){
@@ -3224,7 +3299,7 @@ function drawFocus(){
       <h2 class="fx-h en">${esc(x.h)}</h2>${x.ar?`<p class="fx-ar">${esc(x.ar)}</p>`:""}
       ${x.hk?`<div class="hookbox">🪝 <b>خلّك في بالك وانت تقرأ:</b> ${esc(x.hk)}</div>`:""}
       ${FS.hem?`<p class="ce mid">📖 حيلة همنغواي: اقرأ أول شريحتين بس، وبعدها اضغط «🔖 وقّف هنا».</p>`:""}
-      ${paused?(()=>{const op=openPause(id);return`<p class="fx-note">⏸ موقوفة${op?`: ${esc(op.r)} · من ${ago(op.s)}`:""}</p><button class="btn primary big fx-main" data-fx="resume">▶ استأنف</button>`})():`<button class="btn primary big fx-main" data-fx="read">✓ خلّصت المقطع</button>`}
+      ${paused?(()=>{const op=openPause(id);return`<p class="fx-note">⏸ موقوفة${op?`: ${esc(op.r)} · من ${ago(op.s)}`:""}</p>${op&&op.n?`<div class="hookbox">📍 <b>وقفت عند:</b> ${esc(op.n)}</div>`:""}<button class="btn primary big fx-main" data-fx="resume">▶ استأنف</button>`})():`${st.back&&st.back.id===id?`<div class="hookbox back">📍 <b>كنت عند:</b> ${esc(st.back.t)}</div>`:""}<button class="btn primary big fx-main" data-fx="read">✓ خلّصت المقطع</button>`}
       <div class="fx-row">${paused?"":`<button class="btn sm" data-fx="pause">⏸ إيقاف مؤقت</button>`}<button class="btn sm" data-fx="stop">🔖 وقّف هنا</button><button class="btn sm" data-fx="finish">✓ ذاكرتها كاملة</button></div>`;
   }else if(FS.mode==="blurt"&&x){
     body=`<p class="fx-k">${CLIP_T[x.y]} · المقطع ${i+1}</p><h2 class="fx-h">🗣️ فرّغ بدون ما تشوف</h2>
@@ -3281,7 +3356,7 @@ function focusAct(a,bt){
   if(a==="check"){FS.mode="check";FS.sel=new Set();drawFocus();return}
   if(a==="redo"){FS.mode="read";FS.sel=new Set();FS.txt="";drawFocus();return}
   if(a==="knot"){const c=clipsOf(id),x=c&&c.c[FS.i];if(x)setKnot(id,"k"+Date.now().toString(36),{t:`مقطع ${FS.i+1}: ${x.h}`,c:todayISO,d:false});
-    const p=cprOf(id);p.i=Math.max(p.i,FS.i+1);savePatch(id,{cpr:JSON.stringify({i:p.i,r:p.r,t:p.t})});toast("انسجلت عُقدة 🚧 بتطلع لك بكرة");advanceClip();return}
+    const p=cprOf(id);p.i=Math.max(p.i,FS.i+1);savePatch(id,{cpr:cprEnc(p)});toast("انسجلت عُقدة 🚧 بتطلع لك بكرة");advanceClip();return}
   if(a==="go"){FS.cd=0;FS.mode="read";FS.hem=false;drawFocus();return}
   if(a==="hold"){FS.cd=0;drawFocus();return}
   if(a==="stop"){sheetBookmark(id);return}
@@ -3298,8 +3373,9 @@ function clipRate(g){
   if(Date.now()-(FS.modeAt||0)<320)return;
   const id=FS.id,c=clipsOf(id),p=cprOf(id),i=FS.i,x=c&&c.c[i];if(!x)return;
   const rd0=rdVal(),first=!p.t[i],key=`${id}|clip|${i}`,had=!!boxesAll()[key];
-  p.r[i]=g;if(first)p.t[i]=Date.now();if(g!=="h")p.i=Math.max(p.i,i+1);
-  savePatch(id,{cpr:JSON.stringify({i:p.i,r:p.r,t:p.t})});
+  p.r[i]=g;if(first)p.t[i]=Date.now();if(g!=="h")p.i=Math.max(p.i,i+1);st.back=null;
+  if(x.k.length){while(p.m.length<i)p.m.push([]);p.m[i]=x.k.map((_,j)=>j).filter(j=>!FS.sel.has(j))}
+  savePatch(id,{cpr:cprEnc(p)});
   const bx=boxesAll()[key],rd1=rdVal();
   FS.gain={pts:first?PTS.clip:0,rd:rd0!=null&&rd1!=null?rd1-rd0:null,box:!had&&!!bx&&!bx.n};
   if(g==="h"){FS.mode="fail";drawFocus();return}
@@ -3326,7 +3402,7 @@ setInterval(()=>{
 // ---------- 🔖 bookmark: stop where you know what comes next, and come back to a hanging question ----------
 function sheetBookmark(id){
   const b=BY_ID[id];if(!b)return;const c=clipsOf(id),p=c?cprOf(id):null,i=p?Math.min(p.i,c.c.length):0,cur=c&&c.c[i];
-  const auto=c?(cur?`المقطع ${i+1}: ${cur.h}${cur.f?` · من شريحة ${cur.f} لـ ${cur.t}`:""}`:"خلّصت كل المقاطع"):"";
+  const op=openPause(id),auto=op&&op.n?op.n:c?(cur?`المقطع ${i+1}: ${cur.h}${cur.f?` · من شريحة ${cur.f} لـ ${cur.t}`:""}`:"خلّصت كل المقاطع"):"";
   const canHem=!!(cur&&FS&&FS.id===id&&FS.mode!=="read"&&!(st.hemDone||{})[id]);
   openSheet(`<div class="sh-ic">🔖</div><h2 class="sh-t">علامة الكتاب</h2><p class="sh-s en">${esc(label(b))}</p>
     <p class="sh-s">قبل ما توقف، اترك لنفسك خيط ترجع له. أحسن وقفة هي اللي تعرف فيها وش الجاي، فترجع متشوق مو متثاقل.</p>
@@ -3547,7 +3623,7 @@ function habitDays(){
   for(const id in S.marks){const m=S.marks[id];if(!m||!BY_ID[id])continue;
     if(m.studied){if(m.ss)put(m.ss);else if(m.sAt)put(+m.sAt-(+m.mins||0)*6e4);else putIso(m.studied)}
     [["rev1","rev1At"],["rev2","rev2At"],["anki","ankiAt"],["ankiS","ankiSAt"],["again","againAt"],["rv","rvAt"]].forEach(([f,a])=>{if(m[f]){if(m[a])put(m[a]);else putIso(m[f])}});
-    if(m.lite)putIso(m.lite);
+    if(m.lite)putIso(m.lite);if(m.ltAt)put(m.ltAt);ltList(m).forEach(putIso);{const g=rvqOf(m);if(g)put(g.at)}
     knotsOf(id).forEach(k=>{if(k.d){if(k.at)put(k.at);else putIso(k.d)}});
     recsOf(id).forEach(r=>{if(r.at)put(r.at)});
     const p=sjson(m.cpr,null);if(p&&Array.isArray(p.t))p.t.forEach(t=>put(t));
@@ -3600,9 +3676,9 @@ function forgotCheck(){
 }
 function staleCheck(){
   const a=activeSession();if(!a)return;const m=mk(a.id);if(!m.pz||Date.now()-m.pz<2*HR)return;
-  const c=clipsOf(a.id),p=c?cprOf(a.id):null,cur=c&&p?c.c[p.i]:null,bm=sjson(m.bm,null);
+  const c=clipsOf(a.id),p=c?cprOf(a.id):null,cur=c&&p?c.c[p.i]:null,bm=sjson(m.bm,null),op=openPause(a.id);
   stopSession(a.id,"stale");
-  if(!bm||bm.r)savePatch(a.id,{bm:JSON.stringify({at:Date.now(),i:p?p.i:0,w:cur?`المقطع ${p.i+1}: ${cur.h}`:"",q:cur&&cur.hk||"",s:""})});
+  if(!bm||bm.r)savePatch(a.id,{bm:JSON.stringify({at:Date.now(),i:p?p.i:0,w:op&&op.n?op.n:cur?`المقطع ${p.i+1}: ${cur.h}`:"",q:cur&&cur.hk||"",s:""})});
   toast("جلستك كانت موقوفة من ساعتين، وقّفتها وحفظت وقتها وعلامتها 🔖");
 }
 function weekCheck(){
@@ -3641,6 +3717,55 @@ function thinCheck(){
     <p class="sh-s">نفس المجموع تقريبًا، بس المفاجأة أقوى. المكافأة المتقطعة هي اللي تخلي العادة ما تنطفي، والإحساس بالإنجاز هو اللي يبقى 💪</p>
     <div class="sh-act"><button class="btn primary big" id="thOk">فهمت 👌</button></div>`,box=>{box.querySelector("#thOk").onclick=()=>closeSheet()});
   return true;
+}
+
+// ---------- 🐸 eat the frog: the first two hours of your study day go to the hardest lecture ----------
+// the offer still hands you the EASIEST task (to get going); once it's over, the hardest one comes next
+const FROG_MS=2*HR,FROG_ASK_LS="uqu-frogask",LIGHT_K=["r1","r2","solve","knot","lite"];
+const frogsList=()=>jget("frogs",[]).filter(x=>isObj(x)&&isISO(x.d)&&x.id);
+const frogToday=()=>frogsList().some(x=>x.d===curDay());
+// when today's studying really began: the first thing you did, a running session, or an offer you started (nothing yet = now)
+function dayFirst(){const d=curDay(),B=dayStartMs(d);let t=+habitDays()[d]||Infinity;
+  const a=activeSession();if(a){const m=mk(a.id);[m.ss,m.startAt].forEach(x=>{if(+x>=B&&+x<t)t=+x})}
+  offersList().forEach(o=>{if(+o.s>=B&&+o.s<t)t=+o.s});return t===Infinity?0:t}
+const inFrogWin=()=>{const f=dayFirst();return!f||Date.now()-f<FROG_MS};
+// the heaviest thing waiting today: a new theory lecture first, the longest, then the nearest exam's, then the oldest
+function hardTask(lecOnly){const e=nextExam(),inE=x=>e&&e.ids.has(x.b.id)?1:0;
+  const c=tasksDue(todayISO,true).filter(x=>!x.done&&x.t===STUDY_T&&(!lecOnly||x.b.kind==="lec"));
+  return c.sort((a,b)=>(b.b.kind==="lec")-(a.b.kind==="lec")||hrs(b.b)-hrs(a.b)||inE(b)-inE(a)||a.due.localeCompare(b.due))[0]||null}
+let FRk="",FRv=null;
+function frogState(){const k=LV+"|"+Math.floor(Date.now()/6e4);if(k===FRk&&FRv)return FRv;FRk=k;
+  const off=lowOn()||!!crunchNow()||restList().includes(curDay())||frogToday();   // a low-energy day, exam night or a rest day: no nagging
+  FRv={on:!off&&inFrogWin(),task:off?null:hardTask(true)};return FRv}
+const frogAsked=()=>{try{return localStorage.getItem(FROG_ASK_LS)===curDay()}catch(e){return false}};
+// a light task (review, ANKI, a knot) tapped in the first two hours while a new lecture waits: one nudge a day
+function frogGate(kind,id,go){
+  if(!LIGHT_K.includes(kind)||!achReady||activeSession()||liveOffer()||frogAsked())return go();
+  const fs=frogState();if(!fs.on||!fs.task||fs.task.b.id===id)return go();
+  try{localStorage.setItem(FROG_ASK_LS,curDay())}catch(e){}
+  sheetFrog(fs.task,go,kind,false);
+}
+function sheetFrog(x,go,kind,after){
+  const b=x.b,est=estMin(b,speed()),lock=rtvLocked(),bonus=!frogToday(),kName={r1:"المراجعة",r2:"المراجعة",solve:"حل ANKI",knot:"العُقدة",lite:"المراجعة"}[kind]||"المهمة";
+  sfx("g");
+  openSheet(`<div class="sh-ic">🐸</div><h2 class="sh-t">${after?"خلص العرض ☀️ الحين وقت الأصعب":"تركيزك الصباحي في قمته"}</h2>
+    <p class="sh-s">${after?"العرض أعطاك الأسهل عشان تتحرك. الحين وانت دافي، خذ الأثقل قبل ما تبرد.":"أول ساعتين من يومك الدراسي هي أقوى وقت لدماغك. المراجعة الخفيفة تمشي حتى وانت تعبان آخر اليوم، لكن المحاضرة الجديدة تبيك وانت في قمتك."}</p>
+    <div class="offer-task" style="${sv("study")}"><span class="tlabel">ذاكرها</span><b class="en">${esc(label(b))}</b><small>${durTxt(b)}${est?` · ≈ ${minTxt(est)}`:""}${b.dr?` · ${esc(b.dr)}`:""}</small></div>
+    ${lock?`<p class="sh-note">🧠 أول شي الاسترجاع (هو اللي يفتح المحاضرات الجديدة)، وبعده تبدأ فيها على طول.</p>`:""}
+    <div class="sh-act"><button class="btn primary big" id="frGo">🐸 ابدأ بالأصعب${bonus?` <small class="en">+${PTS.frog}</small>`:""}</button><button class="btn" id="frNo">${after?"بعدين":`كمّل ${kName} الحين`}</button></div>
+    ${bonus?`<p class="sh-note">«Eat the frog»: تبدأ بالأثقل وتاخذ <b class="en">+${PTS.frog}</b> لما تخلّصها (مرة باليوم).</p>`:""}`,box=>{
+    box.querySelector("#frGo").onclick=()=>{st.frogPick=b.id;closeSheet(true);startFlow(b.id)};
+    box.querySelector("#frNo").onclick=()=>{closeSheet();if(go)go()}});
+}
+// after an offer that gave you the easy task: the hardest one comes next (once per offer, not in the middle of a session)
+function afterOfferCheck(){
+  if(activeSession()||(fiveRun&&!fiveRun.done)||focusOpen())return false;
+  const now=Date.now(),l=offersList(),done=o=>offerState(o)==="done"||(()=>{const h=offerHits(o);return h.length>=OFFER_N&&h.every(x=>x.done)})();
+  const o=l.filter(o=>o.s&&!o.hx&&done(o)&&now-Math.min(offerEnd(o),now)<90*6e4).sort((a,b)=>b.s-a.s)[0];if(!o)return false;
+  l.forEach(x=>{if(x.s&&!x.hx&&+x.s<=+o.s)x.hx=1});saveOffers(l);
+  if(o.tg&&o.tg.k==="study")return false;   // the first-lecture offer already gave you a lecture
+  const x=hardTask(false);if(!x)return false;
+  sheetFrog(x,null,"",true);return true;
 }
 
 // ---------- 🌅 the first-lecture-of-the-day offer: one button, 10 minutes to take it ----------
@@ -3725,6 +3850,7 @@ function checkAch(){
   if(!S.since)setTop("since",Date.now());
   const ent=entered;fixPauses();staleCheck();if(forgotCheck())return;
   if(!activeSession()&&!fiveRun){if(napCheck())return;if(dayOfferCheck(ent))return;if(weekCheck())return;if(thinCheck())return}else entered=false;
+  if(afterOfferCheck())return;
   if(focusOpen()&&FS.mode==="read")return;   // never interrupt a clip you're reading
   checkFines();
   const bt=jget("bt",{}),lv=levelOf(xpTotal()).l,got=badgeDefs().filter(x=>x.cur>=x.g||bt[x.id]);
@@ -3760,7 +3886,7 @@ function ledgerHTML(){
     <div class="seg sm lgf" role="group">${[["all","الكل"],["earn","➕ مكافآت"],["fine","⚠️ غرامات"],["spend","🎁 صرفت"]].map(([k,l])=>`<button aria-pressed="${f===k}" data-lgf="${k}">${l}</button>`).join("")}</div>
     <div class="lg">${list||`<p class="note" style="margin:0">ما فيه عمليات هنا للحين.</p>`}</div>
     ${rows.length>N?`<button class="btn sm" id="lgMore">عرض عمليات أقدم (${rows.length-N})</button>`:""}
-    <details class="how lghow"><summary>كيف ينحسب السجل؟</summary><p>المهمة لما تخلّصها تاخذ قيمتها <b>كاملة</b>: ذاكرتها ${PTS.study} · كل مراجعة ${PTS.r1} · مراجعة صعبة ${PTS.again} · سويت ANKI ${PTS.anki} (+${PTS.ankiOk} لو بعدد صحي) · حليتها ${PTS.ankiS} · أول ملخص صوتي ${PTS.voice} وكل تسجيل إضافي ${PTS.rvoice} · تهيئة ${PTS.prime} (+${PTS.hit} لكل سؤال طلع) · عُقدة ${PTS.knot} · ليلة تثبيت ${PTS.sleep} · عرض الصحيان ×2 وكومبو ${PTS.combo}.<br>🎁 كل مهمة تخلّصها لها فرصة صندوق مفاجأة، ونقاطه تنضاف لما تكشطه (احتمالاته في تبويب 🃏 البطاقات). لو ألغيت المهمة ينشال صندوقها.<br>🎬 كل مقطع تفرّغه ${PTS.clip} (مهما كانت النتيجة، عشان تكون صريح) · 🧠 استرجاع محاضرة بعد النوم ${PTS.rtv} · 🌅 قائمة الاسترجاع كاملة ${PTS.rtvAll} · 🔗 ربط معلومة طارت ${PTS.link} · 🔖 رجعت لعلامتك خلال 24 ساعة ${PTS.bmk} · ⚡ أول محاضرة باليوم خلال 30 ثانية ${PTS.fast}.<br>🛟 <b>الإنقاذ:</b> لو خلّصت المهمة المتأخرة خلال أسبوع من غرامتها، يرجع لك نص الغرامة.<br>⚠️ <b>الغرامة تنخصم من رصيدك فورًا:</b> إذا عدّت 24 ساعة على موعد المذاكرة أو المراجعة ينخصم ${pct(40)} من قيمتها، وبعد 12 ساعة زيادة ينخصم ${pct(30)} ثاني. ولما تخلّصها بعدها تاخذ قيمتها كاملة لأن الخصم صار من قبل.<br>📌 بداية السجل ${dayAr(sd)} ${fmt(sd)}: المهام اللي كانت متأخرة قبلها معفاة من الغرامات.<br>🩺 مسيرتك = اللي كسبته ناقص الغرامات. المكافآت اللي تصرفها تنقص الرصيد بس، وما تنزّل مسيرتك.</p></details>`;
+    <details class="how lghow"><summary>كيف ينحسب السجل؟</summary><p>المهمة لما تخلّصها تاخذ قيمتها <b>كاملة</b>: ذاكرتها ${PTS.study} · كل مراجعة ${PTS.r1} · مراجعة صعبة ${PTS.again} · سويت ANKI ${PTS.anki} (+${PTS.ankiOk} لو بعدد صحي) · حليتها ${PTS.ankiS} · أول ملخص صوتي ${PTS.voice} وكل تسجيل إضافي ${PTS.rvoice} · تهيئة ${PTS.prime} (+${PTS.hit} لكل سؤال طلع) · عُقدة ${PTS.knot} · ليلة تثبيت ${PTS.sleep} · عرض الصحيان ×2 وكومبو ${PTS.combo}.<br>🎁 كل مهمة تخلّصها لها فرصة صندوق مفاجأة، ونقاطه تنضاف لما تكشطه (احتمالاته في تبويب 🃏 البطاقات). لو ألغيت المهمة ينشال صندوقها.<br>🎬 كل مقطع تفرّغه ${PTS.clip} (مهما كانت النتيجة، عشان تكون صريح) · 🧠 استرجاع محاضرة بعد النوم ${PTS.rtv} · 🌅 قائمة الاسترجاع كاملة ${PTS.rtvAll} · 🔗 ربط معلومة طارت ${PTS.link} · 🔖 رجعت لعلامتك خلال 24 ساعة ${PTS.bmk} · ⚡ أول محاضرة باليوم خلال 30 ثانية ${PTS.fast} · 🐸 بدأت محاضرة جديدة في أول ساعتين من يومك ${PTS.frog} (لما تخلّصها، مرة باليوم) · 🕌 إيقاف للصلاة ${PTS.pray}.<br>🛟 <b>الإنقاذ:</b> لو خلّصت المهمة المتأخرة خلال أسبوع من غرامتها، يرجع لك نص الغرامة.<br>⚠️ <b>الغرامة تنخصم من رصيدك فورًا:</b> إذا عدّت 24 ساعة على موعد المذاكرة أو المراجعة ينخصم ${pct(40)} من قيمتها، وبعد 12 ساعة زيادة ينخصم ${pct(30)} ثاني. ولما تخلّصها بعدها تاخذ قيمتها كاملة لأن الخصم صار من قبل.<br>📌 بداية السجل ${dayAr(sd)} ${fmt(sd)}: المهام اللي كانت متأخرة قبلها معفاة من الغرامات.<br>🩺 مسيرتك = اللي كسبته ناقص الغرامات. المكافآت اللي تصرفها تنقص الرصيد بس، وما تنزّل مسيرتك.</p></details>`;
 }
 function renderCareerPage(){
   const tab=st.achTab||"c",lg=ledger();
@@ -4402,7 +4528,7 @@ function marksHTML(b){
   const m=mk(b.id),ok=openKnots(b.id).length;
   const chips=MARKS.filter(x=>m[x.f]).map(x=>`<span class="mk" style="${sv(x.c)}">${x.short}</span>`);
   if(m.again&&!m.rev1)chips.push(`<span class="mk" style="${sv("anki")}">مراجعة صعبة</span>`);
-  if(m.cards)chips.push(`<span class="mk${m.cards/hrs(b)>HEALTHY[1]?" over":""}" style="${sv("anki")}">🃏 ${m.cards}</span>`);
+  if(m.cards)chips.push(`<span class="mk${cardsOver(b,m)?" over":""}" style="${sv("anki")}">🃏 ${m.cards}</span>`);
   if(ok)chips.push(`<span class="mk knot">🚧 ${ok}</span>`);
   if(mvOf(b))chips.push(`<span class="mk moved">${MVI[moveKind(b)]} ${MVL[moveKind(b)]}</span>`);
   if(b.custom)chips.push(`<span class="mk custom">＋ أضفتها</span>`);
@@ -4437,7 +4563,7 @@ function cardHTML(b){
         ${m.rv?`<dt>🧠 الاسترجاع</dt><dd>${fmt(m.rv)} · ${{e:"✅ تذكرت أغلبها",m:"🟡 نص نص",h:"🔴 بصعوبة"}[m.rvg]||""}</dd>`:""}
         ${hintsOf(b.id).length?`<dt>💡 تلميحاتك</dt><dd class="hints">${hintsOf(b.id).slice(-3).map(h=>`<span>${hintLine(h)}</span>`).join("")}</dd>`:""}
         ${(()=>{const bm=!m.studied&&sjson(m.bm,null);return bm&&bm.at?`<dt>🔖 علامتك</dt><dd>${bm.w?esc(bm.w):"بدون وصف"}${bm.q?`<br>🪝 ${esc(bm.q)}`:""} <span class="mini">${bmFresh(bm).t}</span></dd>`:""})()}
-        ${m.cards?`<dt>بطاقات ANKI</dt><dd><span class="num">${m.cards}</span> <span class="mini${m.cards/hrs(b)>HEALTHY[1]?" over":""}">${Math.round(m.cards/hrs(b))} لكل ساعة</span> <button class="linkbtn" data-cedit="${b.id}">تعديل</button></dd>`:""}
+        ${m.cards?`<dt>بطاقات ANKI</dt><dd><span class="num">${m.cards}</span> <span class="mini${cardsOver(b,m)?" over":""}">${oldCards(m)?`${Math.round(m.cards/hrs(b))} لكل ساعة`:`الحد ${cardsRange(b,m).cap}`}</span> <button class="linkbtn" data-cedit="${b.id}">تعديل</button></dd>`:""}
       </dl>
       ${needsStudy(b)&&!m.studied?`<div class="actions sess">${m.startAt?`<span class="live">⏱️ تذاكرها الحين <span class="num">${hms(sessMs(b.id))}</span></span>${clipsOf(b.id)?`<button class="btn primary sm" data-focus="${b.id}">🎬 افتح وضع التركيز</button>`:""}`:`<button class="btn primary" data-start="${b.id}">${rtvLocked()?"🔒 ابدأ المذاكرة":sjson(m.bm,null)?"▶︎ كمّل من علامتك":"▶︎ ابدأ المذاكرة"}</button><span class="sessnote">${rtvLocked()?"تنفتح بعد الاسترجاع":clipsOf(b.id)?`🎬 ${cnt(clipsOf(b.id).c.length,"مقطع","مقطعين","مقاطع")}${m.acc?` · ذاكرت ${durFmt(Math.round(m.acc/6e4))}`:""}`:m.nc?"بدون مقاطع":"تقدر تجهّز مقاطع قبلها"}</span>`}</div>`:""}
       ${needsStudy(b)?(()=>{const c=clipsOf(b.id);if(!c)return`<div class="clipsec"><div class="kh cl">🎬 المقاطع</div><p class="note" style="margin:0">قسّم المحاضرة مقاطع قصيرة، كل مقطع ينتهي بتفريغ من راسك. تنسخ أمر لـ Claude وتلصق رده.</p><button class="btn sm" data-clipset="${b.id}">🎬 جهّز المقاطع</button></div>`;
