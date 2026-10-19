@@ -864,7 +864,9 @@ html.lowmo .burst.at,html.lowmo .flashscr,html.lowmo .rays{display:none}html.low
 .rw.adv .rwc{font-size:12px;color:var(--muted)}.rw.adv .warn{color:var(--k-exam);font-weight:700}
 .advbox .rws{gap:4px}
 .aihow p{font-size:13px;line-height:1.8}
-#pg-ai .frow input,.aibox input,#pg-ideas .frow input{flex:1 1 180px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:9px 10px;font:inherit;font-size:14px}
+#pg-ai .frow input,.aibox input{flex:1 1 180px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:9px 10px;font:inherit;font-size:14px}
+/* long words / links you type (summaries, notes, ideas) wrap instead of widening the page */
+.rec .rt2,.sheet p,.sheet li,.card p,.card li,.rpage p,.rpage li,.hubc p{overflow-wrap:anywhere}
 .aibox select,.aiadv select{flex:1 1 200px;min-width:0;max-width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:9px 10px;font:inherit;font-size:14px}
 textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
 .akfu .akn{flex:0 0 64px}.akfu label{display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--muted)}
@@ -5617,7 +5619,7 @@ async function gasCall(op,extra,signal,ms){
   catch(e){if(signal&&signal.aborted)throw e;throw gasErr(ctl.signal.aborted?"slow":"net")}
   finally{clearTimeout(tm);if(signal)signal.removeEventListener("abort",stop)}
   let j=null;try{j=JSON.parse(txt)}catch(e){}
-  if(!isObj(j))throw gasErr(/<html|<!doctype|accounts\.google/i.test(txt)?"page":"bad");
+  if(!isObj(j))throw gasErr(/Script function not found|doPost/i.test(txt)?"nofn":/<html|<!doctype|accounts\.google/i.test(txt)?"page":"bad");
   if(!j.ok)throw gasErr(String(j.err||"fail"),j.msg);
   return j}
 function gasErrMsg(e){const t=String(e&&e.text||""),m=e&&e.msg||"";
@@ -5625,6 +5627,7 @@ function gasErrMsg(e){const t=String(e&&e.text||""),m=e&&e.msg||"";
    :t==="net"?"ما قدرت أوصل للجسر. تأكد من النت، وإن الرابط هو «Web app URL» اللي ينتهي بـ /exec."
    :t==="slow"?"الجسر طوّل أكثر من 5 دقايق. جرّب مرة ثانية."
    :t==="page"?"الجسر رد بصفحة تسجيل دخول: في Apps Script خلّ «Who has access» على Anyone، وانشر من جديد (Deploy ← Manage deployments ← ✏️ ← New version)."
+   :t==="nofn"?"Apps Script ما لقى الكود: افتح المشروع، تأكد إن الكود ملصوق كامل واضغط 💾 حفظ، وبعدها انشر نسخة جديدة (Deploy ← Manage deployments ← ✏️ ← New version)."
    :t==="bad"||t==="op"?"رد الجسر مو مفهوم (يمكن الكود قديم). انسخ الكود من الإعدادات من جديد، الصقه، وانشر نسخة جديدة."
    :t==="token"?"الرمز السري ما يطابق. انسخ الكود من الإعدادات من جديد، الصقه في Apps Script، وانشر نسخة جديدة. ولو هذا جهازك الثاني: الصق «رابط جهازك الثاني» من الجهاز الأول."
    :t==="dir"?"رابط المجلد غلط. افتح المجلد في Drive ← مشاركة ← انسخ الرابط."
@@ -5655,6 +5658,13 @@ async function aiSee(b,pages,images,onStep,signal){let done=0;
     (r.json.figs||[]).forEach(f=>{const x=B[(+f.i||0)-1],d=typeof f.d==="string"?f.d.replace(/\s+/g," ").trim().slice(0,400):"";if(!x||!d||/^-+$/.test(d))return;
       const L=String(pages[x.p]||"").split("\n");L.splice(1,0,`[Figure: ${d}]`);pages[x.p]=L.join("\n");done++})}
   return done}
+// the slides weren't read on THIS device (split on the other one): fetch the text again through the bridge (a few KB, no file comes down)
+const gasSlidesOK=id=>gasOn()&&!!driveRef(mk(id).pdf);
+async function slidesFromDrive(id,onStep,signal){if(!gasSlidesOK(id))return null;const b=BY_ID[id];if(!b)return null;
+  const f=await srcPages({link:mk(id).pdf},onStep,signal),pages=f.pages;if(!pages.length)return null;
+  let figs=0;if(f.images&&f.images.length){try{figs=await aiSee(b,pages,f.images,onStep,signal)}catch(e){if(signal&&signal.aborted)throw e}}
+  const pk=packSlides(pages);if(pk.empty>pk.n*.6&&!figs)return null;
+  const rec={at:Date.now(),n:pk.n,txt:pk.txt,name:f.name};await aiPut("slides",id,rec);return rec}
 // the folder's lecture files (cached 30 min; the list is tiny)
 const GDL_LS="uqu-gdl";
 async function gasList(force,signal){const c=aiCfg();if(!c.gdir)return[];let o=null;try{o=JSON.parse(localStorage.getItem(GDL_LS)||"null")}catch(e){}
@@ -5739,15 +5749,16 @@ function ankiBlurt(id){const c=clipsOf(id),p=c?cprOf(id):null,rec=[],mis=[];
 const blurtTxt=B=>[B.rec.length?`recalled fully: ${B.rec.join("; ")}`:"",B.mis.length?`MISSED: ${B.mis.join("; ")}`:"",B.kn.length?`didn't understand (knots): ${B.kn.join("; ")}`:"",
   B.hl.length?`forgot by next morning: ${B.hl.join("; ")}`:"",B.wrong.length?`got wrong in the morning quiz: ${B.wrong.join(" | ")}`:""].filter(Boolean).join("\n")||"(no blurt)";
 // the content Kimi reads: the slides you opened here (all of them, or only the weak clips' slides), else the clip key points
-async function ankiContent(id,mode){const c=clipsOf(id),sl=await aiGet("slides",id),B=ankiBlurt(id);
+async function ankiContent(id,mode,onStep,signal){const c=clipsOf(id),B=ankiBlurt(id);let sl=await aiGet("slides",id);
+  if(!(sl&&sl.txt)&&gasSlidesOK(id)){try{sl=await slidesFromDrive(id,onStep,signal)}catch(e){if(signal&&signal.aborted)throw e;sl=null}}
   if(sl&&sl.txt){let txt=sl.txt;if(mode==="weak"&&c){const p=cprOf(id),keep=new Set();c.c.forEach((x,i)=>{if(p.r[i]&&p.r[i]!=="e"||(p.m[i]||[]).length)for(let s=x.f;s<=x.t;s++)keep.add(s)});
       if(keep.size)txt=txt.split("\n").filter(l=>{const m=l.match(/^S(\d+):/);return!m||keep.has(+m[1])}).join("\n")}
     return{src:"slides",txt:"SLIDES\n"+txt,B}}
   if(c)return{src:"keys",txt:"KEY POINTS (from his clips)\n"+sliceLec(id,{miss:mode==="weak"}).split("\n").slice(1).join("\n"),B};
   return{src:"title",txt:"(only the title is known: use the standard 2nd-year content of this topic)",B}}
 function ankiCapTxt(cp){const P=cp.P;return`CAP ${cp.cap}: reviews/day = ${P.min} min × 60 ÷ ${P.sec} s = ${cp.rev} → new/day = ÷${P.ret>=.93?15:10} = ${cp.nw} → ÷ ${P.lpd} lectures/day × ${cp.share} (this lecture's hours vs the average) = ${cp.cap}${cp.crunch?" → exam in < 7 days: halved, TIER 1 ONLY":""}`}
-async function aiAnki(id,mode,onProg,signal){
-  const b=BY_ID[id],days=daysToExamOf(b),cp=ankiCap(b,days),ct=await ankiContent(id,mode),P=akp();
+async function aiAnki(id,mode,onProg,signal,onStep){
+  const b=BY_ID[id],days=daysToExamOf(b),cp=ankiCap(b,days),ct=await ankiContent(id,mode,onStep,signal),P=akp();onStep&&onStep("🧠 Kimi يقرأ ويختار الأعلى عائد…");
   const data=`${ankiCapTxt(cp)}\nDAYS TO EXAM ${days??"unknown"}${cp.crunch?" · TIER 1 ONLY":""}\nLEVEL 2nd-year medical student\nLECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · MODE ${mode==="weak"?"weak spots only (card mainly what he missed, his knots and mistakes)":"full lecture"}${P.subj?` · SUBJECT ${P.subj}`:""}\nBLURT\n${blurtTxt(ct.B)}\n\n${ct.txt}`;
   const r=await aiCall({k:"anki",rules:ANKI_RULES,data,schema:ANKI_S,effort:"high",max:32000,fg:true,signal,onProg,check:j=>Array.isArray(j.cards)&&j.cards.length>0});
   let cards=r.json.cards.map(cardClean).filter(Boolean);if(cp.crunch)cards=cards.filter(x=>x.tier===1);
@@ -6015,8 +6026,8 @@ export default {
   }
 };`;
 // ---------- 📂 settings: link Google Drive through his own Apps Script (once per device) ----------
-function gdEnsure(){const host=$("#aiUseBox");if(!host)return null;let d=$("#gdBox");
-  if(!d){host.insertAdjacentHTML("afterend",`<details class="how" id="gdBox"><summary>📂 Google Drive بدون ما ينزل شي على جهازك <span class="note" id="gdSt"></span></summary><div class="aiadv">
+function gdEnsure(){const host=$("#aiMsg");if(!host)return null;let d=$("#gdBox");
+  if(!d){host.insertAdjacentHTML("afterend",`<details class="how" id="gdBox"><summary style="white-space:normal">📂 ربط Google Drive (بدون تحميل) <span class="note" id="gdSt"></span></summary><div class="aiadv">
     <p class="note" style="margin:0">سكربت صغير يشتغل في حسابك على سيرفرات Google: يفتح ملف المحاضرة من Drive، يطلّع نص كل شريحة، ويرسل لجهازك النص بس (محاضرة 14 شريحة ≈ 4KB بدل الملف كامل). يقرأ ملفاتك الخاصة بعد، فما تحتاج تشاركها. مجاني، وتسويه مرة وحدة.</p>
     <ol class="note aisteps"><li>اضغط «📋 انسخ كود الجسر» تحت.</li><li>افتح <span class="en">script.google.com</span> ← <span class="en">New project</span> ← امسح الموجود والصق ← 💾 حفظ.</li><li><span class="en">Deploy</span> ← <span class="en">New deployment</span> ← ⚙️ ← <span class="en">Web app</span>. خلّ <span class="en">Execute as: Me</span> و <span class="en">Who has access: Anyone</span> ← <span class="en">Deploy</span>.</li><li><span class="en">Authorize access</span> ← حسابك ← <span class="en">Advanced</span> ← <span class="en">Go to … (unsafe)</span> ← <span class="en">Allow</span>. (Google يقولها لأي سكربت شخصي مو منشور في المتجر، والكود كودك.)</li><li>انسخ <span class="en">Web app URL</span> (ينتهي بـ <span class="en">/exec</span>) والصقه تحت، وحط رابط مجلد المحاضرات ← حفظ وتجربة.</li></ol>
     <button class="btn sm" id="gdCode" style="align-self:flex-start">📋 انسخ كود الجسر</button>
@@ -6028,7 +6039,7 @@ function gdEnsure(){const host=$("#aiUseBox");if(!host)return null;let d=$("#gdB
     <div class="frow"><button class="btn sm primary" id="gdSave">حفظ وتجربة</button><button class="btn sm" id="gdShare">📋 رابط لجهازك الثاني</button><button class="btn sm" id="gdDel">فك الربط</button></div>
     <p class="note" id="gdMsg" style="margin:0" aria-live="polite"></p></div></details>`);d=$("#gdBox");gdBind()}
   return d}
-function gdRender(){const d=gdEnsure();if(!d)return;d.hidden=!S.aiv;const c=aiCfg();$("#gdSt").textContent=c.gas&&c.gtok?"· ✅ مربوط":"";
+function gdRender(){const d=gdEnsure();if(!d)return;d.hidden=false;const c=aiCfg();$("#gdSt").textContent=c.gas&&c.gtok?"· ✅ مربوط":S.aiv?"":"· بعد تفعيل Kimi";
   if(!d.dataset.filled||!d.contains(document.activeElement)){d.dataset.filled="1";$("#gdUrl").value=c.gas;$("#gdDir").value=c.gdir}
   $("#gdShare").hidden=$("#gdDel").hidden=!(c.gas&&c.gtok)}
 function gdBind(){const msg=t=>{$("#gdMsg").innerHTML=t};
@@ -6088,7 +6099,7 @@ function sheetAnki(id){
     const capTxt=`<div class="rcpt"><div class="rc-row"><span>مراجعات/يوم</span><b><span class="en">${cp.P.min}×60÷${cp.P.sec} = ${cp.rev}</span></b></div><div class="rc-row"><span>جديدة/يوم</span><b><span class="en">÷${cp.P.ret>=.93?15:10} = ${cp.nw}</span></b></div>
       <div class="rc-row"><span>حد هالمحاضرة</span><b><span class="en">÷${cp.P.lpd} × ${cp.share} = ${cp.cap}</span>${cp.crunch?" · نص (الاختبار قريب) Tier 1 بس":""}</b></div></div>`;
     const setup=async()=>{freshTap();const sl=await aiGet("slides",id);if(!R.isConnected)return;
-      const src=sl&&sl.txt?`📄 بيقرأ سلايداتها (${cnt1(sl.n,"شريحة وحدة","شريحتين","شرائح")}) اللي فتحتها هنا`:clipsOf(id)?"🎬 بيبني من نقاط مقاطعها (للأدق: قسّمها من رابط Drive عشان يقرأ السلايدات)":"⚠️ ما عندي غير العنوان. قسّمها مقاطع أول عشان تطلع البطاقات من محاضرتك.";
+      const src=sl&&sl.txt?`📄 بيقرأ سلايداتها (${cnt1(sl.n,"شريحة وحدة","شريحتين","شرائح")}) اللي فتحتها هنا`:gasSlidesOK(id)?"☁️ بيقرأ سلايداتها من Drive عن طريق الجسر (نص بس، ما ينزل ملف على جهازك)":clipsOf(id)?"🎬 بيبني من نقاط مقاطعها (للأدق: قسّمها من رابط Drive عشان يقرأ السلايدات)":"⚠️ ما عندي غير العنوان. قسّمها مقاطع أول عشان تطلع البطاقات من محاضرتك.";
       R.innerHTML=`${capTxt}<p class="sh-note">${src}</p>
         <div class="seg sm" role="group"><button data-mode="full" aria-pressed="${mode==="full"}">📚 المحاضرة كاملة</button><button data-mode="weak" aria-pressed="${mode==="weak"}"${B.any?"":" disabled"}>🎯 بس عُقدي وأخطائي</button></div>
         <p class="sh-note">${B.any?`يعرف ${[B.mis.length?`إنك نسيت ${cnt1(B.mis.length,"نقطة وحدة","نقطتين","نقاط")}`:"",B.kn.length?`عندك ${cnt1(B.kn.length,"عُقدة وحدة","عُقدتين","عُقد")}`:"",B.hl.length?cnt(B.hl.length,"معلومة طارت","معلومتين طاروا","معلومات طارت"):"",B.wrong.length?`${cnt(B.wrong.length,"غلطة","غلطتين","غلطات")} في أسئلة الصبح`:""].filter(Boolean).join("، و")}، فتاخذ أولوية (+2).`:"ما عندي تفريغ لهالمحاضرة، فبيختار الأعلى عائد."}</p>
@@ -6097,8 +6108,8 @@ function sheetAnki(id){
       R.querySelector("#akGo").onclick=gen;const l=R.querySelector("#akLast");if(l)l.onclick=show};
     const prog=t=>{const p=R.querySelector("#akProg");if(p)p.textContent=t};
     const gen=async()=>{const g=R.querySelector("#akGo");g.disabled=true;ctl=new AbortController();prog("🧠 Kimi يقرأ ويختار الأعلى عائد…");
-      try{D=await aiAnki(id,mode,p=>prog(p.c?`✍️ يكتب البطاقات… ${kfmt(p.c)}`:`🧠 يفكر… ${p.s} ثانية`),ctl.signal);if(R.isConnected)show()}
-      catch(e){if(!R.isConnected)return;prog("❌ "+aiErrMsg(e));g.disabled=false}};
+      try{D=await aiAnki(id,mode,p=>prog(p.c?`✍️ يكتب البطاقات… ${kfmt(p.c)}`:`🧠 يفكر… ${p.s} ثانية`),ctl.signal,t=>prog(t));if(R.isConnected)show()}
+      catch(e){if(!R.isConnected)return;prog("❌ "+aiAnyErr(e));g.disabled=false}};
     const show=()=>{freshTap();const cards=deckBuild(D),dist=[0,0,0,0],cov={};cards.forEach(x=>{dist["ABCD".indexOf(x.L)]++;cov[x.sec]=(cov[x.sec]||0)+1});
       const done=mk(id).anki&&mk(id).cards===cards.length;
       R.innerHTML=`<div class="rcpt">
