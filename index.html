@@ -872,6 +872,54 @@ html.lowmo .burst.at,html.lowmo .flashscr,html.lowmo .rays{display:none}html.low
 .gdb-i{display:flex;align-items:center;gap:10px;width:100%;text-align:start;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:11px 12px;font:inherit;font-size:14px;cursor:pointer}
 .gdb-i .gdb-n{flex:1;min-width:0;overflow-wrap:anywhere;direction:auto}.gdb-i small{color:var(--muted);font-size:11.5px;white-space:nowrap}.gdb-i .gdb-go{color:var(--muted);font-size:18px}
 .gdb-i.star{border-color:#d9a400}.gdb-i.on{outline:2px solid var(--accent,#0e5e4a);outline-offset:1px}.gdb-sel{position:sticky;bottom:0}
+/* ===== v20.1: the 🎬 sheet ===== */
+.cs-ai{gap:10px}.cs-ai>b{font-size:15px}
+.cs-ai #spBox{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.cs-ai #spBox .btn.big{align-self:stretch;width:100%}
+.cs-again{align-self:center;font-size:12.5px;text-decoration:none}
+.cs-ok{margin:0;font-size:13px;color:var(--s-study);font-weight:600}
+.cs-warn{border:1px solid var(--k-disc);background:color-mix(in srgb,var(--k-disc) 12%,var(--surface));color:var(--ink);border-radius:12px;padding:8px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:start}
+.cs-opts>summary,.cs-claude>summary{cursor:pointer}
+.cs-obody,.cs-cbody{display:flex;flex-direction:column;gap:10px;align-items:stretch;padding-top:10px;text-align:start}
+.cs-obody .btn{align-self:flex-start}
+.cs-claude{width:100%;max-width:460px}
+.cs-claude .cs-steps{margin:0}
+/* ===== v20.1: the lecture card, tidied: one meta row, number tiles, sections ===== */
+.body.lc{gap:14px}
+.lc-meta{display:flex;align-items:flex-start;gap:8px;justify-content:space-between}
+.lc-chips{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.lc-chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.lc-chip.lc-dim{color:var(--muted);font-weight:500}
+.lc-edit{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:999px;padding:4px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.lc-sub{margin:-6px 0 0;font-size:12px;color:var(--muted)}
+.lc-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.lc-tile{display:flex;flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--line);background:var(--surface-2);border-radius:14px;padding:9px 12px;text-align:start;font:inherit;color:var(--ink);min-width:0}
+button.lc-tile{cursor:pointer}
+.lc-tl{font-size:11.5px;color:var(--muted);font-weight:600}
+.lc-tv{font-size:16px;font-family:var(--f-display);line-height:1.3}
+.lc-ts{font-size:11px;color:var(--muted);line-height:1.4}
+.lc-tile .rcbar{width:100%;max-width:none}
+.lc-go{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.lc-go .lc-start{align-self:stretch;width:100%}
+.lc-go .sessnote{text-align:center}
+.lc-sec{display:flex;flex-direction:column;gap:9px;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:color-mix(in srgb,var(--surface-2) 45%,var(--surface))}
+.lc-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px}
+.lc-h .num{font-size:12px;color:var(--muted)}
+.lc-sec .clipsec{border:0;padding:0}
+.lc-more>summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);list-style:none}
+.lc-more>summary::-webkit-details-marker{display:none}
+.lc-more>summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+.lc-more[open]>summary::before{transform:rotate(90deg)}
+.lc-more .clist{margin-top:6px}
+.lc-tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.lc-tool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 6px;font:inherit;font-size:12.5px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;min-height:64px}
+.lc-tool span{font-size:20px;line-height:1}
+.lc-tool[data-knew]{border-color:color-mix(in srgb,var(--k-disc) 55%,var(--line))}
+.lc-note{display:flex;flex-direction:column;gap:3px;font-size:13px;border-inline-start:3px solid var(--line);padding-inline-start:9px}
+.lc-note b{font-size:12.5px}.lc-note small{color:var(--muted);font-weight:500}
+.lc-note .linkbtn{align-self:flex-start}
+.lc-foot{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
+.lc-foot .related h3{margin:0;font-size:12.5px;color:var(--muted)}
 /* ===== v20: the 🎬 sheet's windows, the progress window, the ANKI output ===== */
 .csmain{display:contents}
 .ovbox.cs-top{justify-content:flex-start}
@@ -1349,7 +1397,7 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.1</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -3255,8 +3303,9 @@ function parseClips(text,b){
 function sheetClipSetup(id,then){
   const b=BY_ID[id];if(!b)return;const has=clipsOf(id),started=clipsRated(id),pr=clipPrompt(b);let parsed=null;
   openSheet(`<div id="csMain" class="csmain"><div class="sh-ic">🎬</div><h2 class="sh-t">${has?"بدّل المقاطع":"وضع المقاطع"}</h2><p class="sh-s en">${esc(label(b))}</p>
-    <p class="sh-s">المحاضرة تنقسم مقاطع قصيرة، وكل مقطع يبدأ بسؤال يشعل الفضول، وينتهي بتفريغ من راسك ونقاط تقارن فيها.</p>
+    <p class="sh-s">مقاطع قصيرة: سؤال يشعل الفضول ← قراءة ← تفريغ من راسك.</p>
     ${AIX(()=>clipAiBlock(id),"")}
+    <details class="how cs-claude"${S.aiv&&aiOn()?"":" open"}><summary>🤖 Claude: الطريقة اليدوية</summary><div class="cs-cbody">
     <ol class="cs-steps">
       <li><b>انسخ الأمر</b> وأرسله لـ Claude مع ملف المحاضرة (PDF أو PowerPoint).
         <div class="frow"><button class="btn primary" id="csCopy">📋 انسخ الأمر</button><button class="btn sm" id="csShow">اعرض الأمر</button></div>
@@ -3267,7 +3316,8 @@ function sheetClipSetup(id,then){
     </ol>
     <div id="csOut" class="cs-out" aria-live="polite"></div>
     ${has&&started?`<p class="sh-note">⚠️ عندك تقدّم في المقاطع الحالية (${started}). لو بدّلتها يتصفّر التقدّم.</p>`:""}
-    <div class="sh-act"><button class="btn primary big" id="csGo" disabled>احفظ المقاطع${then?" وابدأ 🎬":""}</button>${then?`<button class="btn" id="csPlain">ذاكر بدون مقاطع</button>`:""}</div></div>
+    <div class="sh-act"><button class="btn primary big" id="csGo" disabled>احفظ المقاطع${then?" وابدأ 🎬":""}</button></div></div></details>
+    ${then?`<div class="sh-act"><button class="btn" id="csPlain">ذاكر بدون مقاطع</button></div>`:""}</div>
     <div id="csAlt" class="csalt" hidden></div><button class="ovback" id="csBack" type="button" aria-label="رجوع خطوة" hidden>→</button>`,box=>{
     const inp=box.querySelector("#csIn"),out=box.querySelector("#csOut"),go=box.querySelector("#csGo"),pt=box.querySelector("#csPrompt");
     const check=()=>{const v=inp.value.trim();if(!v){out.innerHTML="";go.disabled=true;parsed=null;return}
@@ -3278,7 +3328,7 @@ function sheetClipSetup(id,then){
         <ol class="clist">${r.c.map(x=>`<li><span class="en">${esc(x.h)}</span>${x.f?`<small class="num en">${x.f}–${x.t}</small>`:""}</li>`).join("")}</ol>
         ${r.warn.map(w=>`<p class="ce mid">⚠️ ${esc(w)}</p>`).join("")}`};
     let tm=null,pdfLink="";inp.oninput=()=>{clearTimeout(tm);tm=setTimeout(check,250)};
-    AIX(()=>clipAiBind(box,id,(json,link)=>{inp.value=json;check();pdfLink=link;if(!go.disabled)go.scrollIntoView({behavior:"smooth",block:"center"})}),null);
+    AIX(()=>clipAiBind(box,id,(json,link)=>{const d=box.querySelector(".cs-claude");if(d)d.open=true;inp.value=json;check();pdfLink=link;if(!go.disabled)go.scrollIntoView({behavior:"smooth",block:"center"})}),null);
     box.querySelector("#csCopy").onclick=async e=>{const ok=await copyText(pr);e.target.textContent=ok?"✅ انسخ، روح لـ Claude":"انسخه من المربع تحت";if(!ok){pt.hidden=false;pt.focus();pt.select()}};
     box.querySelector("#csShow").onclick=()=>{pt.hidden=!pt.hidden};
     box.querySelector("#csPaste").onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){inp.value=t;check()}else toast("الحافظة فاضية")}catch(e){toast("الصقه بنفسك داخل المربع");inp.focus()}};
@@ -4709,49 +4759,52 @@ function cardHTML(b){
         <span class="meta"><span class="kind">${KINDS[b.kind].ar}</span>${b.dr?`<span>· ${esc(b.dr)}</span>`:""}</span>${marksHTML(b)}</span>
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
     </button>
-    ${open?`<div class="body">
-      <dl class="rows">
-        <dt>الموضوع</dt><dd><span class="${b.topic?"en":""}">${esc(label(b))}</span>${b.kind!=="exam"?` <button class="linkbtn" data-edit="${b.id}">✏️ تعديل</button>`:""}${!b.custom&&b.topic0&&b.topic!==b.topic0?` <span class="mini">الأصلي: <span class="en">${esc(b.topic0)}</span></span>`:""}</dd>
-        <dt>النوع</dt><dd>${b.act&&b.kind===b.kind0?esc(b.act):KINDS[b.kind].ar}</dd>
-        <dt>الوقت</dt><dd>${timeTxt(b)}${b.from?` <span class="mini">${durTxt(b)}</span>`:""} <button class="linkbtn" data-edit="${b.id}">تعديل</button></dd>
-        ${b.dr||b.kind!=="exam"?`<dt>الدكتور</dt><dd>${b.dr?esc(b.dr):`<span class="note">غير محدد</span>`}${b.kind!=="exam"?` <button class="linkbtn" data-edit="${b.id}">تغيير</button>`:""}</dd>`:""}
-        <dt>اليوم</dt><dd>${dayAr(heldDate(b))} ${fmt(heldDate(b))}${WEEK_OF[heldDate(b)]?` · الأسبوع ${WEEK_OF[heldDate(b)]}`:""}</dd>
-        ${mvOf(b)?`<dt>الموعد الأصلي</dt><dd>${dayAr(origDate(b))} ${fmt(origDate(b))}${b.from?` · ${rawTime(b.from,b.to)}`:""} <span class="mini">${MVL[moveKind(b)]}</span></dd>`:""}
-        ${r!=null?`<dt>التذكر</dt><dd><span class="rc ${rcClass(r)}">${pct(r)}</span>${pbar(r,"rcbar "+rcClass(r))}</dd>`:""}
-        ${m.studied?`<dt>وقت المذاكرة</dt><dd>${m.mins?durFmt(m.mins):"غير مسجّل"} <button class="linkbtn" data-tedit="${b.id}">${m.mins?"تعديل":"سجّل الوقت"}</button></dd>`:""}
-        ${needsStudy(b)?(()=>{const sp=speed(),k=grpOf(b),g=sp.g[k],e=estMin(b,sp);return e?`<dt>المدة المتوقعة</dt><dd>≈ ${minTxt(e)} <span class="mini">سرعتك في ${GRP[k]}${g.dr[b.dr]!=null?" مع هالدكتور":""}</span>${m.mins?` · فعليًا ${durFmt(m.mins)}`:""}</dd>`:`<dt>المدة المتوقعة</dt><dd><span class="note">تنحسب بعد ما تقيس أول ${GRP1[k]} بزر «ابدأ المذاكرة»</span></dd>`})():""}
-        ${m.pre&&typeof m.pre.q==="string"&&m.pre.q?`<dt>أسئلتك المتوقعة</dt><dd class="preq">${m.pre.q.split("\n").map(q=>`<span>❓ ${esc(q)}</span>`).join("")}</dd>`:""}
-        ${m.rv?`<dt>🧠 الاسترجاع</dt><dd>${fmt(m.rv)} · ${{e:"✅ تذكرت أغلبها",m:"🟡 نص نص",h:"🔴 بصعوبة"}[m.rvg]||""}</dd>`:""}
-        ${hintsOf(b.id).length?`<dt>💡 تلميحاتك</dt><dd class="hints">${hintsOf(b.id).slice(-3).map(h=>`<span>${hintLine(h)}</span>`).join("")}</dd>`:""}
-        ${(()=>{const bm=!m.studied&&sjson(m.bm,null);return bm&&bm.at?`<dt>🔖 علامتك</dt><dd>${bm.w?esc(bm.w):"بدون وصف"}${bm.q?`<br>🪝 ${esc(bm.q)}`:""} <span class="mini">${bmFresh(bm).t}</span></dd>`:""})()}
-        ${m.cards?`<dt>بطاقات ANKI</dt><dd><span class="num">${m.cards}</span> <span class="mini${cardsOver(b,m)?" over":""}">${cardsRange(b,m).old?`${Math.round(m.cards/hrs(b))} لكل ساعة`:cardsRange(b,m).cap?`البرومبت ${cardsRange(b,m).cap}`:""}</span> <button class="linkbtn" data-cedit="${b.id}">تعديل</button></dd>`:""}
-      </dl>
-      ${needsStudy(b)&&!m.studied?`<div class="actions sess">${m.startAt?`<span class="live">⏱️ تذاكرها الحين <span class="num">${hms(sessMs(b.id))}</span></span>${clipsOf(b.id)?`<button class="btn primary sm" data-focus="${b.id}">🎬 افتح وضع التركيز</button>`:""}`:`<button class="btn primary" data-start="${b.id}">${rtvLocked()?"🔒 ابدأ المذاكرة":sjson(m.bm,null)?"▶︎ كمّل من علامتك":"▶︎ ابدأ المذاكرة"}</button><span class="sessnote">${rtvLocked()?"تنفتح بعد الاسترجاع":clipsOf(b.id)?`🎬 ${cnt(clipsOf(b.id).c.length,"مقطع","مقطعين","مقاطع")}${m.acc?` · ذاكرت ${durFmt(Math.round(m.acc/6e4))}`:""}`:m.nc?"بدون مقاطع":"تقدر تجهّز مقاطع قبلها"}</span>`}</div>`:""}
-      ${needsStudy(b)?(()=>{const c=clipsOf(b.id);if(!c)return`<div class="clipsec"><div class="kh cl">🎬 المقاطع</div><p class="note" style="margin:0">قسّم المحاضرة مقاطع قصيرة، كل مقطع ينتهي بتفريغ من راسك. ${AIX(()=>gasOn()&&aiOn()?"تختارها من مجلدك في Drive و Kimi يقسّمها لك (تقدر تطلع من الموقع، وتكمل لحالها).":null,null)||"تنسخ أمر لـ Claude وتلصق رده."}</p><button class="btn sm" data-clipset="${b.id}">🎬 جهّز المقاطع</button>${AIX(()=>spCardLine(b.id),"")}</div>`;
-        const p=cprOf(b.id),r=clipsRated(b.id);
-        return`<div class="clipsec"><div class="kh cl">🎬 المقاطع <span class="num">${r}/${c.c.length}</span></div>${pbar(Math.round(r/c.c.length*100),"thin")}
-          <ol class="clist">${c.c.map((x,i)=>`<li class="${p.r[i]||""}"><span class="en">${esc(x.h)}</span>${x.f?`<small class="num en">${x.f}–${x.t}</small>`:""}</li>`).join("")}</ol>
-          <div class="frow"><button class="btn sm" data-clipset="${b.id}">🔁 بدّل المقاطع</button>${r?`<button class="btn sm" data-clipreset="${b.id}">↺ صفّر التقدّم</button>`:""}</div>${AIX(()=>spCardLine(b.id),"")}</div>`})():""}
-      ${needsStudy(b)?`<div class="actions">
-        ${MARKS.filter(x=>m[x.f]||({studied:m.startAt,rev1:m.studied,rev2:m.rev1,anki:m.studied,ankiS:m.anki})[x.f]).map(x=>`<button class="sbtn" style="${sv(x.c)}" aria-pressed="${!!m[x.f]}"${locked(x.f)?` aria-disabled="true" title="حل عُقد الفهم أول"`:""} data-mark="${b.id}|${x.f}"><i></i>${m[x.f]?"✓ ":locked(x.f)?"🔒 ":""}${x.ar}${m[x.f]?` <small>${fmt(m[x.f])}</small>`:""}</button>`).join("")}
+    ${open?(()=>{const stdy=needsStudy(b),c=stdy?clipsOf(b.id):null,cr=c?clipsRated(b.id):0,pl=S.aiv&&stdy?AIX(()=>safeDrive(m.pdf),""):"",th=ideasList().filter(x=>x.l===b.id&&!x.x),recs=recsOf(b.id);
+      const sp=stdy?speed():null,gk=stdy?grpOf(b):null,est=stdy?estMin(b,sp):0,bm=!m.studied&&sjson(m.bm,null);
+      const tile=(lab,val,sub,attr)=>`<${attr?`button type="button" ${attr}`:"div"} class="lc-tile"><span class="lc-tl">${lab}</span><b class="lc-tv">${val}</b>${sub?`<small class="lc-ts">${sub}</small>`:""}</${attr?"button":"div"}>`;
+      const tiles=[r!=null?tile("🧠 التذكر",`<span class="rc ${rcClass(r)}">${pct(r)}</span>`,pbar(r,"rcbar "+rcClass(r))):"",
+        stdy?tile("⏳ المدة المتوقعة",est?`≈ ${minTxt(est)}`:"—",est?`حسب سرعتك${sp.g[gk].dr[b.dr]!=null?" مع هالدكتور":""}`:`تنحسب بعد أول ${GRP1[gk]}`):"",
+        m.studied?tile("⏱️ وقت المذاكرة",m.mins?durFmt(m.mins):"غير مسجّل",m.mins?"اضغط للتعديل":"اضغط عشان تسجّله",`data-tedit="${b.id}"`):"",
+        m.cards?tile("🃏 بطاقات ANKI",`<span class="num">${m.cards}</span>`,`${cardsRange(b,m).old?`${Math.round(m.cards/hrs(b))} لكل ساعة`:cardsRange(b,m).cap?`البرومبت ${cardsRange(b,m).cap}`:"اضغط للتعديل"}`,`data-cedit="${b.id}"`):""].filter(Boolean);
+      const notes=[m.pre&&typeof m.pre.q==="string"&&m.pre.q?`<div class="lc-note"><b>❓ أسئلتك المتوقعة</b>${m.pre.q.split("\n").map(q=>`<span>${esc(q)}</span>`).join("")}</div>`:"",
+        m.rv?`<div class="lc-note"><b>🧠 الاسترجاع</b><span>${fmt(m.rv)} · ${{e:"✅ تذكرت أغلبها",m:"🟡 نص نص",h:"🔴 بصعوبة"}[m.rvg]||""}</span></div>`:"",
+        hintsOf(b.id).length?`<div class="lc-note"><b>💡 تلميحاتك</b>${hintsOf(b.id).slice(-3).map(h=>`<span>${hintLine(h)}</span>`).join("")}</div>`:"",
+        bm&&bm.at?`<div class="lc-note"><b>🔖 علامتك <small>${bmFresh(bm).t}</small></b><span>${bm.w?esc(bm.w):"بدون وصف"}</span>${bm.q?`<span>🪝 ${esc(bm.q)}</span>`:""}</div>`:"",
+        th.length?`<div class="lc-note"><b>💭 أفكار كتبتها أثناءها</b>${th.map(x=>`<span>${esc(x.t)}</span>`).join("")}<button class="linkbtn" data-pgo="ideas">كل أفكارك ←</button></div>`:""].filter(Boolean);
+      return`<div class="body lc">
+      <div class="lc-meta">
+        <div class="lc-chips"><span class="lc-chip">📅 ${dayAr(heldDate(b))} ${fmt(heldDate(b))}${WEEK_OF[heldDate(b)]?` · الأسبوع ${WEEK_OF[heldDate(b)]}`:""}</span>
+          ${b.from?`<span class="lc-chip">🕘 ${timeTxt(b)} · ${durTxt(b)}</span>`:""}
+          ${b.dr?`<span class="lc-chip">👨‍⚕️ ${esc(b.dr)}</span>`:b.kind!=="exam"?`<span class="lc-chip lc-dim">👨‍⚕️ غير محدد</span>`:""}</div>
+        <button class="lc-edit" type="button" data-edit="${b.id}" aria-label="تعديل">✏️ تعديل</button></div>
+      ${mvOf(b)||(!b.custom&&b.topic0&&b.topic!==b.topic0)?`<p class="lc-sub">${mvOf(b)?`📌 الموعد الأصلي: ${dayAr(origDate(b))} ${fmt(origDate(b))}${b.from?` · ${rawTime(b.from,b.to)}`:""} (${MVL[moveKind(b)]})`:""}${!b.custom&&b.topic0&&b.topic!==b.topic0?`${mvOf(b)?" · ":""}الاسم الأصلي: <span class="en">${esc(b.topic0)}</span>`:""}</p>`:""}
+      ${tiles.length?`<div class="lc-tiles">${tiles.join("")}</div>`:""}
+      ${stdy&&!m.studied?`<div class="lc-go">${m.startAt?`<span class="live">⏱️ تذاكرها الحين <span class="num">${hms(sessMs(b.id))}</span></span>${c?`<button class="btn primary" data-focus="${b.id}">🎬 افتح وضع التركيز</button>`:""}`
+        :`<button class="btn primary big lc-start" data-start="${b.id}">${rtvLocked()?"🔒 ابدأ المذاكرة":sjson(m.bm,null)?"▶︎ كمّل من علامتك":"▶︎ ابدأ المذاكرة"}</button><span class="sessnote">${rtvLocked()?"تنفتح بعد الاسترجاع":c?`🎬 ${cnt(c.c.length,"مقطع","مقطعين","مقاطع")}${m.acc?` · ذاكرت ${durFmt(Math.round(m.acc/6e4))}`:""}`:m.nc?"بدون مقاطع":"تقدر تجهّز مقاطع قبلها 👇"}</span>`}</div>`:""}
+      ${stdy?`<section class="lc-sec lc-clips"><div class="lc-h"><b>🎬 المقاطع</b>${c?`<span class="num">${cr}/${c.c.length}</span>`:""}</div>
+        ${c?`${pbar(Math.round(cr/c.c.length*100),"thin")}<details class="lc-more"><summary>شوف المقاطع (${c.c.length})</summary><ol class="clist">${(()=>{const p=cprOf(b.id);return c.c.map((x,i)=>`<li class="${p.r[i]||""}"><span class="en">${esc(x.h)}</span>${x.f?` <small class="num en">${x.f}–${x.t}</small>`:""}</li>`).join("")})()}</ol></details>
+          <div class="frow"><button class="btn sm" data-clipset="${b.id}">🔁 بدّل المقاطع</button>${cr?`<button class="btn sm" data-clipreset="${b.id}">↺ صفّر التقدّم</button>`:""}</div>`
+          :`<p class="note" style="margin:0">مقاطع قصيرة، كل مقطع ينتهي بتفريغ من راسك.</p><button class="btn${m.studied?"":" primary"} sm" data-clipset="${b.id}">🎬 جهّز المقاطع</button>`}
+        ${AIX(()=>spCardLine(b.id),"")}</section>`:""}
+      ${stdy?`<section class="lc-sec"><div class="lc-h"><b>✅ خطواتك</b></div><div class="actions">
+        ${MARKS.filter(x=>m[x.f]||({studied:m.startAt,rev1:m.studied,rev2:m.rev1,anki:m.studied,ankiS:m.anki})[x.f]).map(x=>`<button class="sbtn" style="${sv(x.c)}" aria-pressed="${!!m[x.f]}"${locked(x.f)?` aria-disabled="true" title="حل عُقد الفهم أول"`:""} data-mark="${b.id}|${x.f}"><i></i>${m[x.f]?"✓ ":locked(x.f)?"🔒 ":""}${x.ar}${m[x.f]?` <small>${fmt(m[x.f])}</small>`:""}</button>`).join("")||`<span class="note">تبدأ لما تبدأ المذاكرة.</span>`}
       </div>${prompt}
-      ${ok.length?`<p class="lockmsg${st.lockFlash===b.id?" flash":""}" role="status">🔒 المراجعات و ANKI مقفلة لين تحل ${cnt(ok.length,"عُقدة الفهم","عُقدتي الفهم","عُقد فهم")} تحت. لا تحفظ شي ما فهمته.</p>`:""}
-      <div class="knots">
-        ${kn.length?`<div class="kh">🚧 عُقد الفهم</div>${kn.map(k=>`<div class="kn${k.d?" ok":""}"><button class="kcheck" role="checkbox" aria-checked="${!!k.d}" data-kdone="${b.id}|${k.k}" aria-label="حلّيتها">✓</button><span class="kt">${esc(k.t)}</span><button class="kdel" data-kdel="${b.id}|${k.k}" aria-label="حذف">×</button></div>`).join("")}`:""}
-        ${st.knotFor===b.id?`<div class="frow"><input id="knotIn" maxlength="140" placeholder="وش النقطة اللي ما فهمتها؟ (سطر واحد)"><button class="btn primary" data-kadd="${b.id}">سجّل</button></div>`
-          :`<button class="btn knotbtn" data-knew="${b.id}">🚧 تسجيل عُقدة فهم</button>`}
-      </div>
-      <div class="recs">
-        <div class="kh rh">🎙️ سجل الملخصات</div>
-        ${recsOf(b.id).map(r=>`<div class="rec"><span class="rd"><b>${REC_ST[r.st||"s"]||""}</b> · ${fmt(r.d)}${r.a?` · ${mmss(r.s||0)}`:""}</span>${r.t?`<span class="rt2">${esc(r.t)}</span>`:""}<span class="ra">${r.a?`<button class="btn sm" data-play="${b.id}|${r.k}">▶︎ تشغيل</button>`:""}<button class="linkbtn" data-recdel="${b.id}|${r.k}">حذف</button></span></div>`).join("")}
-        <div class="frow">${m.rev1&&!hasRec(b.id,"r1")?`<button class="btn sm" data-recnew="${b.id}|r1">🎙️ تسجيل المراجعة الأولى</button>`:""}${m.rev2&&!hasRec(b.id,"r2")?`<button class="btn sm" data-recnew="${b.id}|r2">🎙️ تسجيل المراجعة الثانية</button>`:""}<button class="btn sm" data-recnew="${b.id}|${recsOf(b.id).length?"x":"s"}">＋ تسجيل جديد</button></div>
-      </div>`:""}
-      ${(()=>{const th=ideasList().filter(x=>x.l===b.id&&!x.x);return th.length?`<div class="cthink"><div class="kh">💭 أفكار كتبتها أثناءها</div>${th.map(x=>`<div class="kn"><span class="kt">${esc(x.t)}</span></div>`).join("")}<button class="linkbtn" data-pgo="ideas" style="align-self:flex-start">كل أفكارك ←</button></div>`:""})()}
-      ${S.aiv&&needsStudy(b)?AIX(()=>{const pl=safeDrive(m.pdf);return m.studied||pl?`<div class="actions aiact">${m.studied?`<button class="btn sm" data-anki="${b.id}">🃏 ANKI بالذكاء${m.ak?" ✓":""}</button>`:""}${pl?`<a class="btn sm" href="${esc(pl)}" target="_blank" rel="noopener">📄 افتح السلايدات</a>`:""}</div>`:""},""):""}
-      <div class="actions mvrow"><button class="btn sm" data-edit="${b.id}">✏️ ${b.kind==="exam"?"تعديل الموعد":"تعديل الاسم والنوع والدكتور والوقت"}</button></div>
-      ${b.dr?`<div class="actions"><button class="btn" data-dr="${esc(b.dr)}">كل محاضرات ${esc(b.dr)}</button></div>`:""}
-      ${rel.length?`<div class="related"><h3>نفس الموضوع في أماكن أخرى</h3>${rel.map(relHTML).join("")}</div>`:""}
-    </div>`:""}
+      ${ok.length?`<p class="lockmsg${st.lockFlash===b.id?" flash":""}" role="status">🔒 المراجعات و ANKI مقفلة لين تحل ${cnt(ok.length,"عُقدة الفهم","عُقدتي الفهم","عُقد فهم")}. لا تحفظ شي ما فهمته.</p>`:""}</section>
+      <section class="lc-sec"><div class="lc-h"><b>🧰 أدواتك</b></div>
+        <div class="lc-tools">
+          <button class="lc-tool" data-knew="${b.id}"><span>🚧</span>عُقدة فهم</button>
+          <button class="lc-tool" data-recnew="${b.id}|${m.rev1&&!hasRec(b.id,"r1")?"r1":m.rev2&&!hasRec(b.id,"r2")?"r2":recs.length?"x":"s"}"><span>🎙️</span>${m.rev1&&!hasRec(b.id,"r1")?"سجّل المراجعة 1":m.rev2&&!hasRec(b.id,"r2")?"سجّل المراجعة 2":"تسجيل ملخص"}</button>
+          ${S.aiv&&m.studied?AIX(()=>`<button class="lc-tool" data-anki="${b.id}"><span>🃏</span>ANKI${m.ak?" ✓":""}</button>`,""):""}
+          ${pl?`<a class="lc-tool" href="${esc(pl)}" target="_blank" rel="noopener"><span>📄</span>السلايدات</a>`:""}
+        </div>
+        ${st.knotFor===b.id?`<div class="frow"><input id="knotIn" maxlength="140" placeholder="وش النقطة اللي ما فهمتها؟ (سطر واحد)"><button class="btn primary" data-kadd="${b.id}">سجّل</button></div>`:""}
+        ${kn.length?`<div class="knots"><div class="kh">🚧 عُقد الفهم</div>${kn.map(k=>`<div class="kn${k.d?" ok":""}"><button class="kcheck" role="checkbox" aria-checked="${!!k.d}" data-kdone="${b.id}|${k.k}" aria-label="حلّيتها">✓</button><span class="kt">${esc(k.t)}</span><button class="kdel" data-kdel="${b.id}|${k.k}" aria-label="حذف">×</button></div>`).join("")}</div>`:""}
+        ${recs.length?`<details class="lc-more"${recs.length<=2?" open":""}><summary>🎙️ تسجيلاتك (${recs.length})</summary><div class="recs">${recs.map(r=>`<div class="rec"><span class="rd"><b>${REC_ST[r.st||"s"]||""}</b> · ${fmt(r.d)}${r.a?` · ${mmss(r.s||0)}`:""}</span>${r.t?`<span class="rt2">${esc(r.t)}</span>`:""}<span class="ra">${r.a?`<button class="btn sm" data-play="${b.id}|${r.k}">▶︎ تشغيل</button>`:""}<button class="linkbtn" data-recdel="${b.id}|${r.k}">حذف</button></span></div>`).join("")}</div></details>`:""}
+      </section>`:""}
+      ${notes.length?`<section class="lc-sec"><div class="lc-h"><b>📝 ملاحظاتك</b></div>${notes.join("")}</section>`:""}
+      ${b.dr||rel.length?`<footer class="lc-foot">${b.dr?`<button class="btn sm" data-dr="${esc(b.dr)}">👨‍⚕️ كل محاضرات ${esc(b.dr)}</button>`:""}
+        ${rel.length?`<div class="related"><h3>نفس الموضوع في أماكن أخرى</h3>${rel.map(relHTML).join("")}</div>`:""}</footer>`:""}
+    </div>`})():""}
   </article>`;
 }
 function relHTML(o){
@@ -6543,14 +6596,15 @@ function sheetAnki(id){
 // with the Drive bridge: 📂 browse your folder → pick the lecture → a saved job does the rest (see a5d). Without it: a link or a file, read here.
 function clipAiBlock(id){const m=mk(id),on=aiOn();if(!on)return`<p class="sh-note">🤖 لو فعّلت Kimi من الإعدادات، تقسمها من Drive بضغطة.</p>`;
   const g=gasOn(),c=aiCfg();
-  return`<div class="aibox"><b>🤖 خل Kimi يقسّمها لك</b>
-      ${g?`<div id="spBox" data-lid="${esc(id)}"></div>`
-      :`<p class="note" style="margin:0">الصق رابط ينتهي بـ .pdf (أو اكتب اسم الملف بس لو رفعته في مجلد pdf مع الموقع)، أو رابط Google Drive، أو اختر الملف. يقرأ النص على جهازك ويرسل الشرائح مختصرة.</p>
-        <div class="frow"><input id="csLink" dir="ltr" inputmode="url" placeholder="pharm-1.pdf أو https://….pdf" value="${esc(safeDrive(m.pdf))}"><button class="btn primary" id="csAi">✂️ قسّمها</button></div>
-        <p class="note" style="margin:0">💡 تبي تختار المحاضرة من مجلدك وما ينزل ولا ملف على جهازك؟ اربط Google Drive من الإعدادات ← 🤖 ← 📂 (مرة وحدة).</p>`}
-      ${g&&c.key?`<label class="chk"><input type="checkbox" id="csImg"${aiImgOn()?" checked":""}> 👁️ خلّ Kimi يشوف صور الشرائح (رسوم، Histology، جداول، Graphs) · أدق وأغلى شوي</label>`:""}
-      <details class="how"><summary>📄 ملف من جهازك بدل Drive</summary><div class="frow"><button class="btn sm" id="csFile">📄 اختر الملف (PDF / PowerPoint)</button><input type="file" id="csFileIn" accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden></div></details>
-      <p class="sh-note" id="csAiMsg" aria-live="polite"></p></div><p class="sh-note">أو بالطريقة اليدوية مع Claude:</p>`}
+  return`<div class="aibox cs-ai"><b>🤖 Kimi يقسّمها لك</b>
+      ${g?`<div id="spBox" data-lid="${esc(id)}"></div>`:`<p class="note" style="margin:0">الصق رابط ينتهي بـ .pdf (أو اسم الملف لو رفعته في مجلد pdf مع الموقع)، أو رابط Google Drive.</p>`}
+      <div class="frow cs-link"${g?" hidden":""}><input id="csLink" dir="ltr" inputmode="url" placeholder="${g?"https://drive.google.com/file/d/…":"pharm-1.pdf أو https://….pdf"}" value="${esc(g?(driveRef(m.pdf)?m.pdf:""):safeDrive(m.pdf))}"><button class="btn primary" id="csAi">✂️ قسّمها</button></div>
+      <details class="how cs-opts"><summary>⚙️ خيارات ثانية</summary><div class="cs-obody">
+        ${g?`<button class="btn sm" id="csLinkOpen" type="button">🔗 الصق رابط ملف من Drive</button>`:""}
+        <button class="btn sm" id="csFile" type="button">📄 ملف من جهازك (PDF / PowerPoint)</button><input type="file" id="csFileIn" accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
+        ${c.key?`<label class="chk"><input type="checkbox" id="csImg"${aiImgOn()?" checked":""}> 👁️ Kimi يشوف صور الشرائح (أدق وأغلى شوي)</label>`:""}
+        ${g?"":`<p class="note" style="margin:0">💡 تبي تختار المحاضرة من مجلدك؟ اربط Google Drive من الإعدادات ← 🤖 ← 📂 (مرة وحدة).</p>`}</div></details>
+      <p class="sh-note" id="csAiMsg" aria-live="polite"></p></div>`}
 function clipAiBind(box,id,fill){
   const msg=box.querySelector("#csAiMsg"),fi=box.querySelector("#csFileIn");if(!fi)return;let ctl=null;
   // the old path (read on this device, shown below for you to check and save): a file, or a link that isn't Drive
@@ -6559,8 +6613,11 @@ function clipAiBind(box,id,fill){
       if(!box.isConnected)return;fill(r.json,r.link||src.link||"");msg.textContent=`✅ جاهزة: ${cnt1(r.pk.n,r.approx?"قسم واحد":"شريحة وحدة",r.approx?"قسمين":"شريحتين",r.approx?"أقسام":"شرائح")}${r.pk.cut?` · شلت ${r.pk.cut} سطر مكرر (هيدر/فوتر)`:""}${r.figs?` · 👁️ وصف ${cnt1(r.figs,"صورة وحدة","صورتين","صور")}`:""}. راجعها تحت واحفظ.`}
     catch(e){if(msg.isConnected)msg.innerHTML=`<span class="late">❌ ${esc(aiAnyErr(e))}</span>`}
     finally{ctl=null;btns.forEach(x=>{if(x.isConnected)x.disabled=false})}};
-  const sp=box.querySelector("#spBox");if(sp){sp._run=run;spBoxDraw(sp,id)}
-  else{const go=box.querySelector("#csAi");if(go)go.onclick=()=>{const l=box.querySelector("#csLink").value.trim();if(!srcOK(l)){msg.textContent="اكتب اسم الملف (مثل pharm-1.pdf) أو رابط ينتهي بـ .pdf أو رابط Google Drive.";return}run({link:safeDrive(l)})}}
+  const sp=box.querySelector("#spBox");if(sp)spBoxDraw(sp,id);
+  const lo=box.querySelector("#csLinkOpen");if(lo)lo.onclick=()=>{const r=box.querySelector(".cs-link");r.hidden=false;lo.hidden=true;const i=box.querySelector("#csLink");if(i)i.focus()};
+  const go=box.querySelector("#csAi");if(go)go.onclick=()=>{const l=box.querySelector("#csLink").value.trim(),r=driveRef(l);
+    if(sp&&r){spStart(id,r.id,"",[]);csGo("prog");return}
+    if(!srcOK(l)){msg.textContent=sp?"الصق رابط ملف من Google Drive (مشاركة ← نسخ الرابط).":"اكتب اسم الملف (مثل pharm-1.pdf) أو رابط ينتهي بـ .pdf أو رابط Google Drive.";return}run({link:safeDrive(l)})};
   const ci=box.querySelector("#csImg");if(ci)ci.onchange=()=>aiImgSet(ci.checked);
   box.querySelector("#csFile").onclick=()=>fi.click();
   fi.onchange=()=>{const f=fi.files&&fi.files[0];fi.value="";if(!f)return;if(f.size>60e6){msg.textContent="الملف أكبر من 60MB.";return}run({file:f})}}
@@ -6569,7 +6626,8 @@ function clipAiBind(box,id,fill){
 const GDLAST_LS="uqu-gdlast",dShort=iso=>`${dnum(iso)} ${MONTHS[+iso.slice(5,7)-1]}`;
 let CSV=null;
 const csOpen=()=>!!(CSV&&CSV.box&&CSV.box.isConnected);
-function csInit(box,lid){CSV={box,lid,v:"main",stack:null,seq:0,shown:""};const B=box.querySelector("#csBack");if(B)B.onclick=csBackTap;if(spRunning(lid))csGo("prog")}
+function csInit(box,lid){CSV={box,lid,v:"main",stack:null,seq:0,shown:""};const B=box.querySelector("#csBack");if(B)B.onclick=csBackTap;
+  const s=spState(lid);if(spRunning(lid)||s&&s.st==="err"&&Date.now()-(+(s.own?s.j.at:s.hb)||0)<864e5)csGo("prog")}
 function csLastStack(){try{const o=JSON.parse(localStorage.getItem(GDLAST_LS)||"null");return isObj(o)&&o.root===aiCfg().gdir&&Array.isArray(o.s)?o.s.filter(x=>isObj(x)&&typeof x.id==="string").slice(0,12):[]}catch(e){return[]}}
 function csGo(v,o={}){if(!csOpen())return;const c=CSV,M=c.box.querySelector("#csMain"),A=c.box.querySelector("#csAlt"),B=c.box.querySelector("#csBack");if(!M||!A)return;
   if(v==="browse"&&!gasOn())v="main";
@@ -6589,7 +6647,7 @@ async function csBrowse(force,note){const c=CSV,A=c.box.querySelector("#csAlt"),
   const crumbs=[rootN||"مجلدك",...stack.map(x=>x.n)];
   A.innerHTML=`<div class="gdb"><div class="gdb-h"><b class="gdb-t">📂 ${esc(crumbs[crumbs.length-1])}</b><button class="btn sm" id="gbRe" aria-label="حدّث">🔄</button></div>
     ${crumbs.length>1?`<p class="gdb-p en">${crumbs.map(esc).join(" › ")}</p>`:""}<div id="gbBan"></div>
-    ${note?`<p class="note" style="margin:0"><span class="late">${esc(note)}</span></p>`:""}<div class="gdb-l" id="gbL"><p class="note">⏳ يفتح المجلد…</p></div><div class="gdb-sel" id="gbSel" hidden></div></div>`;
+    ${note?`<p class="note" style="margin:0"><span class="late">${esc(note)}</span></p>`:""}<div class="gdb-l" id="gbL"><p class="note">⏳ يفتح المجلد…</p></div></div>`;
   csBanner();A.querySelector("#gbRe").onclick=()=>csGo("browse",{stack,force:true});
   let d;try{d=await gasDir(cur?cur.id:"",force)}catch(e){if(!csOpen()||CSV.seq!==seq)return;const L=A.querySelector("#gbL");if(L)L.innerHTML=`<p class="note"><span class="late">❌ ${esc(aiAnyErr(e))}</span></p>`;
     if(stack.length&&e.code==="gas"&&["nofile","access","dir"].includes(e.text))csGo("browse",{stack:[],note:"المجلد هذا ما انفتح (انحذف أو انتقل)، فرجعتك لمجلدك الأساسي."});return}
@@ -6603,14 +6661,11 @@ async function csBrowse(force,note){const c=CSV,A=c.box.querySelector("#csAlt"),
     [...d.files.filter(f=>star.has(f.id)),...d.files.filter(f=>!star.has(f.id))].map(f=>`<button class="gdb-i${star.has(f.id)?" star":""}" data-file="${esc(f.id)}" data-n="${esc(f.n)}"><span>${star.has(f.id)?"⭐":ic[f.k]||"📄"}</span><span class="gdb-n">${esc(f.n)}</span><small>${[fmtS(f.s),f.t?dShort(isoOf(new Date(f.t))):""].filter(Boolean).join(" · ")}</small></button>`).join("")
     :`<p class="note">📭 المجلد فاضي (ما فيه PDF ولا PowerPoint ولا مجلدات).</p>`;
   L.querySelectorAll("[data-dir]").forEach(x=>x.onclick=()=>csGo("browse",{stack:[...stack,{id:x.dataset.dir,n:x.dataset.n}]}));
-  L.querySelectorAll("[data-file]").forEach(x=>x.onclick=()=>{L.querySelectorAll(".gdb-i.on").forEach(y=>y.classList.remove("on"));x.classList.add("on");
-    const S0=A.querySelector("#gbSel");S0.hidden=false;
-    S0.innerHTML=`${aiCfg().key?`<label class="chk"><input type="checkbox" id="gbImg"${aiImgOn()?" checked":""}> 👁️ خلّ Kimi يشوف صور الشرائح (أدق وأغلى شوي)</label>`:""}<button class="btn primary big" id="gbGo">✂️ قسّم «<span class="en">${esc(x.dataset.n)}</span>»</button>`;
-    const im=S0.querySelector("#gbImg");if(im)im.onchange=()=>aiImgSet(im.checked);
-    S0.querySelector("#gbGo").onclick=e=>{const btn=e.currentTarget;
-      if(spRunning(lid)){if(btn.dataset.sure!=="1"){btn.dataset.sure="1";btn.textContent="⚠️ فيه تقسيم شغّال · اضغط مرة ثانية عشان تلغيه وتبدأ هذا";return}spCancel(lid)}
-      spStart(lid,x.dataset.file,x.dataset.n,stack);csGo("prog")};
-    S0.scrollIntoView({block:"nearest",behavior:"smooth"})})}
+  let arm=null;
+  L.querySelectorAll("[data-file]").forEach(x=>x.onclick=()=>{
+    if(spRunning(lid)&&arm!==x.dataset.file){arm=x.dataset.file;L.querySelectorAll(".gdb-i.on").forEach(y=>y.classList.remove("on"));x.classList.add("on");
+      toast("فيه تقسيم شغّال · اضغط الملف مرة ثانية عشان تلغيه وتبدأ هذا");setTimeout(()=>{if(arm===x.dataset.file){arm=null;x.classList.remove("on")}},4000);return}
+    if(spRunning(lid))spCancel(lid);spStart(lid,x.dataset.file,x.dataset.n,stack);csGo("prog")})}
 // while a split runs, the folder windows carry a way back to its percentage
 function csBanner(){if(!csOpen()||CSV.v!=="browse")return;const el=CSV.box.querySelector("#gbBan");if(!el)return;const s=spState(CSV.lid);
   if(s&&(s.st==="text"||s.st==="kimi")){el.innerHTML=`<button class="spban" type="button">⏳ التقسيم شغّال <b class="en">${Math.floor(s.pc)}%</b>${s.own?"":` على ${esc(s.dn||"جهازك الثاني")}`} · ارجع للنسبة ‹</button>`;el.firstChild.onclick=()=>csGo("prog")}
@@ -6628,11 +6683,12 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
     setTimeout(()=>{if(csOpen()&&CSV.v==="prog"&&CSV.lid===lid)csGo("main")},1800)}
   else if(s.st==="ready")foot=!s.own&&s.big?`<p class="sh-note">المقاطع الجديدة (${s.cn}) جاهزة على ${esc(s.dn||"جهازك الثاني")}، وهي كبيرة على المزامنة: احفظها من هناك.</p>`
     :`<p class="sh-note">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="sh-act"><button class="btn primary big" id="spOk">💾 احفظ الجديدة (${s.cn})</button><button class="btn" id="spKeep">✕ خلّ القديمة</button></div>`;
-  else if(s.st==="err")foot=`<p class="ce bad">❌ ${esc(s.err||"ما تقسّمت")}</p><div class="sh-act">${can&&gid?`<button class="btn primary big" id="spRe">🔁 جرّب مرة ثانية</button>`:""}<button class="btn" id="spDrop">إلغاء</button></div>`;
-  A.innerHTML=`<div class="spw"><div class="sh-ic">✂️</div><h2 class="sh-t">${run?"يقسّم المحاضرة":s.st==="err"?"ما تقسّمت":"خلص التقسيم"}</h2><p class="sh-s en">${esc(label(b))}</p>
+  else if(s.st==="err")foot=`<p class="ce bad">❌ ${esc(s.err||"ما تقسّمت")}</p><div class="sh-act">${can&&gid?`<button class="btn primary big" id="spRe">🔁 جرّب نفس الملف</button>`:""}${gasOn()?`<button class="btn" id="spPick2">📂 اختر ملف ثاني</button>`:""}<button class="btn dangerbtn" id="spDrop">إلغاء</button></div>`;
+  const er=s.st==="err";
+  A.innerHTML=`<div class="spw"><div class="sh-ic">${er?"⚠️":"✂️"}</div><h2 class="sh-t">${run?"يقسّم المحاضرة":er?"ما تقسّمت":"خلص التقسيم"}</h2><p class="sh-s en">${esc(label(b))}</p>
     ${s.nm?`<p class="sh-note en">📄 ${esc(s.nm)}</p>`:""}
-    <div class="spw-pc"><b class="en" id="spPc">${Math.floor(pc)}</b><span>%</span></div><div class="spw-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(pc)}"><i id="spBar" style="width:${pc}%"></i></div>
-    <p class="sh-note" id="spStep" aria-live="polite">${esc(spStepTxt(s))}</p><div class="spw-parts" id="spDots">${s.np>1?Array.from({length:s.np},(_,i)=>`<i class="${i<s.nd?"on":""}"></i>`).join(""):""}</div>${foot}</div>`;
+    <div class="spw-pc"${er?" hidden":""}><b class="en" id="spPc">${Math.floor(pc)}</b><span>%</span></div><div class="spw-bar"${er?" hidden":""} role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(pc)}"><i id="spBar" style="width:${pc}%"></i></div>
+    <p class="sh-note" id="spStep" aria-live="polite"${er?" hidden":""}>${esc(spStepTxt(s))}</p><div class="spw-parts" id="spDots">${s.np>1?Array.from({length:s.np},(_,i)=>`<i class="${i<s.nd?"on":""}"></i>`).join(""):""}</div>${foot}</div>`;
   const q=x=>A.querySelector(x);
   if(q("#spCancel"))q("#spCancel").onclick=e=>{const x=e.currentTarget;if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية عشان توقف التقسيم";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="إلغاء"}},3500);return}
     spCancel(lid);toast("انلغى التقسيم");csGo("main")};
@@ -6640,6 +6696,7 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
   if(q("#spOk"))q("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};
   if(q("#spKeep"))q("#spKeep").onclick=()=>{spSettle(lid,s,"x");csGo("main")};
   if(q("#spRe"))q("#spRe").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
+  if(q("#spPick2"))q("#spPick2").onclick=()=>csGo("browse",{stack:s.stk&&s.stk.length?s.stk:csLastStack()});
   if(q("#spDrop"))q("#spDrop").onclick=()=>{if(s.own)spDrop(lid);else spSettle(lid,s,"x");csGo("main")}}
 // the numbers move; the window is redrawn only when the job changes kind (running → done, …)
 function csTick(lid){if(!csOpen()||lid&&CSV.lid!==lid)return;const c=CSV,s=spState(c.lid);
@@ -6653,25 +6710,20 @@ function csTick(lid){if(!csOpen()||lid&&CSV.lid!==lid)return;const c=CSV,s=spSta
   const dots=q("#spDots");if(dots&&s.np>1)dots.innerHTML=Array.from({length:s.np},(_,i)=>`<i class="${i<s.nd?"on":""}"></i>`).join("")}
 function csFollow(lid){if(!csOpen()||lid&&CSV.lid!==lid)return;if(CSV.v==="main"){const sp=CSV.box.querySelector("#spBox");if(sp)spBoxDraw(sp,CSV.lid)}csTick()}
 setInterval(()=>{if(csOpen()&&CSV.v==="prog")csTick()},1000);
-// the first window's part: the job's state (when it isn't running), or the way in (📂 your folder / 🔗 a Drive link)
-function spBoxDraw(sp,lid,force){if(!sp.isConnected)return;if(!force&&sp.contains(document.activeElement)&&document.activeElement.tagName==="INPUT")return;
-  const s=spState(lid),c=aiCfg(),line=spLine(lid);
-  if(s&&(s.st==="text"||s.st==="kimi")){sp.innerHTML=`<p class="note sp-line" style="margin:0">${line}</p><div class="frow"><button class="btn primary sm" id="spSee">📊 شوف النسبة</button></div>`;
-    sp.querySelector("#spSee").onclick=()=>csGo("prog");return}
+// the first window's part: one way in (📂), a quiet line about the last split, and «↻ the same file» when there is one
+function spBoxDraw(sp,lid){if(!sp.isConnected)return;
+  const s=spState(lid),c=aiCfg(),line=spLine(lid),run=s&&(s.st==="text"||s.st==="kimi");
+  if(run){sp.innerHTML=`<p class="note sp-line" style="margin:0">${line}</p><button class="btn primary big" id="spSee">📊 شوف النسبة</button>`;sp.querySelector("#spSee").onclick=()=>csGo("prog");return}
   if(s&&s.st==="ready"){sp.innerHTML=`<p class="note" style="margin:0">${line}</p><p class="sh-note" style="margin:0">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="frow"><button class="btn primary sm" id="spOk">💾 احفظ الجديدة</button><button class="btn sm" id="spX">✕ خلّ القديمة</button></div>`;
-    sp.querySelector("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};sp.querySelector("#spX").onclick=()=>{spSettle(lid,s,"x");spBoxDraw(sp,lid,true)};return}
-  const gid=s?(s.own?s.j.gid:s.sj&&s.sj.gid):"";
-  const head=s&&s.st==="err"?`<p class="note" style="margin:0"><span class="late">${line}</span></p><div class="frow">${gid?`<button class="btn primary sm" id="spRe">🔁 جرّب مرة ثانية</button>`:""}<button class="btn sm" id="spX">✕</button></div>`
-    :s&&s.st==="done"&&line?`<p class="note" style="margin:0">${line}</p><div class="frow"><button class="btn primary sm" id="spDone">تمام 👍</button></div>`:"";
-  sp.innerHTML=`${head}${c.gdir?`<button class="btn ${head?"":"primary "}big" id="spPick">📂 اختر المحاضرة من Drive</button>`:`<p class="note" style="margin:0">📂 حط رابط مجلد المحاضرات في الإعدادات ← 🤖 ← 📂، وتختار المحاضرة من قائمة بدل الروابط.</p>`}
-    <details class="how"${c.gdir?"":" open"}><summary>🔗 أو الصق رابط ملف من Drive</summary><div class="frow"><input id="csLink" dir="ltr" inputmode="url" placeholder="https://drive.google.com/file/d/…" value="${esc(driveRef(mk(lid).pdf)?mk(lid).pdf:"")}"><button class="btn primary" id="csAi">✂️ قسّمها</button></div></details>`;
+    sp.querySelector("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};sp.querySelector("#spX").onclick=()=>{spSettle(lid,s,"x");spBoxDraw(sp,lid)};return}
+  const last=s&&s.nm&&(s.own?s.j.gid:s.sj&&s.sj.gid)?{gid:s.own?s.j.gid:s.sj.gid,nm:s.nm,stk:s.stk}:null;
+  const top=s&&s.st==="done"&&line?`<p class="cs-ok">${line}</p>`:s&&s.st==="err"?`<button class="cs-warn" id="spErr" type="button">⚠️ آخر محاولة ما ضبطت · شوف السبب</button>`:"";
+  sp.innerHTML=`${top}${c.gdir?`<button class="btn primary big" id="spPick">📂 اختر المحاضرة من Drive</button>`:`<p class="note" style="margin:0">📂 حط رابط مجلد المحاضرات في الإعدادات ← 🤖 ← 📂، وتختار المحاضرة من قائمة.</p>`}
+    ${last&&s.st!=="done"?`<button class="linkbtn cs-again" id="spAgain" type="button">↻ نفس الملف: <span class="en">${esc(last.nm)}</span></button>`:""}`;
   const q=x=>sp.querySelector(x);
-  if(q("#spRe"))q("#spRe").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
-  if(q("#spX"))q("#spX").onclick=()=>{if(s.own)spDrop(lid);else spSettle(lid,s,"x");spBoxDraw(sp,lid,true)};
-  if(q("#spDone"))q("#spDone").onclick=()=>closeSheet();
+  if(q("#spErr"))q("#spErr").onclick=()=>csGo("prog");
   if(q("#spPick"))q("#spPick").onclick=()=>csGo("browse",{stack:csLastStack()});
-  q("#csAi").onclick=()=>{const l=q("#csLink").value.trim(),r=driveRef(l),msg=document.querySelector("#csAiMsg");
-    if(r){spStart(lid,r.id,"",[]);csGo("prog");return}if(srcOK(l)&&sp._run){sp._run({link:safeDrive(l)});return}if(msg)msg.textContent="الصق رابط ملف من Google Drive (مشاركة ← نسخ الرابط)."}}
+  if(q("#spAgain"))q("#spAgain").onclick=()=>{spStart(lid,last.gid,last.nm,last.stk);csGo("prog")}}
 aiBindSettings();
 // ===== v19 AI END =====
 renderSync();renderNext();render();connect();
