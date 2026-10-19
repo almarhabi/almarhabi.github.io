@@ -37,19 +37,26 @@ jobs:
           path: jobs
 
       - name: Build every waiting job
-        run: python3 site/tools/anki/job.py jobs
+        run: python3 site/tools/anki/job.py jobs "$RUNNER_TEMP/done.txt"
 
+      # the branch is kept as ONE commit (no history): old decks really leave it, and it never grows.
+      # A job the site sent while this ran is carried over; --force-with-lease never drops one that lands meanwhile.
       - name: Save the decks
         working-directory: jobs
         run: |
           git config user.name "anki-builder"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
-          git commit -q -m "anki: build decks"
-          for i in 1 2 3 4 5; do
-            if git push -q origin HEAD:anki-jobs; then exit 0; fi
+          touch "${RUNNER_TEMP:?}/done.txt"
+          for i in 1 2 3 4 5 6; do
+            git fetch -q origin anki-jobs
+            tip=$(git rev-parse FETCH_HEAD)
+            for f in $(git ls-tree --name-only FETCH_HEAD in/); do
+              id=$(basename "$f" .json)
+              if [ ! -e "$f" ] && ! grep -qx "$id" "$RUNNER_TEMP/done.txt"; then git show "FETCH_HEAD:$f" > "$f"; fi
+            done
+            git add -A
+            commit=$(git commit-tree "$(git write-tree)" -m "anki: decks")
+            if git push -q --force-with-lease="anki-jobs:$tip" origin "$commit:refs/heads/anki-jobs"; then exit 0; fi
             sleep $((i * 2))
-            git pull -q --rebase origin anki-jobs
           done
           exit 1

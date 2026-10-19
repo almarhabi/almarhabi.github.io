@@ -1580,6 +1580,9 @@ function savePatch(id,local,wire){
   cache();render();
   if(sync)schedFlush();
 }
+// the same, quietly: no repaint, no points, no boxes (for state that only its own widgets show, like a split's progress)
+function quietPatch(id,local){S.marks[id]={...mk(id),...local};LV++;const sync=!!remote||syncPlanned();
+  if(sync){for(const f in local)pend(id,f,null,local[f]);savePend()}cache();if(sync)schedFlush()}
 // ---------- 🔀 lists that two devices changed at once: merged item by item, the same way on every device ----------
 const pj=(s,d)=>{if(typeof s!=="string"||!s)return d;try{const o=JSON.parse(s);return o??d}catch(e){return d}};
 const canon=v=>JSON.stringify(v,(k,x)=>isObj(x)?Object.keys(x).sort().reduce((o,q)=>(o[q]=x[q],o),{}):x);
@@ -2494,7 +2497,7 @@ const HEALTHY=[15,25],V19=Date.parse("2026-10-19T00:00:00+03:00");
 const AVG_H=(()=>{const L=BASE_ALL.filter(needsStudy);return L.length?L.reduce((a,b)=>a+Math.max(1,hrs(b)),0)/L.length:1.5})();
 const oldCards=m=>{if(!m||!m.cards||m.akc)return false;const t=+m.ankiAt||(isISO(m.anki)?Date.parse(m.anki+"T20:00:00"):0);return!!t&&t<V19};
 function cardsRange(b,m){if(!S.aiv||oldCards(m)){const h=hrs(b);return{lo:HEALTHY[0]*h,hi:HEALTHY[1]*h,old:1}}
-  const c=+(m&&m.akc)||akLastN(b.id);if(!c)return{lo:0,hi:Infinity,none:1};return{lo:Math.max(1,Math.round(c*.4)),hi:Math.ceil(c*1.15),cap:c}}
+  const c=+(m&&m.akc);if(!c)return{lo:0,hi:Infinity,none:1};return{lo:Math.max(1,Math.round(c*.4)),hi:Math.ceil(c*1.15),cap:c}}
 const cardsOk=(b,m)=>{if(!m||!m.cards)return false;const r=cardsRange(b,m);return!r.none&&m.cards>=r.lo&&m.cards<=r.hi};
 const cardsOver=(b,m)=>!!(m&&m.cards)&&m.cards>cardsRange(b,m).hi;
 function cardEval(n,b,m){
@@ -5751,12 +5754,12 @@ function spjOf(lid){const o=sjson(mk(lid).spj,null);if(!isObj(o)||!SPJ_ST.includ
   return{d:o.d.slice(0,16),dn:typeof o.dn==="string"?o.dn.slice(0,20):"",at:+o.at,st:o.st,pc:n(o.pc,0,100),np:n(o.np,0,99),nd:n(o.nd,0,99),hb:+o.hb||+o.at,
     nm:typeof o.nm==="string"?o.nm.slice(0,120):"",gid:typeof o.gid==="string"&&/^[\w-]{10,}$/.test(o.gid)?o.gid:"",pz:typeof o.pz==="string"?o.pz.slice(0,80):"",
     err:typeof o.err==="string"?o.err.slice(0,200):"",cn:n(o.cn,0,999),fg:n(o.fg,0,99),stk:Array.isArray(o.stk)?o.stk.filter(x=>isObj(x)&&typeof x.id==="string"&&/^[\w-]{10,}$/.test(x.id)).map(x=>({id:x.id,n:String(x.n||"").slice(0,80)})).slice(0,12):[],
-    res:o.st==="ready"&&typeof o.res==="string"?o.res:""}}
+    res:o.st==="ready"&&typeof o.res==="string"?o.res:"",big:!!o.big}}
 // the job you see, wherever it runs: this device's own, else your other device's (a cancel aimed at it hides it right away)
 function spState(lid){const j=spGet(lid),x=+mk(lid).spx||0,sj=spjOf(lid);
   if(j&&x!==j.at)return{own:1,j,st:j.st,pc:spPct(j),np:j.parts?j.parts.length:0,nd:j.parts?j.parts.filter(p=>p.st==="done").length:0,nm:j.name||"",why:spActive(j)?spWhy(j):"",err:j.err||"",cn:+j.cn||0,fg:+j.figs||0,at:j.at,stk:j.stk||[]};
   if(sj&&sj.d!==SP_DEV&&sj.st!=="x"&&x!==sj.at&&Date.now()-sj.hb<3*864e5){const stale=(sj.st==="text"||sj.st==="kimi")&&Date.now()-sj.hb>5*60e3;
-    return{own:0,sj,st:sj.st,pc:sj.pc,np:sj.np,nd:sj.nd,nm:sj.nm,why:sj.pz,err:sj.err,cn:sj.cn,fg:sj.fg,at:sj.at,stk:sj.stk,stale,dn:sj.dn,hb:sj.hb,res:sj.res}}
+    return{own:0,sj,st:sj.st,pc:sj.pc,np:sj.np,nd:sj.nd,nm:sj.nm,why:sj.pz,err:sj.err,cn:sj.cn,fg:sj.fg,at:sj.at,stk:sj.stk,stale,dn:sj.dn,hb:sj.hb,res:sj.res,big:sj.big}}
   return null}
 const spRunning=lid=>{const s=spState(lid);return!!s&&(s.st==="text"||s.st==="kimi")};
 // why a job of this device isn't moving right now ("" = it is)
@@ -5778,8 +5781,8 @@ function spStepTxt(s){if(!s)return"";if(s.why&&(s.st==="text"||s.st==="kimi"))re
 function spPub(lid,force){const j=spGet(lid);if(!j||!S.aiv)return;const now=Date.now(),act=spActive(j),pc=Math.round(spPct(j)),nd=j.parts?j.parts.filter(p=>p.st==="done").length:0,why=act?spWhy(j):"",L=SPPUB[lid]||{};
   if(!(force||L.at!==j.at||L.st!==j.st||L.nd!==nd||L.why!==why||pc>=(L.pc||0)+10||act&&now-(L.t||0)>=(why?180e3:20e3)))return;
   const o={v:1,d:SP_DEV,dn:SP_DEVN,at:j.at,st:j.st,pc:act?Math.min(99,pc):j.st==="done"||j.st==="ready"?100:pc,np:j.parts?j.parts.length:0,nd,hb:now,nm:String(j.name||"").slice(0,120),gid:j.gid,
-    pz:why.slice(0,80),err:String(j.err||"").slice(0,200),cn:+j.cn||0,fg:+j.figs||0,stk:(j.stk||[]).slice(0,12),...(j.st==="ready"&&typeof j.res==="string"&&j.res.length<90000?{res:j.res}:{})};
-  SPPUB[lid]={at:j.at,st:j.st,nd,pc,why,t:now};try{savePatch(lid,{spj:JSON.stringify(o)})}catch(e){console.warn(e)}}
+    pz:why.slice(0,80),err:String(j.err||"").slice(0,200),cn:+j.cn||0,fg:+j.figs||0,stk:(j.stk||[]).slice(0,12),...(j.st==="ready"&&typeof j.res==="string"?j.res.length<200000?{res:j.res}:{big:1}:{})};
+  SPPUB[lid]={at:j.at,st:j.st,nd,pc,why,t:now};try{quietPatch(lid,{spj:JSON.stringify(o)})}catch(e){console.warn(e)}}
 function spDrop(lid){const j=spGet(lid);delete spAll()[lid];spSave();delete SPLIVE[lid];if(SPCTL[lid])SPCTL[lid].abort();spRefresh(lid)}
 // ✕ cancel: on the device that runs it the work stops now; from the other device it's a request that device acts on (and you don't wait for it)
 function spCancel(lid){const s=spState(lid);if(!s)return;
@@ -5809,11 +5812,11 @@ function spKill(lid,why){const j=spGet(lid);if(!j)return;if(SPCTL[lid])SPCTL[lid
   const sj=spjOf(lid);if(why==="x"&&(!sj||sj.d===SP_DEV||sj.at===j.at))try{savePatch(lid,{spj:JSON.stringify({v:1,d:SP_DEV,dn:SP_DEVN,at:j.at,st:"x",hb:Date.now()})})}catch(e){}
   spRefresh(lid)}
 async function spRun(lid){
-  const j0=spGet(lid);if(!spActive(j0)||spBusy[lid])return;
+  const j0=spGet(lid);if(!spActive(j0)||spBusy[lid]===j0)return;
   const gone=spStillMine(lid,j0);if(gone){spKill(lid,gone);return}
   if(!S.aiv||!aiOn()||!gasOn()||navigator.onLine===false||aiHalted(aiCfg())){spPub(lid);return}
-  if(j0.run&&Date.now()-j0.run<90e3&&!spBusy[lid]&&j0.tab&&j0.tab!==SP_TAB)return;   // another tab of this site is on it
-  spBusy[lid]=true;const b=BY_ID[lid],j=j0,ctl=SPCTL[lid]=new AbortController(),signal=ctl.signal;j.run=Date.now();j.tab=SP_TAB;spSave();
+  if(j0.run&&Date.now()-j0.run<90e3&&j0.tab&&j0.tab!==SP_TAB)return;   // another tab of this site is on it
+  spBusy[lid]=j0;const b=BY_ID[lid],j=j0,ctl=SPCTL[lid]=new AbortController(),signal=ctl.signal;j.run=Date.now();j.tab=SP_TAB;spSave();
   const beat=setInterval(()=>{if(spGet(lid)!==j)return;j.run=Date.now();spSave();spPub(lid)},20e3);
   try{
     if(j.st==="text"){j.tAt=Date.now();spRefresh(lid);const c=aiCfg();
@@ -5845,8 +5848,8 @@ async function spRun(lid){
     else if(e.code==="gas"&&["net","slow","bad"].includes(e.text)&&(j.tries||0)<3){j.tries=(j.tries||0)+1;j.err=gasErrMsg(e);spSave()}   // a hiccup: again in a bit
     else if(["budget","nokey"].includes(e.code)||aiHalted(aiCfg())){j.err=aiAnyErr(e)+" · يكمل لحاله بعدها";spSave()}   // paused, not failed
     else{j.st="err";j.err=aiAnyErr(e);spSave()}}
-  finally{clearInterval(beat);spBusy[lid]=false;if(SPCTL[lid]===ctl)delete SPCTL[lid];const k=spGet(lid);if(k){k.run=0;spSave()}spRefresh(lid);
-    if(spActive(spGet(lid)))setTimeout(()=>spRun(lid),20e3)}
+  finally{clearInterval(beat);if(spBusy[lid]===j)spBusy[lid]=false;if(SPCTL[lid]===ctl)delete SPCTL[lid];if(spGet(lid)===j){j.run=0;spSave();spRefresh(lid);
+      if(spActive(j))setTimeout(()=>spRun(lid),20e3)}}
 }
 // the parts → one set of clips: in order, no gaps, no overlap, the first starts at 1 and the last ends at n
 function spMerge(j){const out=[];let lecture="";
@@ -5874,10 +5877,11 @@ async function spFinish(lid,j){const b=BY_ID[lid],mg=spMerge(j);
   j.res=null;savePatch(lid,{clips:pc.enc,cpr:false,nc:false,pdf:link});spSave();spRefresh(lid);
   toast(`✅ تقسّمت «${label(b)}» لـ ${cnt(pc.c.length,"مقطع","مقطعين","مقاطع")} 🎬${figs?` · 👁️ ${cnt1(figs,"صورة وحدة","صورتين","صور")}`:""}`);LV++;try{render()}catch(e){}}
 // new clips waiting for your OK (you had progress on the old ones): from this device's job, or the one your other device shared
-function spApplyReady(lid){const s=spState(lid),b=BY_ID[lid];if(!s||s.st!=="ready")return;const res=s.own?s.j.res:s.res,gid=s.own?s.j.gid:(s.sj&&s.sj.gid);if(!res||!gid)return;
-  const pc=parseClips(res,b);if(pc.err){toast("❌ "+pc.err);return}
+function spApplyReady(lid){const s=spState(lid),b=BY_ID[lid];if(!s||s.st!=="ready")return false;const res=s.own?s.j.res:s.res,gid=s.own?s.j.gid:(s.sj&&s.sj.gid);
+  if(!res||!gid){toast(`المقاطع الجديدة محفوظة على ${s.dn||"جهازك الثاني"}، احفظها من هناك`);return false}
+  const pc=parseClips(res,b);if(pc.err){toast("❌ "+pc.err);return false}
   savePatch(lid,{clips:pc.enc,cpr:false,nc:false,pdf:`https://drive.google.com/file/d/${gid}/view`});toast(`انحفظت ${cnt(pc.c.length,"مقطع","مقطعين","مقاطع")} 🎬`);
-  spSettle(lid,s,"done");LV++;try{render()}catch(e){}}
+  spSettle(lid,s,"done");LV++;try{render()}catch(e){}return true}
 // a finished job stops being news: here, and on your other device
 function spSettle(lid,s,st){if(s.own&&st==="x"){const j=s.j;delete spAll()[lid];spSave();try{savePatch(lid,{spj:JSON.stringify({v:1,d:SP_DEV,dn:SP_DEVN,at:j.at,st:"x",hb:Date.now()})})}catch(e){}}
   else if(s.own){s.j.st=st;s.j.res=null;s.j.doneAt=Date.now();spSave();spPub(lid,true)}else try{savePatch(lid,{spj:JSON.stringify({v:1,d:SP_DEV,dn:SP_DEVN,at:s.at,st,hb:Date.now(),cn:s.cn})})}catch(e){}
@@ -6053,7 +6057,7 @@ function akWeakList(B){const L=[];B.mis.forEach(t=>L.push("[missed in his clip] 
 // parts: ≤ 40 cards a request; facts in slide order, N and the type mix shared out exactly
 function akParts(D){const cnt=D.count,F=D.facts,W=D.extra||[],weak=new Set(D.weak||[]);
   const wx=W.length+F.filter(x=>weak.has(x.id)&&x.t==="S").length;let P=Math.max(1,Math.ceil((cnt.N+wx)/40));P=Math.min(P,Math.max(1,F.length));
-  const per=Math.ceil(F.length/P),grp=[];for(let p=0;p<P;p++)grp.push(F.slice(p*per,(p+1)*per));
+  const grp=[];let at=0;for(let p=0;p<P;p++){const n=Math.floor(F.length/P)+(p<F.length%P?1:0);grp.push(F.slice(at,at+n));at+=n}
   const n=grp.map(g=>g.length/F.length*cnt.N),fl=n.map(Math.floor);let r=cnt.N-fl.reduce((a,b)=>a+b,0);
   n.map((v,i)=>({i,f:v-fl[i]})).sort((p,q)=>q.f-p.f||p.i-q.i).forEach(z=>{if(r>0){fl[z.i]++;r--}});
   // the type of each of the N slots, spread evenly (Bresenham), then sliced by part
@@ -6114,8 +6118,8 @@ WEAK SPOTS (numbered; test every one)\n${weakL.length?weakL.map((t,i)=>`${i+1}. 
     facts:fx.F,extra:fx.W,weak:fx.weak,X:fx.X,errs:fx.errs,count,flN:flN>0?flN:0,src:ct.src,nWeak:weakL.length,cards:[],fixes:0,job:null};
   D.line=akLine(count,fx.X);onStep&&onStep("🧮 "+D.line);
   const parts=akParts(D),ft=akFactsTxt(D),prog=parts.map(()=>0);let got=[];
-  for(let s=0;s<parts.length;s+=3)await Promise.all(parts.slice(s,s+3).map(async pt=>{
-    const r=await call("anki2",ft+"\n\n"+akT2(D,pt),AK2_S,48000,j=>Array.isArray(j.cards)&&j.cards.length>0,p=>{prog[pt.p]=p.c||0;
+  for(let s=0;s<parts.length;s+=3)await Promise.all(parts.slice(s,s+3).map(async pt=>{if(!pt.N&&!pt.weak.length)return;
+    const r=await call("anki2",ft+"\n\n"+akT2(D,pt),AK2_S,48000,j=>Array.isArray(j.cards)&&(j.cards.length>0||!pt.N),p=>{prog[pt.p]=p.c||0;
       onStep&&onStep(p.c?`✍️ المرحلة 2: Kimi يكتب ${cnt1(count.N,"بطاقة وحدة","بطاقتين","بطاقات")}… ${kfmt(prog.reduce((a,b)=>a+b,0))}`:`✍️ المرحلة 2: يخطط البطاقات… ${p.s} ثانية`)});
     got.push(...r.json.cards.map(akCard).filter(Boolean).map(c=>({...c,_p:pt.p})))}));
   // the parts in their own order (each part's cards keep Kimi's order)
@@ -6152,7 +6156,7 @@ WEAK SPOTS (numbered; test every one)\n${weakL.length?weakL.map((t,i)=>`${i+1}. 
   const call=(k,tail,schema,max,check)=>aiCall({k,rules:AK_RULES,data:base+"\n\n"+tail,schema,effort:"high",max,fg:true,over:true,signal,check,
     onProg:p=>onStep&&onStep(p.c?`✍️ Kimi يكتب… ${kfmt(p.c)}`:`✍️ يفكر… ${p.s} ثانية`)});
   const parts=akParts(N),ft=akFactsTxt(N),got=[];
-  for(let s=0;s<parts.length;s+=3)await Promise.all(parts.slice(s,s+3).map(async pt=>{const r=await call("anki2",ft+"\n\n"+akT2(N,pt),AK2_S,48000,j=>Array.isArray(j.cards)&&j.cards.length>0);
+  for(let s=0;s<parts.length;s+=3)await Promise.all(parts.slice(s,s+3).map(async pt=>{if(!pt.N&&!pt.weak.length)return;const r=await call("anki2",ft+"\n\n"+akT2(N,pt),AK2_S,48000,j=>Array.isArray(j.cards)&&(j.cards.length>0||!pt.N));
     got.push(...r.json.cards.map(akCard).filter(Boolean).map(c=>({...c,_p:pt.p})))}));
   N.cards=got.sort((x,y)=>x._p-y._p).map(({_p,...c})=>c);if(!N.cards.length)throw aiErr("bad");akDropWeakRepeats(N);
   for(let round=0;round<2;round++){const q=akQA(N);if(!akHasWork(q))break;onStep&&onStep(`🛠️ Kimi يصلّح (${round+1}/2)…`);
@@ -6409,7 +6413,7 @@ function ghBind(){const msg=t=>{$("#ghMsg").innerHTML=t};
   $("#ghSave").onclick=async e=>{const t=$("#ghTok").value.trim().replace(/^(Bearer|token)\s+/i,"");
     if(!/^[\x21-\x7e]{20,300}$/.test(t)){msg(`<span class="late">❌ الصق الـ token كامل (يبدأ غالبًا بـ github_pat_).</span>`);return}
     aiSet({gh:t});e.target.disabled=true;msg("⏳ يجرّب GitHub…");
-    try{const r=await ghTest();msg(`✅ شغّال: البطاقات تنبني في <span class="en">${esc(r.repo)}</span> (فرع ${GH_BR})${r.priv?"":" · المستودع عام، فملفات ANKI تنحفظ فيه 14 يوم وبعدها تنحذف"}.`)}
+    try{const r=await ghTest();msg(`✅ شغّال: البطاقات تنبني في <span class="en">${esc(r.repo)}</span> (فرع ${GH_BR})${r.priv?"":" · المستودع عام: البطاقات تمر على فرع anki-jobs، وتنشال منه بعد 14 يوم"}.`)}
     catch(x){msg(`<span class="late">❌ ${esc(ghErrMsg(x))}</span>`)}finally{e.target.disabled=false;ghRender()}};
   $("#ghDel").onclick=e=>{const b=e.currentTarget;if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟";setTimeout(()=>{b.dataset.sure="";b.textContent="احذف الـ token"},3000);return}
     aiSet({gh:""});$("#ghTok").value="";msg("انحذف من هالجهاز. احذفه من GitHub بعد لو ما تحتاجه.");ghRender()}}
@@ -6451,10 +6455,11 @@ const akErrMsg=e=>e&&e.code==="gh"?ghErrMsg(e):e&&e.code==="akslides"?"ما عن
 function akStart(id,how,flN,D0){if(AKRUN[id])return AKRUN[id];
   const run={how,t:"",ctl:new AbortController(),subs:new Set()};AKRUN[id]=run;
   const step=t=>{run.t=t;run.subs.forEach(f=>{try{f(t)}catch(e){}})};
-  run.p=(async()=>{try{
-      const D=how==="build"?D0:how==="redo"?await akRedo(D0,flN,step,run.ctl.signal):await akGenerate(id,flN,step,run.ctl.signal);
+  run.p=(async()=>{let D=how==="build"?D0:null;try{
+      if(!D)D=how==="redo"?await akRedo(D0,flN,step,run.ctl.signal):await akGenerate(id,flN,step,run.ctl.signal);
       if(ghOn()){try{await ghBuild(D,step,run.ctl.signal)}catch(e){if(e.code==="abort")throw e;run.bErr=e}}
       run.D=D;return D}
+    catch(e){if(e&&e.code==="abort"&&D&&D.job&&D.job.st==="wait"){D.job.st="stop";try{await aiPut("decks",D.id,D)}catch(x){}}throw e}
     finally{delete AKRUN[id]}})();
   run.p.then(D=>{if(!document.querySelector(`#akBox[data-id="${CSS.escape(id)}"]`))toast(run.bErr?`🃏 البطاقات جاهزة بس الملف ما انبنى: ${akErrMsg(run.bErr)}`:`🃏 بطاقات «${label(BY_ID[id]||{kind:"lec"})}» جاهزة (${D.cards.length}) · افتح 🃏`)},
     e=>{if(e.code!=="abort"&&!document.querySelector(`#akBox[data-id="${CSS.escape(id)}"]`))toast("❌ ANKI: "+akErrMsg(e))});
@@ -6502,10 +6507,10 @@ function sheetAnki(id){
     // ✅ the deck, in the prompt's output order: the count line → the file → the coverage line + slide errors
     const show=bErr=>{freshTap();const q=D.qa||akQA(D),j=D.job,dist=[0,0,0,0];D.out.forEach(x=>dist[AKL.indexOf(x.answer)]++);
       const m=mk(id),wk=D.cards.filter(x=>x.weak).length,main=D.cards.length-wk,done=!!m.anki&&+m.cards===D.cards.length,ok=j&&j.st==="ok";
-      const jerr=bErr?akErrMsg(bErr):j&&j.st==="err"?(j.err==="slow"?ghErrMsg({text:"slow"}):ghErrMsg({text:"build",msg:j.err})):"";
+      const jerr=bErr?akErrMsg(bErr):j&&j.st==="err"?(j.err==="slow"?ghErrMsg({text:"slow"}):ghErrMsg({text:"build",msg:j.err})):"",stopped=j&&j.st==="stop";
       const file=ok?`<div class="sh-act">${navigator.canShare?`<button class="btn primary big" id="akShare">📤 افتحه في ANKI</button>`:""}<button class="btn${navigator.canShare?"":" primary big"}" id="akDl">⬇️ نزّل <span class="en">${esc(D.file)}</span></button></div>`
-        :`<p class="ce ${jerr?"bad":"mid"}">${jerr?"❌ "+esc(jerr):ghOn()?"الملف ما انبنى للحين.":"⚠️ عشان ينبني ملف .apkg على GitHub، حط الـ token من الإعدادات ← 🤖 ← 🃏 بناء ANKI على GitHub."}</p>
-          <div class="frow">${ghOn()?`<button class="btn primary" id="akBuild">☁️ ابنِ الملف على GitHub</button>`:`<button class="btn sm" id="akSet">⚙️ الإعدادات</button>`}</div>`;
+        :`<p class="ce ${jerr?"bad":"mid"}">${jerr?"❌ "+esc(jerr):stopped?"⏸️ وقّفت متابعة GitHub. يمكن الملف انبنى هناك: اضغط تحت عشان أجيبه.":ghOn()?"الملف ما انبنى للحين.":"⚠️ عشان ينبني ملف .apkg على GitHub، حط الـ token من الإعدادات ← 🤖 ← 🃏 بناء ANKI على GitHub."}</p>
+          <div class="frow">${ghOn()?`<button class="btn primary" id="akBuild">${stopped?"☁️ كمّل وجيب الملف":"☁️ ابنِ الملف على GitHub"}</button>`:`<button class="btn sm" id="akSet">⚙️ الإعدادات</button>`}</div>`;
       const facts=[...D.facts,...(D.extra||[])];
       R.innerHTML=`<div class="akout"><p class="akline en" dir="ltr">${esc(D.line)}</p>${file}<p class="akline en" dir="ltr">${esc(q.cov)}</p>
           ${(D.slideErr||[]).map(e=>`<p class="akline akerr en" dir="ltr">⚠️ Slide error: ${esc(e)}</p>`).join("")}</div>
@@ -6522,7 +6527,7 @@ function sheetAnki(id){
           <button class="btn sm" id="akRedo"${aiOn()?"":" disabled"}>↺ بهالعدد (نفس المعلومات)</button><button class="btn sm" id="akNew"${aiOn()?"":" disabled"}>↺ من جديد</button></div>`;
       const q$=s=>R.querySelector(s);
       if(ok){const ref=akRef(D);akPreload(id,ref);if(q$("#akShare"))q$("#akShare").onclick=()=>akSend(id,ref,true);q$("#akDl").onclick=()=>akSend(id,ref,false)}
-      if(q$("#akBuild"))q$("#akBuild").onclick=()=>{if(D.job&&D.job.st!=="wait")D.job=null;watch(akStart(id,"build",0,D))};
+      if(q$("#akBuild"))q$("#akBuild").onclick=()=>{const jb=D.job;if(jb&&jb.st==="stop"&&Date.now()-jb.at<30*60e3)jb.st="wait";else if(jb&&jb.st!=="wait")D.job=null;watch(akStart(id,"build",0,D))};
       if(q$("#akSet"))q$("#akSet").onclick=()=>{closeSheet();setPage("settings")};
       q$("#akTxt").onclick=async()=>{const ok=await copyText(akPipe(D));toast(ok?"انسخت البطاقات (Stem | A | B | C | D | Answer | Explain | Why | Source | Tags)":"ما قدرت أنسخ")};
       if(q$("#akMark"))q$("#akMark").onclick=()=>{const m0=mk(id),n=D.cards.length;savePatch(id,{anki:m0.anki||todayISO,...(m0.anki?{}:{ankiAt:Date.now()}),cards:n,akc:n,ak:JSON.stringify({n,at:Date.now(),N:D.count.N,w:wk})});toast("انسجلت 🃏");show()};
@@ -6621,7 +6626,8 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
       <button class="btn dangerbtn" id="spCancel">إلغاء</button>`;
   else if(s.st==="done"){foot=`<p class="ce good">✅ تقسّمت لـ ${cnt(s.cn,"مقطع","مقطعين","مقاطع")} 🎬${s.fg?` · 👁️ ${cnt1(s.fg,"صورة وحدة","صورتين","صور")}`:""}</p>`;
     setTimeout(()=>{if(csOpen()&&CSV.v==="prog"&&CSV.lid===lid)csGo("main")},1800)}
-  else if(s.st==="ready")foot=`<p class="sh-note">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="sh-act"><button class="btn primary big" id="spOk">💾 احفظ الجديدة (${s.cn})</button><button class="btn" id="spKeep">✕ خلّ القديمة</button></div>`;
+  else if(s.st==="ready")foot=!s.own&&s.big?`<p class="sh-note">المقاطع الجديدة (${s.cn}) جاهزة على ${esc(s.dn||"جهازك الثاني")}، وهي كبيرة على المزامنة: احفظها من هناك.</p>`
+    :`<p class="sh-note">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="sh-act"><button class="btn primary big" id="spOk">💾 احفظ الجديدة (${s.cn})</button><button class="btn" id="spKeep">✕ خلّ القديمة</button></div>`;
   else if(s.st==="err")foot=`<p class="ce bad">❌ ${esc(s.err||"ما تقسّمت")}</p><div class="sh-act">${can&&gid?`<button class="btn primary big" id="spRe">🔁 جرّب مرة ثانية</button>`:""}<button class="btn" id="spDrop">إلغاء</button></div>`;
   A.innerHTML=`<div class="spw"><div class="sh-ic">✂️</div><h2 class="sh-t">${run?"يقسّم المحاضرة":s.st==="err"?"ما تقسّمت":"خلص التقسيم"}</h2><p class="sh-s en">${esc(label(b))}</p>
     ${s.nm?`<p class="sh-note en">📄 ${esc(s.nm)}</p>`:""}
@@ -6631,7 +6637,7 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
   if(q("#spCancel"))q("#spCancel").onclick=e=>{const x=e.currentTarget;if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية عشان توقف التقسيم";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="إلغاء"}},3500);return}
     spCancel(lid);toast("انلغى التقسيم");csGo("main")};
   if(q("#spTake"))q("#spTake").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
-  if(q("#spOk"))q("#spOk").onclick=()=>{spApplyReady(lid);closeSheet()};
+  if(q("#spOk"))q("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};
   if(q("#spKeep"))q("#spKeep").onclick=()=>{spSettle(lid,s,"x");csGo("main")};
   if(q("#spRe"))q("#spRe").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
   if(q("#spDrop"))q("#spDrop").onclick=()=>{if(s.own)spDrop(lid);else spSettle(lid,s,"x");csGo("main")}}
@@ -6653,7 +6659,7 @@ function spBoxDraw(sp,lid,force){if(!sp.isConnected)return;if(!force&&sp.contain
   if(s&&(s.st==="text"||s.st==="kimi")){sp.innerHTML=`<p class="note sp-line" style="margin:0">${line}</p><div class="frow"><button class="btn primary sm" id="spSee">📊 شوف النسبة</button></div>`;
     sp.querySelector("#spSee").onclick=()=>csGo("prog");return}
   if(s&&s.st==="ready"){sp.innerHTML=`<p class="note" style="margin:0">${line}</p><p class="sh-note" style="margin:0">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="frow"><button class="btn primary sm" id="spOk">💾 احفظ الجديدة</button><button class="btn sm" id="spX">✕ خلّ القديمة</button></div>`;
-    sp.querySelector("#spOk").onclick=()=>{spApplyReady(lid);closeSheet()};sp.querySelector("#spX").onclick=()=>{spSettle(lid,s,"x");spBoxDraw(sp,lid,true)};return}
+    sp.querySelector("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};sp.querySelector("#spX").onclick=()=>{spSettle(lid,s,"x");spBoxDraw(sp,lid,true)};return}
   const gid=s?(s.own?s.j.gid:s.sj&&s.sj.gid):"";
   const head=s&&s.st==="err"?`<p class="note" style="margin:0"><span class="late">${line}</span></p><div class="frow">${gid?`<button class="btn primary sm" id="spRe">🔁 جرّب مرة ثانية</button>`:""}<button class="btn sm" id="spX">✕</button></div>`
     :s&&s.st==="done"&&line?`<p class="note" style="margin:0">${line}</p><div class="frow"><button class="btn primary sm" id="spDone">تمام 👍</button></div>`:"";

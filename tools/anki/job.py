@@ -5,7 +5,7 @@ The study site (index.html) puts the cards Kimi wrote into the `anki-jobs` branc
 then asks GitHub to run this. For each waiting job it writes:
   out/<id>.apkg  the deck (made by build_apkg.py, unchanged)
   out/<id>.json  the status the site reads: {"ok": true, ...} or {"ok": false, "errors": [...]}
-Usage: python3 job.py <jobs-branch-checkout>
+Usage: python3 job.py <jobs-branch-checkout> [done-list-file]
 Standard library only. Nothing from a job is ever run as code or used as a path.
 """
 import json, os, re, shutil, subprocess, sys, tempfile, time
@@ -13,7 +13,7 @@ import json, os, re, shutil, subprocess, sys, tempfile, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 BUILDER = os.path.join(HERE, "build_apkg.py")
 ID_RE = re.compile(r"^[a-z0-9]{8,40}$")
-MAX_CARDS, MAX_TEXT, MAX_INPUT = 400, 4000, 3 * 1024 * 1024
+MAX_CARDS, MAX_TEXT, MAX_INPUT = 400, 20000, 3 * 1024 * 1024   # caps are a safety net only: never below what the site sends (HTML-escaped)
 KEEP_DAYS = 14
 TYPES = ("Direct", "Analytic", "Hard")
 CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -41,11 +41,11 @@ def clean_card(c):
         "hy": c.get("hy") is True,
         "stem": text(c.get("stem")),
         "image": "", "image_back": "",          # picture cards are off for now: nothing from a job becomes a file path
-        "options": {k: text(o.get(k), 600) for k in "ABCD" if k in o},
+        "options": {k: text(o.get(k)) for k in "ABCD" if k in o},
         "answer": a,
         "explain": text(c.get("explain")),
-        "why": {k: text(w.get(k), 800) for k in "ABCD" if k in w},
-        "warning": text(c.get("warning"), 800),
+        "why": {k: text(w.get(k)) for k in "ABCD" if k in w},
+        "warning": text(c.get("warning")),
         "source": text(c.get("source"), 120),
     }
 
@@ -104,7 +104,7 @@ def sweep(out_dir, now):
                     pass
 
 
-def main(root):
+def main(root, done_file=None):
     in_dir, out_dir = os.path.join(root, "in"), os.path.join(root, "out")
     os.makedirs(in_dir, exist_ok=True)
     os.makedirs(out_dir, exist_ok=True)
@@ -129,13 +129,16 @@ def main(root):
             json.dump(st, f, ensure_ascii=False)
         os.remove(path)
         done += 1
+        if done_file:
+            with open(done_file, "a", encoding="utf-8") as f:
+                f.write(job_id + "\n")
         print(f"{job_id}: {'OK' if st['ok'] else 'FAILED'} {st.get('msg') or '; '.join(st.get('errors', []))[:300]}")
     sweep(out_dir, int(time.time()))
     print(f"{done} job(s)")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or not os.path.isdir(sys.argv[1]):
-        print("usage: job.py <jobs-branch-checkout>")
+    if len(sys.argv) not in (2, 3) or not os.path.isdir(sys.argv[1]):
+        print("usage: job.py <jobs-branch-checkout> [file listing the job ids built]")
         sys.exit(2)
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2] if len(sys.argv) == 3 else None)

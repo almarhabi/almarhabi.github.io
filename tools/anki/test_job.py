@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Checks for job.py + build_apkg.py. Run: python3 tools/anki/test_job.py"""
-import json, os, sqlite3, sys, tempfile, time, unittest, zipfile
+import json, os, re, shutil, sqlite3, sys, tempfile, time, unittest, zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import job  # noqa: E402
@@ -27,6 +27,9 @@ class JobTests(unittest.TestCase):
     def setUp(self):
         self.root = tempfile.mkdtemp()
         os.makedirs(os.path.join(self.root, "in"))
+
+    def tearDown(self):
+        shutil.rmtree(self.root, ignore_errors=True)
 
     def put(self, jid, spec):
         with open(os.path.join(self.root, "in", jid + ".json"), "w", encoding="utf-8") as f:
@@ -83,12 +86,15 @@ class JobTests(unittest.TestCase):
 
     def test_junk_and_bad_files(self):
         self.put("abcdefgh4", "{not json")
-        self.put("../../evil", {"cards": deck_cards(2)})
+        self.put("Bad Name!", {"cards": deck_cards(2)})     # not a job id: removed, never built
         with open(os.path.join(self.root, "in", "x.txt"), "w") as f:
             f.write("junk")
-        job.main(self.root)
+        done = os.path.join(self.root, "done.txt")
+        job.main(self.root, done)
         self.assertFalse(self.status("abcdefgh4")["ok"])
         self.assertEqual(os.listdir(os.path.join(self.root, "in")), [])
+        self.assertEqual(sorted(os.listdir(os.path.join(self.root, "out"))), ["abcdefgh4.json"])
+        self.assertEqual(open(done).read().split(), ["abcdefgh4"])
 
     def test_paths_from_a_job_are_ignored(self):
         c = deck_cards(2)
@@ -106,6 +112,16 @@ class JobTests(unittest.TestCase):
         open(os.path.join(out, "oldjob123.apkg"), "wb").close()
         job.main(self.root)
         self.assertEqual(os.listdir(out), [])
+
+
+class SiteCopyTests(unittest.TestCase):
+    def test_site_uses_this_prompt(self):
+        """index.html carries a copy of PROMPT.md (Kimi gets it from there): the two must stay identical."""
+        here = os.path.dirname(os.path.abspath(__file__))
+        html = open(os.path.join(here, "..", "..", "index.html"), encoding="utf-8").read()
+        m = re.search(r'const AK_PROMPT=("(?:[^"\\]|\\.)*");', html)
+        self.assertIsNotNone(m)
+        self.assertEqual(json.loads(m.group(1)), open(os.path.join(here, "PROMPT.md"), encoding="utf-8").read().strip())
 
 
 if __name__ == "__main__":
