@@ -1504,7 +1504,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6.1</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6.2</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -3462,6 +3462,22 @@ function clipPrompt(b){
   ].join("\n");
 }
 // Claude's reply → clean clips, or a clear Arabic reason why not
+// ✂️ the 4-slide floor: a clip under 4 slides joins its shorter neighbour (its key points and minutes go along)
+const MIN_SL=4;
+function clipFloor(c){let mg=0;if(!c.length||!(c[0].f>0))return 0;
+  for(let i=0;i<c.length&&c.length>1;){const x=c[i];if(x.t-x.f+1>=MIN_SL){i++;continue}
+    const L=i>0?c[i-1]:null,R=i<c.length-1?c[i+1]:null,t=!L?R:!R?L:(L.t-L.f<=R.t-R.f?L:R);
+    t.f=Math.min(t.f,x.f);t.t=Math.max(t.t,x.t);t.k=[...t.k,...x.k].slice(0,6);t.mi=Math.min(60,t.mi+x.mi);c.splice(i,1);mg++}
+  return mg}
+// clips saved before the floor existed: fixed too, as long as you haven't started them (their progress belongs to those exact clips)
+function clipFloorAll(){if(!achReady||(syncPlanned()&&!merged))return;const a=activeSession();let n=0;
+  ALL.filter(needsStudy).forEach(b=>{if(a&&a.id===b.id)return;const o=sjson(mk(b.id).clips,null);if(!isObj(o)||!Array.isArray(o.c)||o.c.length<2)return;
+    const p=cprOf(b.id);if(p.i>0||p.t.some(Boolean)||p.r.some(Boolean)||p.m.some(x=>x&&x.length))return;
+    const c=o.c.filter(Array.isArray).map(x=>({f:Math.round(+x[0]||0),t:Math.round(+x[1]||0),h:x[2],ar:x[3],mi:+x[4]||0,hk:x[5],k:Array.isArray(x[6])?x[6]:[],y:x[7],p:x[8]}));
+    if(!clipFloor(c))return;n++;
+    savePatch(b.id,{clips:JSON.stringify({...o,c:c.map(x=>[x.f,x.t,x.h,x.ar,x.mi,x.hk,x.k,x.y,x.p])}),cpr:false})});
+  if(n)toast(`✂️ دمجت المقاطع القصيرة (أقل من ${MIN_SL} شرائح) في ${cnt(n,"محاضرة","محاضرتين","محاضرات")} ما بديتها`)}
+[6e3,3e4,12e4].forEach(t=>setTimeout(()=>{try{clipFloorAll()}catch(e){console.warn(e)}},t));   // once your data has arrived from the sync
 function parseClips(text,b){
   let s=String(text||"").trim();if(!s)return{err:"الصق رد Claude أول."};
   const fence=s.match(/```(?:json)?\s*([\s\S]*?)```/i);if(fence&&fence[1].includes("{"))s=fence[1];
@@ -3484,12 +3500,8 @@ function parseClips(text,b){
   let n=Math.max(0,Math.round(+o.slides||0));const last=c[c.length-1].t;
   if(last&&n>last){c[c.length-1].t=n;warn.add(`مدّيت آخر مقطع لين آخر شريحة (${n}).`)}
   if(!n)n=last;
-  // ✂️ no clip under 4 slides (whoever split it: Kimi, a file, or Claude): a short one joins its shorter neighbour, its points go along
-  const MIN_SL=4;if(c[0].f>0){let mg=0;
-    for(let i=0;i<c.length&&c.length>1;){const x=c[i];if(x.t-x.f+1>=MIN_SL){i++;continue}
-      const L=i>0?c[i-1]:null,R=i<c.length-1?c[i+1]:null,t=!L?R:!R?L:(L.t-L.f<=R.t-R.f?L:R);
-      t.f=Math.min(t.f,x.f);t.t=Math.max(t.t,x.t);t.k=[...t.k,...x.k].slice(0,6);t.mi=Math.min(60,t.mi+x.mi);c.splice(i,1);mg++}
-    if(mg)warn.add(`دمجت ${mg===1?"مقطع قصير":mg+" مقاطع قصيرة"} (أقل من ${MIN_SL} شرائح) مع اللي جنبه.`)}
+  // ✂️ no clip under 4 slides (whoever split it: Kimi, a file, or Claude) — checked here in code, not only asked of the AI
+  {const mg=clipFloor(c);if(mg)warn.add(`دمجت ${mg===1?"مقطع قصير":mg+" مقاطع قصيرة"} (أقل من ${MIN_SL} شرائح) مع اللي جنبه.`)}
   c.forEach(x=>{if(!x.p)x.p=`اذكر كل اللي تتذكره عن ${x.h}`});
   if(c.some(x=>!x.k.length))warn.add("بعض المقاطع بدون نقاط مفتاحية، بتقارن فيها بالشرائح.");
   const want=norm(label(b)),got=norm(String(o.lecture||""));
@@ -6723,7 +6735,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.6.1";
+const RN_DEV="ghrunner",APPV="20.6.2";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
