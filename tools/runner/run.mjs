@@ -2,7 +2,7 @@
 // It opens the study site (this checkout's index.html) in headless Chrome as one more "device" of yours. The page, in runner
 // mode, does what your devices asked (split a lecture, make an ANKI deck) and the background analysis, syncs it, and says when
 // it's done; then this closes it. Everything it needs comes from ONE secret, UQU_RUNNER, made by the site
-// (Settings → 🤖 → ☁️ الشغل أونلاين). No key is ever printed (every value is masked) or saved between runs.
+// (Settings → 🤖 → 🃏 بناء ANKI على GitHub → ☁️). No key is ever printed (every value is masked) or saved between runs.
 import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
@@ -21,7 +21,7 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 // ---- the secret
 const raw = (process.env.UQU_RUNNER || "").trim();
 if (!raw) {   // not set up yet: a quiet success, so the hourly schedule doesn't flood you with failure emails
-  console.log("::notice::UQU_RUNNER is not set yet. Make it from the site: Settings → 🤖 → ☁️ الشغل أونلاين على GitHub.");
+  console.log("::notice::UQU_RUNNER is not set yet. Make it from the site: Settings → 🤖 → 🃏 بناء ANKI على GitHub → ☁️ يكمل لحاله لو طلعت من الموقع.");
   process.exit(0);
 }
 let cfg;

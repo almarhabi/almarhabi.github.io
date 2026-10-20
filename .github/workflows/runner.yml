@@ -1,7 +1,7 @@
 # ☁️ The runner: the study site itself (index.html), opened headless on GitHub's servers as one more device of yours.
 # It splits the lectures and makes the ANKI decks your devices asked for, and runs the background analysis (the coach,
 # the morning questions, the week report) every hour, even when you don't open the site. See tools/runner/run.mjs.
-# Needs ONE repository secret, UQU_RUNNER, made by the site (Settings → 🤖 → ☁️ الشغل أونلاين على GitHub).
+# Needs ONE repository secret, UQU_RUNNER, made by the site (Settings → 🤖 → 🃏 بناء ANKI على GitHub → ☁️).
 name: runner
 
 on:
@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install playwright-core (Chrome is already on the runner)
         run: npm install --prefix tools/runner --no-audit --no-fund --loglevel=error
