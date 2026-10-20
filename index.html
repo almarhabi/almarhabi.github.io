@@ -996,7 +996,7 @@ img{-webkit-touch-callout:none}
 .ov.in::before{animation:dimIn .38s ease-out}
 .ov.in>.ovbox{animation:shPop .46s var(--ease)}
 .ov.swap>.ovbox{animation:shSwap .3s var(--ease)}
-.ovghost{pointer-events:none;z-index:51}.ovghost::before{animation:dimOut .3s ease-in forwards}
+.ovghost{pointer-events:none;z-index:49}.ovghost::before{animation:dimOut .3s ease-in forwards}
 @media (max-width:640px){
   .ov{align-items:flex-end;padding:max(12px,env(safe-area-inset-top,0px)) 0 0}
   .ovbox{width:100%;border-radius:22px 22px 0 0;padding:32px 18px max(22px,calc(env(safe-area-inset-bottom,0px) + 14px));box-shadow:0 -10px 40px rgb(0 0 0 / .25)}
@@ -1008,8 +1008,7 @@ img{-webkit-touch-callout:none}
 .drawer:not([hidden])::before{animation:dimIn .3s ease-out}
 @keyframes drOut{to{transform:translateX(100%)}}
 .drawer.out{pointer-events:none}.drawer.out::before{animation:dimOut .26s ease-in forwards}.drawer.out .dr-box{animation:drOut .26s cubic-bezier(.4,0,1,1) forwards}
-/* rows and cards off screen aren't laid out until you scroll to them (switching pages stays light) */
-.task,.card:not([data-open="true"]){content-visibility:auto;contain-intrinsic-size:auto 64px}
+/* settings sections off screen aren't laid out until you scroll to them (switching pages stays light) */
 #pg-settings>.rpage{content-visibility:auto;contain-intrinsic-size:auto 280px}
 html.lowmo .ov.in::before,html.lowmo .ov.in>.ovbox,html.lowmo .ov.swap>.ovbox,html.lowmo .dr-box,html.lowmo .drawer::before{animation:none!important}
 @media (prefers-reduced-motion:reduce){.ov.in::before,.ov.in>.ovbox,.ov.swap>.ovbox,.dr-box,.drawer::before,.drawer.out .dr-box{animation:none!important}}
@@ -2178,7 +2177,7 @@ function unsetStudied(id){if(blockUndo(id,"studied"))return;savePatch(id,{studie
 const LOCKED=["rev1","rev2","anki","ankiS"];
 function flashLock(id){
   st.lockFlash=id;st.open=id;render();
-  const el=document.querySelector(`#c-${CSS.escape(id)} .lockmsg`);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+  const el=document.querySelector(`#c-${CSS.escape(id)} .lockmsg`);if(el&&el.classList.contains("flash")){el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
   setTimeout(()=>{if(st.lockFlash===id)st.lockFlash=null},1600);
 }
 function clickMark(id,f,ok){
@@ -2234,7 +2233,7 @@ function bindPrompts(root){
     const t0=b.textContent;b.disabled=true;b.textContent="…";
     const bl=await recBlob(id,rid,r,t=>{if(b.isConnected)b.textContent=t}).catch(()=>null);
     const btn=b.isConnected?b:document.querySelector(`[data-play="${id}|${rid}"]`);if(btn){btn.disabled=false;btn.textContent=t0}
-    if(!bl){if(btn)btn.textContent=r.w==="local"?"محفوظ على جهاز ثاني":"غير متاح";return}
+    if(!bl){if(btn){btn.textContent=r.w==="local"?"محفوظ على جهاز ثاني":"غير متاح";setTimeout(()=>{if(btn.isConnected)btn.textContent=t0},3000)}return}
     playNow(bl,`${label(BY_ID[id])} · ${REC_ST[r.st||"s"]}`)});
   root.querySelectorAll("[data-recdel]").forEach(b=>b.onclick=()=>{const [id,rid]=b.dataset.recdel.split("|"),r=(mk(id).recs||{})[rid];if(!r)return;
     if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟";setTimeout(()=>{b.dataset.sure="";b.textContent="حذف"},3000);return}
@@ -2255,13 +2254,13 @@ const H=el=>({set h(v){if(!el)return;if(el.__h===v&&el.firstChild===el.__f&&el.c
 // ---------- full-screen sheets ----------
 let sheetCleanup=null,SGH=null;
 function openSheet(html,bind){
-  const o=$("#ov"),was=!o.hidden;
+  const o=$("#ov"),was=!o.hidden||!!SGH;
   closeSheet(true,true);
   if(SGH){SGH.remove();SGH=null}   // one sheet replaces another: the new one fades in where the old one was
-  o.dataset.t0=Date.now();o.innerHTML=`<div class="ovbox" role="dialog" aria-modal="true"><button class="ovx" aria-label="إغلاق">×</button>${html}</div>`;
+  o.__dirty=0;o.dataset.t0=Date.now();o.innerHTML=`<div class="ovbox" role="dialog" aria-modal="true"><button class="ovx" aria-label="إغلاق">×</button>${html}</div>`;
   o.classList.toggle("in",!was);o.classList.toggle("swap",was);o.style.removeProperty("--dim");
   o.hidden=false;document.documentElement.classList.add("noscroll");
-  o.querySelector(".ovx").onclick=closeSheet;
+  o.querySelector(".ovx").onclick=()=>closeSheet();
   if(bind)bind(o.querySelector(".ovbox"));
 }
 const freshTap=()=>{const o=$("#ov");if(o)o.dataset.t0=Date.now()};
@@ -2289,11 +2288,12 @@ document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#ov").
   const o=$("#ov");let d=null;
   const no=t=>!!(t.closest&&t.closest("input,textarea,select,[contenteditable],canvas,audio,video,.scr,.no-drag,.wipe-hold"));
   const back=(box,y)=>{box.style.transform="";o.style.removeProperty("--dim");anim(box,[{transform:`translateY(${y}px)`},{transform:"translateY(0)"}],{duration:420,easing:EASE})};
-  o.addEventListener("touchstart",e=>{d=null;if(!isPhone()||!motionOn()||e.touches.length!==1)return;const box=o.querySelector(".ovbox");if(!box||!box.contains(e.target)||no(e.target))return;
+  ["input","change"].forEach(ev=>o.addEventListener(ev,()=>{o.__dirty=1}));   // you typed or picked something: only ✕ closes it now
+  o.addEventListener("touchstart",e=>{d=null;if(!isPhone()||!motionOn()||e.touches.length!==1||o.__dirty||st.recOn)return;const box=o.querySelector(".ovbox");if(!box||!box.contains(e.target)||no(e.target))return;
     for(let el=e.target;el&&el!==box;el=el.parentElement)if(el.scrollTop>0)return;   // a list inside that's scrolled scrolls first
     const t=e.touches[0];d={box,x0:t.clientX,y0:t.clientY,on:false,y:0,v:[[t.clientY,e.timeStamp]]}},{passive:true});
   o.addEventListener("touchmove",e=>{if(!d)return;const t=e.touches[0],dx=t.clientX-d.x0,dy=t.clientY-d.y0;
-    if(!d.on){if(d.box.scrollTop>0||dy<-6||Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)){d=null;return}if(dy<8)return;d.on=true;d.y0=t.clientY;d.box.style.transition="none"}
+    if(!d.on){if(d.box.scrollTop>0||dy<-6||Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)){d=null;return}if(dy>0&&Math.abs(dy)>=Math.abs(dx))e.preventDefault();if(dy<8)return;d.on=true;d.y0=t.clientY;d.box.style.transition="none"}
     e.preventDefault();const y=Math.max(0,t.clientY-d.y0);d.y=y;d.box.style.transform=`translateY(${y}px)`;
     o.style.setProperty("--dim",(1-Math.min(1,y/Math.max(1,d.box.offsetHeight))).toFixed(3));d.v.push([t.clientY,e.timeStamp]);if(d.v.length>6)d.v.shift()},{passive:false});
   const end=()=>{if(!d||!d.on){d=null;return}const {box,y,v}=d;d=null;const a=v[0],z=v[v.length-1],vel=z[1]>a[1]?(z[0]-a[0])/(z[1]-a[1]):0;
@@ -2746,7 +2746,7 @@ function drawSleep(){
   box.innerHTML=`<button class="ovx" aria-label="إغلاق">×</button><div class="sh-ic">🌙</div><p class="sh-s">${r.i+1} من ${r.list.length} · غمّض عينك واسترجع</p>
     <h2 class="sh-t en sl-topic">${esc(label(r.list[r.i]))}</h2><div class="ring"><b class="num" id="slT">${left}</b><small>ثانية</small></div>
     <div class="sh-act"><button class="btn primary big" id="slNext">التالي</button><button class="btn" id="slStop">إيقاف</button></div>`;
-  box.querySelector(".ovx").onclick=closeSheet;
+  box.querySelector(".ovx").onclick=()=>closeSheet();
   box.querySelector("#slNext").onclick=advanceSleep;
   box.querySelector("#slStop").onclick=()=>{sleepRun=null;sheetSleep()};
 }
@@ -2824,7 +2824,7 @@ function sheetPodcast(key){
       ${cur?`<div class="podnow"><span class="sh-note">${i+1} من ${items.length}</span><b class="en">${esc(label(cur.b))}</b>${cur.r.t?`<p class="podt">${esc(cur.r.t)}</p>`:""}</div>
       <div class="podctl"><button class="btn" id="pPrev" aria-label="المحاضرة السابقة">⏮</button><button class="btn sm" id="pBk" aria-label="رجوع 5 ثواني">⏪ 5</button><button class="btn primary big" id="pPlay">${playing?"⏸ إيقاف":"▶︎ تشغيل"}</button><button class="btn sm" id="pFw" aria-label="تقديم 5 ثواني">5 ⏩</button><button class="btn" id="pNext" aria-label="المحاضرة الجاية">⏭</button></div>`:""}
       ${knots.length?`<div class="podk"><div class="kh">🧩 عُقد الفهم اللي حليتها</div>${knots.map(k=>`<div class="kn ok"><span class="kt">${esc(k.t)}</span><span class="mini en">${esc(label(k.b))}</span></div>`).join("")}</div>`:""}`;
-    box.querySelector(".ovx").onclick=closeSheet;
+    box.querySelector(".ovx").onclick=()=>closeSheet();
     if(!cur)return;
     box.querySelector("#pPlay").onclick=()=>{if(playing){stop();draw()}else{playing=true;playCur();draw()}};
     box.querySelector("#pPrev").onclick=()=>{stop();i=Math.max(0,i-1);playing=true;playCur();draw()};
@@ -5078,7 +5078,7 @@ function bindCards(root){
   root.querySelectorAll("[data-clipset]").forEach(b=>b.onclick=()=>sheetClipSetup(b.dataset.clipset,null));
   root.querySelectorAll("[data-anki]").forEach(b=>b.onclick=()=>AIX(()=>sheetAnki(b.dataset.anki),null));
   root.querySelectorAll("[data-focus]").forEach(b=>b.onclick=()=>openFocus(b.dataset.focus));
-  root.querySelectorAll("[data-clipreset]").forEach(b=>b.onclick=()=>{if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟ ينشال تقدّمها ونقاطها";return}savePatch(b.dataset.clipreset,{cpr:false});toast("تصفّر تقدّم المقاطع")});
+  root.querySelectorAll("[data-clipreset]").forEach(b=>b.onclick=()=>{if(b.dataset.sure!=="1"){const t0=b.textContent;b.dataset.sure="1";b.textContent="متأكد؟ ينشال تقدّمها ونقاطها";setTimeout(()=>{if(b.isConnected&&b.dataset.sure==="1"){b.dataset.sure="";b.textContent=t0}},3500);return}savePatch(b.dataset.clipreset,{cpr:false});toast("تصفّر تقدّم المقاطع")});
   const ki=root.querySelector("#knotIn");if(ki){ki.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addKnot(st.knotFor)}}}
   root.querySelectorAll("[data-kdone]").forEach(b=>b.onclick=()=>{const [id,k]=b.dataset.kdone.split("|");const kn=knotsOf(id).find(x=>x.k===k);if(kn)setKnot(id,k,{...stripK(kn),d:kn.d?false:todayISO,at:kn.d?false:Date.now()})});
   root.querySelectorAll("[data-kdel]").forEach(b=>b.onclick=()=>{const [id,k]=b.dataset.kdel.split("|");setKnot(id,k,false)});
@@ -5121,9 +5121,9 @@ const typing=()=>{const a=document.activeElement;return!!(a&&(a.tagName==="INPUT
 document.addEventListener("focusout",()=>setTimeout(()=>{if(deferred&&!typing()){deferred=false;render()}},350));
 const safe=f=>{try{f()}catch(e){console.error(e)}};
 function render(){
+  safe(applyEdits);
   // don't wipe a knot the user is typing; repaint when they leave the field
   if(typing()){deferred=true;return}
-  safe(applyEdits);
   safe(()=>{lastSig=timeSig()});
   [ensureSit,renderHeader,renderSession,renderOfferBar,renderPage].forEach(safe);
   if(st.page==="main")safe(renderHub);
@@ -5194,12 +5194,13 @@ setInterval(()=>{todayISO=isoOf(new Date());try{if(timeSig()!==lastSig)render()}
 ["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{todayISO=isoOf(new Date())},true));
 // ▸ a panel (details) opens and closes with motion: its height follows, nothing jumps
 document.addEventListener("click",e=>{const sm=e.target.closest&&e.target.closest("summary");if(!sm||!motionOn()||e.defaultPrevented)return;const d=sm.parentElement;
-  if(!d||d.tagName!=="DETAILS"||sm!==d.querySelector(":scope>summary")||d.__anim)return;const ov=$("#ov");if(ov&&ov.contains(d)&&Date.now()-(+ov.dataset.t0||0)<320)return;const ia=e.target.closest("button,a,input,select,textarea,label");if(ia&&ia!==sm&&sm.contains(ia))return;
+  if(!d||d.tagName!=="DETAILS"||sm!==d.querySelector(":scope>summary"))return;
+  if(d.__anim){const closing=d.__closing;d.__anim.cancel();if(closing)e.preventDefault();return}   // tapped again mid-way: closing → stays open; opening → the browser closes itconst ov=$("#ov");if(ov&&ov.contains(d)&&Date.now()-(+ov.dataset.t0||0)<320)return;const ia=e.target.closest("button,a,input,select,textarea,label");if(ia&&ia!==sm&&sm.contains(ia))return;
   const cs=getComputedStyle(d),closedH=sm.offsetHeight+parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)+parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth);
-  const fin=()=>{d.style.overflow="";d.style.height="";d.__anim=null};
+  const fin=()=>{d.style.overflow="";d.style.height="";d.__anim=null;d.__closing=0};
   if(!d.open){requestAnimationFrame(()=>{if(!d.open)return;const h1=d.getBoundingClientRect().height;if(h1-closedH<4)return;d.style.overflow="clip";
       d.__anim=d.animate([{height:closedH+"px"},{height:h1+"px"}],{duration:Math.min(460,240+(h1-closedH)/6),easing:EASE});d.__anim.onfinish=fin;d.__anim.oncancel=fin})}
-  else{e.preventDefault();const h1=d.getBoundingClientRect().height;d.style.overflow="clip";
+  else{e.preventDefault();const h1=d.getBoundingClientRect().height;d.style.overflow="clip";d.__closing=1;
     d.__anim=d.animate([{height:h1+"px"},{height:closedH+"px"}],{duration:Math.min(380,200+(h1-closedH)/8),easing:EASE});d.__anim.onfinish=()=>{d.open=false;fin()};d.__anim.oncancel=fin}},true);
 ["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 document.addEventListener("touchstart",()=>{},{passive:true});   // lets :active (the press look) work on iOS
