@@ -1504,7 +1504,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6.1</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -3431,7 +3431,7 @@ function clipPrompt(b){
 "المطلوب: قسّم المحاضرة إلى «مقاطع» مذاكرة قصيرة، وجهّز لكل مقطع سؤال تشويق ونقاط مفتاحية وسؤال تفريغ، وأعطني النتيجة JSON فقط.",
 "",
 "قواعد التقسيم:",
-"1. المقطع من 5 إلى 9 شرائح، أو تقريبًا 10 إلى 15 دقيقة مذاكرة. الشرائح الكثيفة (آليات، مسارات، جداول) مقطعها أقصر، وشرائح الصور والعناوين أطول.",
+"1. المقطع من 4 إلى 9 شرائح (ولا مرة أقل من 4)، أو تقريبًا 10 إلى 15 دقيقة مذاكرة. الشرائح الكثيفة (آليات، مسارات، جداول) مقطعها أقصر، وشرائح الصور والعناوين أطول.",
 "2. لا تقطع فكرة أو آلية في نصها؛ حدود المقطع تكون عند تغيّر الموضوع.",
 "3. غطِّ كل الشرائح بالترتيب بدون فراغات ولا تداخل: أول مقطع يبدأ من الشريحة 1، وكل مقطع يبدأ بعد نهاية اللي قبله مباشرة، وآخر مقطع ينتهي عند آخر شريحة.",
 "4. شرائح الغلاف والأهداف (Objectives) والمراجع ادمجها مع أقرب مقطع.",
@@ -3484,6 +3484,12 @@ function parseClips(text,b){
   let n=Math.max(0,Math.round(+o.slides||0));const last=c[c.length-1].t;
   if(last&&n>last){c[c.length-1].t=n;warn.add(`مدّيت آخر مقطع لين آخر شريحة (${n}).`)}
   if(!n)n=last;
+  // ✂️ no clip under 4 slides (whoever split it: Kimi, a file, or Claude): a short one joins its shorter neighbour, its points go along
+  const MIN_SL=4;if(c[0].f>0){let mg=0;
+    for(let i=0;i<c.length&&c.length>1;){const x=c[i];if(x.t-x.f+1>=MIN_SL){i++;continue}
+      const L=i>0?c[i-1]:null,R=i<c.length-1?c[i+1]:null,t=!L?R:!R?L:(L.t-L.f<=R.t-R.f?L:R);
+      t.f=Math.min(t.f,x.f);t.t=Math.max(t.t,x.t);t.k=[...t.k,...x.k].slice(0,6);t.mi=Math.min(60,t.mi+x.mi);c.splice(i,1);mg++}
+    if(mg)warn.add(`دمجت ${mg===1?"مقطع قصير":mg+" مقاطع قصيرة"} (أقل من ${MIN_SL} شرائح) مع اللي جنبه.`)}
   c.forEach(x=>{if(!x.p)x.p=`اذكر كل اللي تتذكره عن ${x.h}`});
   if(c.some(x=>!x.k.length))warn.add("بعض المقاطع بدون نقاط مفتاحية، بتقارن فيها بالشرائح.");
   const want=norm(label(b)),got=norm(String(o.lecture||""));
@@ -6070,7 +6076,7 @@ function packSlides(pages,keepAll){
   return{n,txt,empty,cut,raw:lines.reduce((a,L)=>a+L.join(" ").length,0),chars:txt.length}}
 const SPLIT_RULES=`TASK=split
 Cut this lecture into short study clips. SLIDES are "S<n>: text" ("·" = picture-only slide).
-Rules: each clip 5–9 slides (~10–15 min); dense slides (mechanisms, pathways, tables) → shorter clips, picture/title slides → longer; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
+Rules: each clip 4–9 slides (~10–15 min), NEVER fewer than 4 slides; dense slides (mechanisms, pathways, tables) → shorter clips, picture/title slides → longer; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
 Per clip: "title" English title as on the slides; "ar" Arabic title 2–5 words; "from"/"to" first and last slide; "min" expected minutes; "hook" ONE curiosity question in Arabic (English terms kept) that the clip answers, without giving the answer; "keys" 3–5 high-yield points in English, slide wording, one short line each; "type" the blurt type, one of free, child, exam, link, clinic, why, compare — vary them, never the same type in two clips in a row, no "link" in the first clip; "prompt" the blurt question in Arabic (English terms kept) matching its type: free: اذكر كل اللي تتذكره عن … · child: اشرح … لطفل عمره 10 سنين · exam: وش السؤال اللي ممكن يجي على … في الاختبار؟ وجاوبه · link: وش علاقة … بـ … (من مقطع سابق)؟ · clinic: وين تظهر الأهمية السريرية لـ …؟ · why: ليش …؟ · compare: قارن بين … و …
 "lecture" = the lecture title as on the slides.`;
 const SPLIT_S=sObj({lecture:S_STR,clips:sArr(sObj({title:S_STR,ar:S_STR,from:S_INT,to:S_INT,min:S_INT,hook:S_STR,keys:sArr(S_STR),type:{type:"string",enum:Object.keys(CLIP_T)},prompt:S_STR}))});
@@ -6717,7 +6723,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.6";
+const RN_DEV="ghrunner",APPV="20.6.1";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
