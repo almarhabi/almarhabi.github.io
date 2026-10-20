@@ -974,13 +974,16 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
 
 /* ===== v20.5: feels like an app — no zoom, Apple motion (sheets, drawer, pages, cards, toast), instant press ===== */
 :root{--ease:cubic-bezier(.32,.72,0,1);--spring:cubic-bezier(.34,1.3,.64,1)}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y;-webkit-tap-highlight-color:transparent}
-button,summary,label,a,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+*{touch-action:pan-x pan-y}   /* every element only scrolls: no pinch, no double-tap zoom (canvas games keep their own «none») */
+button,summary,label,a,[role="button"]{-webkit-tap-highlight-color:transparent}
+/* iOS zooms into a text field whose text is under 16px: never on this site */
+@supports (-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea,select{font-size:max(16px,1em)!important}}
 button,summary,[role="button"]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 img{-webkit-touch-callout:none}
 /* the thing you touch answers at once */
-.btn,.chip,.wk,.day,.doc,.back,.pc,.gdb-i,.lc-tile,.ovx,.spban,.cs-warn,.gx,.gb,.dr-i,.lc-wipe,.ob-next{transition:transform .2s var(--ease),background-color .2s,opacity .2s}
-:is(.btn,.chip,.wk,.day,.doc,.back,.pc,.gdb-i,.lc-tile,.ovx,.spban,.cs-warn,.gx,.gb,.lc-wipe,.ob-next):active:not(:disabled){transform:scale(.96);transition-duration:.08s}
+.btn,.chip,.wk,.day,.doc,.back,.pc,.gdb-i,.lc-tile,.ovx,.spban,.cs-warn,.gx,.gb,.dr-i,.lc-wipe,.ob-next,.burger,.thinkbtn,.seg button,.head .chev{transition:transform var(--spring-d,.4s) var(--spring,var(--ease)),background-color .2s,opacity .2s}
+:is(.btn,.chip,.wk,.day,.doc,.back,.pc,.gdb-i,.lc-tile,.ovx,.spban,.cs-warn,.gx,.gb,.lc-wipe,.ob-next,.burger,.thinkbtn,.seg button):active:not(:disabled){transform:scale(.95);transition:transform .1s ease-out}
 .dr-i:active{background:var(--surface-2);transform:scale(.98);transition-duration:.08s}
 .head{transition:background-color .25s}.head:active{background:color-mix(in srgb,var(--ink) 5%,transparent);transition-duration:0s}
 /* sheets: slide up from the bottom on a phone (with a handle you can pull down), a soft pop on the iPad */
@@ -994,17 +997,17 @@ img{-webkit-touch-callout:none}
 @keyframes shUp{from{transform:translateY(100%)}}
 @keyframes shSwap{from{opacity:0;transform:translateY(12px)}}
 .ov.in::before{animation:dimIn .38s ease-out}
-.ov.in>.ovbox{animation:shPop .46s var(--ease)}
-.ov.swap>.ovbox{animation:shSwap .3s var(--ease)}
+.ov.in>.ovbox{animation:shPop var(--smooth-d,.5s) var(--smooth,var(--ease))}
+.ov.swap>.ovbox{animation:shSwap .36s var(--smooth,var(--ease))}
 .ovghost{pointer-events:none;z-index:49}.ovghost::before{animation:dimOut .3s ease-in forwards}
 @media (max-width:640px){
   .ov{align-items:flex-end;padding:max(12px,env(safe-area-inset-top,0px)) 0 0}
   .ovbox{width:100%;border-radius:22px 22px 0 0;padding:32px 18px max(22px,calc(env(safe-area-inset-bottom,0px) + 14px));box-shadow:0 -10px 40px rgb(0 0 0 / .25)}
   .ovbox::before{content:"";position:absolute;top:8px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line);opacity:.9}
-  .ov.in>.ovbox{animation:shUp .52s var(--ease)}
+  .ov.in>.ovbox{animation:shUp var(--smooth-d,.55s) var(--smooth,var(--ease))}
 }
 /* the drawer slides in and out */
-.dr-box{animation:drin .44s var(--ease)}
+.dr-box{animation:drin var(--smooth-d,.5s) var(--smooth,var(--ease))}
 .drawer:not([hidden])::before{animation:dimIn .3s ease-out}
 @keyframes drOut{to{transform:translateX(100%)}}
 .drawer.out{pointer-events:none}.drawer.out::before{animation:dimOut .26s ease-in forwards}.drawer.out .dr-box{animation:drOut .26s cubic-bezier(.4,0,1,1) forwards}
@@ -1012,6 +1015,42 @@ img{-webkit-touch-callout:none}
 #pg-settings>.rpage{content-visibility:auto;contain-intrinsic-size:auto 280px}
 html.lowmo .ov.in::before,html.lowmo .ov.in>.ovbox,html.lowmo .ov.swap>.ovbox,html.lowmo .dr-box,html.lowmo .drawer::before{animation:none!important}
 @media (prefers-reduced-motion:reduce){.ov.in::before,.ov.in>.ovbox,.ov.swap>.ovbox,.dr-box,.drawer::before,.drawer.out .dr-box{animation:none!important}}
+
+/* ===== v20.6: fluid like iOS — springs, a translucent bar, gliding selections, switches, pages that slide ===== */
+/* the top bar: sticks, turns translucent (blur) once you scroll, and the big title settles smaller */
+html{--hdr-top:env(safe-area-inset-top,0px);scroll-padding-top:calc(var(--hdr-top) + 64px)}html:has(body.has-offer){--hdr-top:calc(max(8px,env(safe-area-inset-top,0px)) + 54px)}   /* scrolling to something never leaves it under the bar */
+#app>header{position:sticky;top:var(--hdr-top);z-index:30;isolation:isolate;padding-block:6px;margin-block:-6px}
+/* the bar's material reaches the top of the screen (nothing scrolls visibly above it) */
+#app>header::before{content:"";position:absolute;top:calc(-1 * var(--hdr-top));bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:color-mix(in srgb,var(--bg) 74%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(18px);backdrop-filter:saturate(1.8) blur(18px);
+  border-bottom:.5px solid color-mix(in srgb,var(--ink) 14%,transparent);opacity:0;transition:opacity .3s ease}
+#app>header.stuck::before{opacity:1}
+#pgTitle{transform-origin:right center;transition:transform var(--smooth-d,.5s) var(--smooth,var(--ease))}
+#app>header.stuck #pgTitle{transform:scale(.8)}
+/* segmented control: the white pill glides to what you chose */
+.seg.thumbed{position:relative;isolation:isolate}
+.seg.thumbed button{position:relative;z-index:1}
+.seg.thumbed button[aria-pressed="true"]{background:transparent;box-shadow:none}
+.segthumb{position:absolute;top:3px;bottom:3px;left:0;width:0;z-index:0;border-radius:999px;background:var(--surface);box-shadow:0 1px 3px rgb(0 0 0 / .14),0 0 0 .5px rgb(0 0 0 / .04);pointer-events:none;
+  transition:transform var(--spring-d,.4s) var(--spring,var(--ease)),width var(--spring-d,.4s) var(--spring,var(--ease))}
+/* the day you're on: a ring glides from day to day */
+#days{position:relative}
+.dthumb{position:absolute;top:0;left:0;z-index:2;border-radius:10px;pointer-events:none;box-shadow:inset 0 0 0 1.5px var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent)}
+#days.thumbed .day[aria-pressed="true"]{border-color:var(--line);box-shadow:none;background:var(--surface)}
+/* iOS switches for the yes/no settings */
+.chk input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;position:relative;width:46px;height:28px;margin:0;border-radius:999px;cursor:pointer;
+  background:color-mix(in srgb,var(--ink) 17%,transparent);transition:background-color .25s ease}
+.chk input[type=checkbox]::before{content:"";position:absolute;top:2px;right:2px;width:24px;height:24px;border-radius:50%;background:#fff;
+  box-shadow:0 2px 4px rgb(0 0 0 / .22),0 0 0 .5px rgb(0 0 0 / .06);transition:transform var(--spring-d,.4s) var(--spring,var(--ease))}
+.chk input[type=checkbox]:checked{background:var(--accent)}
+.chk input[type=checkbox]:checked::before{transform:translateX(-18px)}
+.chk input[type=checkbox]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+/* the main page, when you're on another page, stays laid out but out of sight (coming back is instant, not a fresh layout) */
+#app{position:relative}
+#app>#pg-main[hidden]{display:flex!important;content-visibility:hidden;visibility:hidden;position:absolute;inset-inline:0;top:0;height:0;overflow:hidden;pointer-events:none;contain:strict}
+/* a page you leave: a still copy that slides away while the next one comes in */
+.pgghost{position:fixed;inset:0;z-index:20;pointer-events:none;overflow:hidden}
+.pgghost.solid{background:var(--bg);box-shadow:-12px 0 30px rgb(0 0 0 / .18)}
+html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transition:none!important}
 </style>
 
 </head>
@@ -1463,9 +1502,9 @@ html.lowmo .ov.in::before,html.lowmo .ov.in>.ovbox,html.lowmo .ov.swap>.ovbox,ht
       <label class="chk"><input type="checkbox" id="sfxOn"> أصوات الإنجاز والصناديق</label>
       <label class="chk"><input type="checkbox" id="sfxMed"> شغّل الأصوات حتى لو الآيباد صامت (ممكن توقف الموسيقى اللي شغّالة وقتها)</label>
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
-      <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
+      <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.5</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -2244,12 +2283,42 @@ function bindPrompts(root){
 
 // ---------- pre-sleep replay (after 9 pm): lectures studied today, 90 s each ----------
 // ---------- ✨ v20.5 motion: Apple's curves; nothing moves when you asked for less motion ----------
-const EASE="cubic-bezier(.32,.72,0,1)";
+// 🌀 springs, the way iOS moves (SwiftUI's response + damping) → a CSS linear() curve and the time it takes to settle
+function springCurve(resp,damp){const w0=2*Math.PI/resp,z=damp;
+  const x=t=>{if(z<1){const wd=w0*Math.sqrt(1-z*z);return 1-Math.exp(-z*w0*t)*(Math.cos(wd*t)+z*w0/wd*Math.sin(wd*t))}return 1-Math.exp(-w0*t)*(1+w0*t)};
+  let T=resp*.6;while(T<3&&!(Math.abs(1-x(T))<.0025&&Math.abs(1-x(T+.04))<.0025&&Math.abs(1-x(T+.08))<.0025))T+=.01;
+  const n=Math.max(30,Math.min(90,Math.round(T*70))),pts=[];for(let i=0;i<=n;i++)pts.push(+x(T*i/n).toFixed(4));pts[n]=1;return{e:`linear(${pts.join(",")})`,d:Math.round(T*1000)}}
+const LINEAR_OK=(()=>{try{return CSS.supports("transition-timing-function","linear(0, 0.5, 1)")}catch(e){return false}})();
+const SPR=LINEAR_OK?{smooth:springCurve(.5,1),snappy:springCurve(.36,.78),bouncy:springCurve(.42,.6)}
+  :{smooth:{e:"cubic-bezier(.32,.72,0,1)",d:520},snappy:{e:"cubic-bezier(.34,1.3,.64,1)",d:440},bouncy:{e:"cubic-bezier(.34,1.56,.64,1)",d:500}};
+(r=>{r.setProperty("--spring",SPR.snappy.e);r.setProperty("--spring-d",SPR.snappy.d+"ms");r.setProperty("--smooth",SPR.smooth.e);r.setProperty("--smooth-d",SPR.smooth.d+"ms")})(document.documentElement.style);
+const EASE=SPR.smooth.e;
 const motionOn=()=>{if(reduceMotion())return false;try{return!matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return true}};
 const isPhone=()=>{try{return matchMedia("(max-width:640px)").matches}catch(e){return false}};
 const anim=(el,kf,o)=>{try{return el&&el.animate&&motionOn()?el.animate(kf,o):null}catch(e){return null}};
 // a container's HTML is only rewritten when it really changed (what you opened, typed or scrolled inside stays put)
 const H=el=>({set h(v){if(!el)return;if(el.__h===v&&el.firstChild===el.__f&&el.childNodes.length===el.__c)return;el.innerHTML=v;el.__h=v;el.__f=el.firstChild;el.__c=el.childNodes.length}});
+
+const hdrH=()=>{const h=document.querySelector("#app>header");return h?h.getBoundingClientRect().bottom:0};   // how much of the screen the top bar covers
+// after a repaint, once per frame and just before it's drawn: the bar, the pill and the day ring read where things are (one layout, not three)
+let PRQ=0;function postRender(){if(PRQ)return;PRQ=requestAnimationFrame(()=>{PRQ=0;safe(hdrSync);if(st.page!=="main")return;
+  safe(()=>{segSync($("#vDay")&&$("#vDay").parentElement);if(st.view==="week")segSync($("#wGrid")&&$("#wGrid").parentElement)});if(st.view==="day")safe(dayThumb)})}
+// the top bar: translucent and with a smaller title once the page scrolls under it
+let HDS=-1;const hdrSync=()=>{const h=document.querySelector("#app>header");if(!h)return;const on=window.scrollY>8;if(on!==HDS){HDS=on;h.classList.toggle("stuck",on)}};
+window.addEventListener("scroll",()=>requestAnimationFrame(hdrSync),{passive:true});
+// segmented control: the pill glides under the choice (the view switch on the main page)
+function segSync(seg,first){if(!seg)return;let t=seg.querySelector(":scope>.segthumb");if(!t){t=document.createElement("i");t.className="segthumb";t.setAttribute("aria-hidden","true");seg.prepend(t);seg.classList.add("thumbed");first=true}
+  const b=seg.querySelector('button[aria-pressed="true"]');if(!b||!b.offsetWidth){t.style.opacity="0";return}t.style.opacity="";
+  if(first)t.style.transition="none";t.style.width=b.offsetWidth+"px";t.style.transform=`translateX(${b.offsetLeft}px)`;if(first){void t.offsetWidth;t.style.transition=""}}
+// the day ring glides from the day you were on to the one you chose
+let DTH=null;
+function dayThumb(){const box=$("#days");if(!box)return;const b=box.querySelector('.day[aria-pressed="true"]');let t=box.querySelector(":scope>.dthumb");
+  if(!b||!b.offsetWidth){if(t)t.remove();box.classList.remove("thumbed");return}
+  if(!t){t=document.createElement("i");t.className="dthumb";t.setAttribute("aria-hidden","true");box.appendChild(t);box.__c=box.childNodes.length}
+  box.classList.add("thumbed");const r={x:b.offsetLeft,y:b.offsetTop,w:b.offsetWidth,h:b.offsetHeight};
+  t.style.width=r.w+"px";t.style.height=r.h+"px";t.style.transform=`translate(${r.x}px,${r.y}px)`;
+  if(DTH&&DTH.wi===st.wi&&(DTH.x!==r.x||DTH.y!==r.y))anim(t,[{transform:`translate(${DTH.x}px,${DTH.y}px)`},{transform:`translate(${r.x}px,${r.y}px)`}],{duration:SPR.snappy.d,easing:SPR.snappy.e});
+  DTH={...r,wi:st.wi}}
 
 // ---------- full-screen sheets ----------
 let sheetCleanup=null,SGH=null;
@@ -2262,6 +2331,8 @@ function openSheet(html,bind){
   o.hidden=false;document.documentElement.classList.add("noscroll");
   o.querySelector(".ovx").onclick=()=>closeSheet();
   if(bind)bind(o.querySelector(".ovbox"));
+  if(!was){const kids=[];[...o.querySelector(".ovbox").children].forEach(k=>{if(k.classList.contains("ovx")||k.hidden)return;if(getComputedStyle(k).display==="contents")kids.push(...[...k.children].filter(x=>!x.hidden));else kids.push(k)});
+    flowIn(kids,{delay:40,step:18,max:7,from:"translateY(8px)",d:Math.round(SPR.smooth.d*.75)})}   // gentle: what you might tap barely moves
 }
 const freshTap=()=>{const o=$("#ov");if(o)o.dataset.t0=Date.now()};
 // the sheet you close leaves the way it came (slides down on a phone), while the page under it is already live
@@ -4405,13 +4476,58 @@ const PAGES=[["main","🏠","الرئيسية"],["ai","🤖","المساعد"],[
 let DRT=null;
 function closeDrawer(){const d=$("#drawer");$("#burger").setAttribute("aria-expanded","false");if(d.hidden)return;clearTimeout(DRT);
   if(!motionOn()){d.hidden=true;d.classList.remove("out");return}d.classList.add("out");DRT=setTimeout(()=>{d.hidden=true;d.classList.remove("out");const b=d.querySelector(".dr-box");if(b)b.style.transform=""},260)}
-function setPage(pg){
-  const prev=st.page;
-  st.page=PAGES.some(p=>p[0]===pg)&&(pg!=="ai"||S.aiv)?pg:"main";closeDrawer();
+// 📱 pages move like an iPhone app: a page you open comes in from the side, the one you leave slides the other way (a still copy of it),
+// and each page remembers where you were scrolled. On any page but the main one, a swipe from the right edge goes back.
+const PGSC={};
+// the copy only carries what's on screen: everything above or below becomes an empty block of the same height (light to draw)
+function ghostPrune(orig,clone,depth){const vh=window.innerHeight,oc=[...orig.children],cc=[...clone.children];if(oc.length!==cc.length)return;
+  const pd=getComputedStyle(orig);if(!(pd.display==="block"||pd.display==="flow-root"||pd.display==="flex"&&pd.flexDirection==="column"))return;
+  for(let i=0;i<oc.length;i++){const o=oc[i],c=cc[i];if(o.hidden)continue;const cs=getComputedStyle(o);if(cs.display==="none"||cs.position==="absolute"||cs.position==="fixed")continue;const r=o.getBoundingClientRect();
+    if(r.bottom<-40||r.top>vh+40){const sp=document.createElement("div");sp.style.cssText=`height:${r.height}px;margin:${cs.marginTop} 0 ${cs.marginBottom};flex:none`;c.replaceWith(sp)}
+    else if(depth<4&&o.childElementCount>3&&(r.top<-40||r.bottom>vh+40))ghostPrune(o,c,depth+1)}}
+function pageGhost(pg,solid){const el=$("#pg-"+pg);if(!el||el.hidden)return null;const r=el.getBoundingClientRect();
+  const w=document.createElement("div");w.className="pgghost"+(solid?" solid":"");w.setAttribute("aria-hidden","true");w.inert=true;
+  const c=el.cloneNode(true);c.removeAttribute("id");c.hidden=false;try{ghostPrune(el,c,0)}catch(e){}c.querySelectorAll("[id]").forEach(x=>x.removeAttribute("id"));
+  c.style.cssText=`position:absolute;top:${r.top}px;left:${r.left}px;width:${r.width}px;margin:0`;w.appendChild(c);document.body.appendChild(w);return w}
+function flowIn(els,o={}){if(!motionOn())return;els.slice(0,o.max||8).forEach((el,i)=>anim(el,[{opacity:0,transform:o.from||"translateY(12px)"},{opacity:1,transform:"none"}],{duration:o.d||SPR.smooth.d,delay:(o.delay||0)+i*(o.step||28),easing:SPR.smooth.e,fill:"backwards"}))}
+function setPage(pg,o={}){
+  const prev=st.page,next=PAGES.some(p=>p[0]===pg)&&(pg!=="ai"||S.aiv)?pg:"main";
+  if(prev!==next)PGSC[prev]=window.scrollY;
+  const g=prev!==next&&!o.instant&&motionOn()?pageGhost(prev):null;
+  st.page=next;closeDrawer();
   try{history.replaceState(null,"",st.page==="main"?location.pathname+location.search:"#"+st.page)}catch(e){}
-  render();window.scrollTo({top:0});
-  if(prev!==st.page)anim($("#pg-"+st.page),[{opacity:0,transform:"translateY(14px)"},{opacity:1,transform:"none"}],{duration:380,easing:EASE});   // the new page rises in
+  render();window.scrollTo({top:next==="main"?PGSC.main||0:0});
+  if(prev===next||!motionOn())return;
+  const el=$("#pg-"+next),pop=next==="main",W=Math.min(window.innerWidth,900),D=SPR.smooth.d;
+  // RTL: a page you open comes in from the left; going back, the page you leave goes left and the main page returns from the right
+  if(g){const ga=anim(g,[{transform:"none",opacity:1},{transform:`translateX(${pop?-W*.3:W*.25}px)`,opacity:0}],{duration:D*.8,easing:SPR.smooth.e,fill:"forwards"});
+    const rm=()=>g.remove();if(ga)ga.onfinish=rm;setTimeout(rm,D+200)}
+  anim(el,[{transform:`translateX(${pop?W*.22:-W*.3}px)`,opacity:0},{transform:"none",opacity:1}],{duration:D,easing:SPR.smooth.e});
+  anim($("#pgTitle"),[{opacity:0,transform:`translateX(${pop?16:-16}px)`},{opacity:1,transform:"none"}],{duration:D,easing:SPR.smooth.e});
+  if(!pop&&el)flowIn([...el.children].filter(x=>!x.hidden),{delay:60,step:32});
 }
+// swipe back from the right edge (the page follows your finger; let go early and it stays)
+(function edgeBack(){let s=null;
+  document.addEventListener("touchstart",e=>{s=null;if(st.page==="main"||e.touches.length!==1||!motionOn()||!$("#ov").hidden||!$("#drawer").hidden||focusOpen())return;
+    const t=e.touches[0];if(t.clientX<window.innerWidth-28)return;s={x0:t.clientX,y0:t.clientY,on:false,from:st.page,v:[]}},{passive:true});
+  document.addEventListener("touchmove",e=>{if(!s)return;const t=e.touches[0],dx=t.clientX-s.x0,dy=t.clientY-s.y0;
+    if(!s.on){if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){s=null;return}if(dx>-8)return;
+      const sc=window.scrollY,g=pageGhost(s.from,true);if(!g){s=null;return}
+      s.on=true;s.g=g;PGSC[s.from]=sc;st.page="main";render();window.scrollTo(0,PGSC.main||0);s.main=$("#pg-main");s.W=window.innerWidth;s.x0=t.clientX;
+      anim($("#pgTitle"),[{opacity:0},{opacity:1}],{duration:260})}
+    if(e.cancelable)e.preventDefault();const x=Math.min(0,t.clientX-s.x0),p=Math.min(1,-x/s.W);s.x=x;
+    s.g.style.transform=`translateX(${x}px)`;s.main.style.transform=`translateX(${((1-p)*s.W*.28).toFixed(1)}px)`;s.main.style.opacity=String(.55+.45*p);
+    s.v.push([t.clientX,e.timeStamp]);if(s.v.length>6)s.v.shift()},{passive:false});
+  const end=()=>{if(!s||!s.on){s=null;return}const {g,main,W,from}=s,x=s.x||0,v=s.v;s=null;const a=v[0]||[0,0],z=v[v.length-1]||a,vel=z[1]>a[1]?(z[0]-a[0])/(z[1]-a[1]):0;
+    const go=-x>W*.33||vel<-.45,D=SPR.smooth.d;
+    const fin=()=>{main.style.transform="";main.style.opacity=""};
+    if(go){vib(6);const ga=anim(g,[{transform:`translateX(${x}px)`},{transform:`translateX(${-W}px)`}],{duration:D*.7,easing:SPR.smooth.e,fill:"forwards"});
+      anim(main,[{transform:main.style.transform,opacity:main.style.opacity},{transform:"none",opacity:1}],{duration:D*.7,easing:SPR.smooth.e});fin();
+      const rm=()=>g.remove();if(ga)ga.onfinish=rm;setTimeout(rm,D+200);try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
+    else{const ga=anim(g,[{transform:`translateX(${x}px)`},{transform:"none"}],{duration:D*.6,easing:SPR.smooth.e,fill:"forwards"});
+      anim(main,[{transform:main.style.transform,opacity:main.style.opacity},{transform:`translateX(${W*.28}px)`,opacity:.55}],{duration:D*.6,easing:SPR.smooth.e,fill:"forwards"});
+      const back=()=>{st.page=from;render();window.scrollTo(0,PGSC[from]||0);main.getAnimations().forEach(a=>a.cancel());fin();g.remove()};if(ga)ga.onfinish=back;else back()}};
+  document.addEventListener("touchend",end);document.addEventListener("touchcancel",end)})();
 function openDrawer(){
   const d=$("#drawer"),lg=ledger(),x={total:lg.career},lv=levelOf(x.total),ni=ideasList().filter(i=>!i.x).length,no=offersWaiting();
   d.innerHTML=`<nav class="dr-box" aria-label="القائمة"><div class="dr-h">القائمة</div>${PAGES.filter(([k])=>k!=="ai"||S.aiv).map(([k,i,l])=>`<button class="dr-i" aria-current="${st.page===k?"page":"false"}" data-pg="${k}">${k==="career"?tile(lv.c,"xs"):`<span>${i}</span>`}<span class="dri-t">${l}${k==="career"?`<small>${lv.title} · 🪙 ${nf(lg.bal)}</small>`:""}</span>${k==="ideas"&&ni?`<b class="dri-n">${ni}</b>`:k==="offers"&&no?`<b class="dri-n sun">${no}</b>`:k==="ai"&&AIX(caseWaiting,false)?`<b class="dri-n sun">🩺</b>`:""}</button>${k==="main"?`<hr class="dr-sep">`:k==="ideas"?`<hr class="dr-sep">`:""}`).join("")}</nav>`;
@@ -4667,7 +4783,7 @@ const offersWaiting=()=>offersList().filter(o=>{const s=offerState(o);return s==
 function weekStep(dir){
   st.wi=(st.wi+dir+DATA.length)%DATA.length;st.di=Math.min(st.di,DATA[st.wi].days.length-1);st.open=null;render();
   const el=$("#days");if(el){el.classList.remove("swl","swr");void el.offsetWidth;el.classList.add(dir>0?"swl":"swr")}
-  anim($("#list"),[{opacity:0,transform:`translateX(${dir>0?-26:26}px)`},{opacity:1,transform:"none"}],{duration:340,easing:EASE});
+  flowIn([...$("#list").children],{from:`translateX(${dir>0?-34:34}px)`,step:36,max:7});
   toast(`الأسبوع ${DATA[st.wi].n}${dir>0&&st.wi===0?" · رجعنا للبداية ↻":dir<0&&st.wi===DATA.length-1?" · آخر أسبوع ↻":""}`);
 }
 function bindSwipe(el,onLeft,onRight){
@@ -4911,7 +5027,7 @@ function renderDays(){
     <span class="dn">${d.ar}</span><span class="dd">${dnum(d.date)}</span>
     <span class="dots">${bl.map(b=>`<i style="${kv(b.kind)}"></i>`).join("")}</span>${p!=null?`<span class="dpct num">${pct(p)}</span>${pbar(p,"thin")}`:""}</button>`}).join("");
   $("#days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{const dir=+b.dataset.d-st.di;st.di=+b.dataset.d;st.open=null;render();
-    if(dir)anim($("#list"),[{opacity:0,transform:`translateX(${dir>0?-26:26}px)`},{opacity:1,transform:"none"}],{duration:340,easing:EASE})});
+    if(dir)flowIn([...$("#list").children],{from:`translateX(${dir>0?-34:34}px)`,step:36,max:7})});
 }
 function related(b){
   const key=norm(b.topic||"");if(!key)return[];
@@ -5053,7 +5169,7 @@ function renderDocs(){
         return `<button class="doc" data-di="${i}"><b>${esc(d.name)}</b><span class="dmeta">${cnt(d.bl.length,"جلسة","جلستين","جلسات")} · ذاكرت ${s} من ${n.length}${r!=null?` · تذكّر ${pct(r)}`:""}</span>
           <span class="dprog">${p!=null?`إنجاز <b class="num">${pct(p)}</b>`:"لم يبدأ"}${pbar(p)}</span>${f?`<span class="dmeta">⏱️ تاخذ معه ≈ ${minTxt(f*60)} لكل ساعة محاضرة</span>`:""}
           <span class="dots">${d.bl.map(b=>`<i style="${kv(b.kind)}"></i>`).join("")}</span></button>`}).join("")}</div>`;
-    box.querySelectorAll("[data-di]").forEach(b=>b.onclick=()=>{st.dr=DOCTORS[+b.dataset.di].name;st.open=null;render();window.scrollTo({top:box.offsetTop-12,behavior:"smooth"})});
+    box.querySelectorAll("[data-di]").forEach(b=>b.onclick=()=>{st.dr=DOCTORS[+b.dataset.di].name;st.open=null;render();window.scrollTo({top:box.offsetTop-12-hdrH(),behavior:"smooth"})});
     return;
   }
   const d=DOCTORS.find(x=>x.name===st.dr);if(!d){st.dr=null;return renderDocs()}
@@ -5072,7 +5188,7 @@ function bindCards(root){
   root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>sheetEdit(b.dataset.edit));
   root.querySelectorAll("[data-pgo]").forEach(b=>b.onclick=()=>setPage(b.dataset.pgo));
   root.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
-  root.querySelectorAll("[data-dr]").forEach(b=>b.onclick=()=>{st.view="doc";st.dr=b.dataset.dr;st.open=null;render();const v=$("#docView");window.scrollTo({top:v.offsetTop-12,behavior:"smooth"})});
+  root.querySelectorAll("[data-dr]").forEach(b=>b.onclick=()=>{st.view="doc";st.dr=b.dataset.dr;st.open=null;render();const v=$("#docView");window.scrollTo({top:v.offsetTop-12-hdrH(),behavior:"smooth"})});
   root.querySelectorAll("[data-knew]").forEach(b=>b.onclick=()=>{st.knotFor=b.dataset.knew;render();const i=$("#knotIn");if(i)i.focus()});
   root.querySelectorAll("[data-kadd]").forEach(b=>b.onclick=()=>addKnot(b.dataset.kadd));
   root.querySelectorAll("[data-clipset]").forEach(b=>b.onclick=()=>sheetClipSetup(b.dataset.clipset,null));
@@ -5112,7 +5228,8 @@ function addKnot(id){
 }
 function go(id){
   const b=BY_ID[id];if(!b)return;
-  if(st.page!=="main"){st.page="main";closeDrawer();try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
+  if(st.page!=="main"){const g=motionOn()?pageGhost(st.page):null;PGSC[st.page]=window.scrollY;st.page="main";closeDrawer();try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+    if(g){const ga=anim(g,[{transform:"none",opacity:1},{transform:`translateX(${-Math.min(window.innerWidth,900)*.3}px)`,opacity:0}],{duration:SPR.smooth.d*.8,easing:SPR.smooth.e,fill:"forwards"});const rm=()=>g.remove();if(ga)ga.onfinish=rm;setTimeout(rm,1200)}}
   const pos=DAY_IDX[heldDate(b)]||[b.wi,b.di];st.wi=pos[0];st.di=pos[1];st.open=id;st.view="day";st.kinds.add(b.kind);render();
   const el=document.getElementById("c-"+id);if(el){el.scrollIntoView({behavior:motionOn()?"smooth":"auto",block:"center"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
 }
@@ -5138,6 +5255,7 @@ function render(){
     $("#docView").hidden=st.view!=="doc";
     safe(()=>{if(st.view==="day"){renderDays();renderDay()}else if(st.view==="week")renderWeek();else renderDocs()});
   }
+  postRender();
   scheduleAch();
 }
 $("#vDay").onclick=()=>{st.view="day";render()};
@@ -5203,7 +5321,8 @@ document.addEventListener("click",e=>{const sm=e.target.closest&&e.target.closes
   else{e.preventDefault();const h1=d.getBoundingClientRect().height;d.style.overflow="clip";d.__closing=1;
     d.__anim=d.animate([{height:h1+"px"},{height:closedH+"px"}],{duration:Math.min(380,200+(h1-closedH)/8),easing:EASE});d.__anim.onfinish=()=>{d.open=false;fin()};d.__anim.oncancel=fin}},true);
 ["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
-document.addEventListener("touchstart",()=>{},{passive:true});   // lets :active (the press look) work on iOS
+document.addEventListener("touchstart",e=>{if(e.touches.length>1&&e.cancelable)e.preventDefault()},{passive:false});   // a second finger never starts a pinch (and :active works on iOS)
+document.addEventListener("touchmove",e=>{if((e.touches.length>1||e.scale&&e.scale!==1)&&e.cancelable)e.preventDefault()},{passive:false});
 // a double tap can't land on the next screen's button: taps in the first moment after a sheet appears are ignored
 $("#ov").addEventListener("click",e=>{if(e.isTrusted&&Date.now()-(+$("#ov").dataset.t0||0)<320){e.stopPropagation();e.preventDefault()}},true);
 // ===== v19 AI START =====
@@ -6590,7 +6709,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.5";
+const RN_DEV="ghrunner",APPV="20.6";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
