@@ -1504,7 +1504,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6.2</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6.3</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -6086,8 +6086,10 @@ function packSlides(pages,keepAll){
   if(!keepAll&&empty>n*.6&&cut)return packSlides(pages,true);   // the squeeze went too far: keep everything
   const txt=out.map((s,i)=>`S${i+1}: ${s||"·"}`).join("\n");
   return{n,txt,empty,cut,raw:lines.reduce((a,L)=>a+L.join(" ").length,0),chars:txt.length}}
+// each slide on its own numbered line, and a picture sent with the request is named inside the slide it sits on: "S5: … [IMAGE 2]"
+const spSlideLines=(j,p,im)=>j.lines.slice(p.a-1,p.b).map((l,i)=>{const n=p.a+i,tags=(im||[]).map((x,k)=>x.p+1===n?`[IMAGE ${k+1}]`:"").filter(Boolean);return tags.length?`${l} ${tags.join(" ")}`:l}).join("\n");
 const SPLIT_RULES=`TASK=split
-Cut this lecture into short study clips. SLIDES are "S<n>: text" ("·" = picture-only slide).
+Cut this lecture into short study clips. SLIDES are "S<n>: text", ONE line per slide (each line is a separate slide; "·" = picture-only slide; "[IMAGE k]" = attached picture k is on that slide).
 Rules: each clip 4–9 slides (~10–15 min), NEVER fewer than 4 slides; dense slides (mechanisms, pathways, tables) → shorter clips, picture/title slides → longer; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
 Per clip: "title" English title as on the slides; "ar" Arabic title 2–5 words; "from"/"to" first and last slide; "min" expected minutes; "hook" ONE curiosity question in Arabic (English terms kept) that the clip answers, without giving the answer; "keys" 3–5 high-yield points in English, slide wording, one short line each; "type" the blurt type, one of free, child, exam, link, clinic, why, compare — vary them, never the same type in two clips in a row, no "link" in the first clip; "prompt" the blurt question in Arabic (English terms kept) matching its type: free: اذكر كل اللي تتذكره عن … · child: اشرح … لطفل عمره 10 سنين · exam: وش السؤال اللي ممكن يجي على … في الاختبار؟ وجاوبه · link: وش علاقة … بـ … (من مقطع سابق)؟ · clinic: وين تظهر الأهمية السريرية لـ …؟ · why: ليش …؟ · compare: قارن بين … و …
 "lecture" = the lecture title as on the slides.`;
@@ -6321,7 +6323,7 @@ async function spRun(lid){
       const todo=j.parts.filter(p=>p.st!=="done");let stop=null;SPLIVE[lid]=SPLIVE[lid]||{};
       for(let i=0;i<todo.length&&!stop;i+=SPJ_MAXP)await Promise.all(todo.slice(i,i+SPJ_MAXP).map(async p=>{const pi=j.parts.indexOf(p);if(stop||signal.aborted)return;
         const im=j.imgs.filter(x=>x.p+1>=p.a&&x.p+1<=p.b).slice(0,8);
-        const data=`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · ${j.n} ${j.approx?"sections (no slide breaks in this file: S<n> = section n)":"slides"}\nPART ${pi+1} of ${j.parts.length}: S${p.a}–S${p.b}\nSLIDES\n${j.lines.slice(p.a-1,p.b).join("\n")}${im.length?`\nIMAGES\n${im.map((x,i)=>`IMAGE ${i+1} · slide S${x.p+1}`).join("\n")}`:""}`;
+        const data=`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · ${j.n} ${j.approx?"sections (no slide breaks in this file: S<n> = section n)":"slides"}\nPART ${pi+1} of ${j.parts.length}: S${p.a}–S${p.b}\nSLIDES\n${spSlideLines(j,p,im)}${im.length?`\nIMAGES\n${im.map((x,i)=>`IMAGE ${i+1} · slide S${x.p+1}`).join("\n")}`:""}`;
         p.st="run";(SPLIVE[lid]||(SPLIVE[lid]={}))[pi]={c:0,s:0,t0:0};spSave();spRefresh(lid);
         try{const r=await aiCall({k:"split",rules:spPartRules(j,pi),data,schema:SPLIT_PART_S,effort:"low",max:8000,fg:true,signal,check:x=>Array.isArray(x.clips)&&x.clips.length>0,
             onProg:pr=>{const L=SPLIVE[lid];if(L)L[pi]={...(L[pi]||{}),c:pr.c||0,s:pr.s||0,w:null};spTick(lid)},
@@ -6735,7 +6737,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.6.2";
+const RN_DEV="ghrunner",APPV="20.6.3";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
