@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <!-- opened from the home screen: the status bar (clock, battery) takes the page's colour instead of a white strip -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -971,6 +971,48 @@ button.lc-tile{cursor:pointer}
 textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
 .akfu .akn{flex:0 0 64px}.akfu label{display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--muted)}
 
+
+/* ===== v20.5: feels like an app — no zoom, Apple motion (sheets, drawer, pages, cards, toast), instant press ===== */
+:root{--ease:cubic-bezier(.32,.72,0,1);--spring:cubic-bezier(.34,1.3,.64,1)}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y;-webkit-tap-highlight-color:transparent}
+button,summary,label,a,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button,summary,[role="button"]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+img{-webkit-touch-callout:none}
+/* the thing you touch answers at once */
+.btn,.chip,.wk,.day,.doc,.back,.pc,.gdb-i,.lc-tile,.ovx,.spban,.cs-warn,.gx,.gb,.dr-i,.lc-wipe,.ob-next{transition:transform .2s var(--ease),background-color .2s,opacity .2s}
+:is(.btn,.chip,.wk,.day,.doc,.back,.pc,.gdb-i,.lc-tile,.ovx,.spban,.cs-warn,.gx,.gb,.lc-wipe,.ob-next):active:not(:disabled){transform:scale(.96);transition-duration:.08s}
+.dr-i:active{background:var(--surface-2);transform:scale(.98);transition-duration:.08s}
+.head{transition:background-color .25s}.head:active{background:color-mix(in srgb,var(--ink) 5%,transparent);transition-duration:0s}
+/* sheets: slide up from the bottom on a phone (with a handle you can pull down), a soft pop on the iPad */
+.ovbox{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;justify-content:safe center}   /* a tall sheet starts at its top (nothing cut off above) */
+/* the dimmed page behind is its own layer that only fades (cheap for the graphics chip, even with the blur) */
+.ov,.drawer{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.ov::before,.drawer::before{content:"";position:absolute;inset:0;background:rgb(6 10 8 / .5);opacity:var(--dim,1);pointer-events:none}   /* plain dimming, like iOS sheets (a blur here costs frames) */
+.drawer::before{background:rgb(6 10 8 / .42)}
+@keyframes dimIn{from{opacity:0}}@keyframes dimOut{to{opacity:0}}
+@keyframes shPop{from{opacity:0;transform:translateY(26px) scale(.965)}}
+@keyframes shUp{from{transform:translateY(100%)}}
+@keyframes shSwap{from{opacity:0;transform:translateY(12px)}}
+.ov.in::before{animation:dimIn .38s ease-out}
+.ov.in>.ovbox{animation:shPop .46s var(--ease)}
+.ov.swap>.ovbox{animation:shSwap .3s var(--ease)}
+.ovghost{pointer-events:none;z-index:51}.ovghost::before{animation:dimOut .3s ease-in forwards}
+@media (max-width:640px){
+  .ov{align-items:flex-end;padding:max(12px,env(safe-area-inset-top,0px)) 0 0}
+  .ovbox{width:100%;border-radius:22px 22px 0 0;padding:32px 18px max(22px,calc(env(safe-area-inset-bottom,0px) + 14px));box-shadow:0 -10px 40px rgb(0 0 0 / .25)}
+  .ovbox::before{content:"";position:absolute;top:8px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:var(--line);opacity:.9}
+  .ov.in>.ovbox{animation:shUp .52s var(--ease)}
+}
+/* the drawer slides in and out */
+.dr-box{animation:drin .44s var(--ease)}
+.drawer:not([hidden])::before{animation:dimIn .3s ease-out}
+@keyframes drOut{to{transform:translateX(100%)}}
+.drawer.out{pointer-events:none}.drawer.out::before{animation:dimOut .26s ease-in forwards}.drawer.out .dr-box{animation:drOut .26s cubic-bezier(.4,0,1,1) forwards}
+/* rows and cards off screen aren't laid out until you scroll to them (switching pages stays light) */
+.task,.card:not([data-open="true"]){content-visibility:auto;contain-intrinsic-size:auto 64px}
+#pg-settings>.rpage{content-visibility:auto;contain-intrinsic-size:auto 280px}
+html.lowmo .ov.in::before,html.lowmo .ov.in>.ovbox,html.lowmo .ov.swap>.ovbox,html.lowmo .dr-box,html.lowmo .drawer::before{animation:none!important}
+@media (prefers-reduced-motion:reduce){.ov.in::before,.ov.in>.ovbox,.ov.swap>.ovbox,.dr-box,.drawer::before,.drawer.out .dr-box{animation:none!important}}
 </style>
 
 </head>
@@ -1424,7 +1466,7 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.4</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.5</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1994,7 +2036,8 @@ const EXAMS_RAW=ALL.filter(b=>b.kind==="exam").map(b=>{
   return{b,name,short:t==="FINAL"?"Final":t,what,scopeOf};
 });
 // recomputed on use so a postponed exam or lecture moves the scope with it
-const examsNow=()=>EXAMS_RAW.map(e=>{const date=heldDate(e.b),scope=e.scopeOf(date);return{...e,date,scope,ids:new Set(scope.map(x=>x.id))}}).sort((a,b)=>a.date.localeCompare(b.date));
+let EXN=null,EXNk="";
+const examsNow=()=>{const k=LV+"|"+todayISO+"|"+ALL.length;if(k!==EXNk||!EXN){EXNk=k;EXN=EXAMS_RAW.map(e=>{const date=heldDate(e.b),scope=e.scopeOf(date);return{...e,date,scope,ids:new Set(scope.map(x=>x.id))}}).sort((a,b)=>a.date.localeCompare(b.date))}return EXN};
 const nextExam=()=>examsNow().find(e=>e.date>=todayISO);
 
 // ---------- load balancer ----------
@@ -2072,7 +2115,7 @@ function renderTasks(){
     h+=`<details class="later"${st.laterOpen?" open":""}><summary>مؤجلة بذكاء: ${cnt(p.later.length,"مهمة","مهمتين","مهام")} موزّعة على الأيام الجاية</summary>
       ${groups.map(g=>`<h4 class="lday">${g.on?dayName(g.on):"بعد 3 أسابيع"}</h4>${g.items.map(taskHTML).join("")}`).join("")}</details>`;
   }
-  $("#tlist").innerHTML=h;
+  const tl=$("#tlist"),fb=tl&&tl.__h!==undefined&&tl.__h!==h?flipSnap(tl,".task,.lday"):null;H(tl).h=h;if(fb)flipPlay(tl,".task,.lday",fb);
   renderFive(planned[0]||free[0]||null);
   const det=$("#tlist details");if(det)det.ontoggle=()=>{st.laterOpen=det.open};
   const all=[...rows,...p.later];
@@ -2201,25 +2244,69 @@ function bindPrompts(root){
 }
 
 // ---------- pre-sleep replay (after 9 pm): lectures studied today, 90 s each ----------
+// ---------- ✨ v20.5 motion: Apple's curves; nothing moves when you asked for less motion ----------
+const EASE="cubic-bezier(.32,.72,0,1)";
+const motionOn=()=>{if(reduceMotion())return false;try{return!matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return true}};
+const isPhone=()=>{try{return matchMedia("(max-width:640px)").matches}catch(e){return false}};
+const anim=(el,kf,o)=>{try{return el&&el.animate&&motionOn()?el.animate(kf,o):null}catch(e){return null}};
+// a container's HTML is only rewritten when it really changed (what you opened, typed or scrolled inside stays put)
+const H=el=>({set h(v){if(!el)return;if(el.__h===v&&el.firstChild===el.__f&&el.childNodes.length===el.__c)return;el.innerHTML=v;el.__h=v;el.__f=el.firstChild;el.__c=el.childNodes.length}});
+
 // ---------- full-screen sheets ----------
-let sheetCleanup=null;
+let sheetCleanup=null,SGH=null;
 function openSheet(html,bind){
-  closeSheet(true);
-  const o=$("#ov");o.dataset.t0=Date.now();o.innerHTML=`<div class="ovbox" role="dialog" aria-modal="true"><button class="ovx" aria-label="إغلاق">×</button>${html}</div>`;
+  const o=$("#ov"),was=!o.hidden;
+  closeSheet(true,true);
+  if(SGH){SGH.remove();SGH=null}   // one sheet replaces another: the new one fades in where the old one was
+  o.dataset.t0=Date.now();o.innerHTML=`<div class="ovbox" role="dialog" aria-modal="true"><button class="ovx" aria-label="إغلاق">×</button>${html}</div>`;
+  o.classList.toggle("in",!was);o.classList.toggle("swap",was);o.style.removeProperty("--dim");
   o.hidden=false;document.documentElement.classList.add("noscroll");
   o.querySelector(".ovx").onclick=closeSheet;
   if(bind)bind(o.querySelector(".ovbox"));
 }
 const freshTap=()=>{const o=$("#ov");if(o)o.dataset.t0=Date.now()};
-function closeSheet(replacing){
+// the sheet you close leaves the way it came (slides down on a phone), while the page under it is already live
+function sheetOut(g,box){
+  const phone=isPhone(),from=getComputedStyle(box).transform,start=from&&from!=="none"?from:"translateY(0)";
+  box.style.transform="";
+  const b=phone?box.animate([{transform:start},{transform:"translateY(105%)"}],{duration:300,easing:"cubic-bezier(.4,0,.8,.6)",fill:"forwards"})
+    :box.animate([{opacity:1,transform:start},{opacity:0,transform:"translateY(14px) scale(.97)"}],{duration:200,easing:"ease-in",fill:"forwards"});
+  b.onfinish=()=>setTimeout(()=>g.remove(),40);setTimeout(()=>g.remove(),700)}
+function closeSheet(replacing,swap){
   if(sheetCleanup){try{sheetCleanup()}catch(e){}sheetCleanup=null}
-  const o=$("#ov");if(!o.hidden){o.hidden=true;o.innerHTML="";if(!focusOpen())document.documentElement.classList.remove("noscroll");scheduleAch();if(st.page!=="main")renderPage()}
+  const o=$("#ov");if(!o.hidden){
+    const box=o.querySelector(".ovbox");
+    // a still copy leaves the screen (the real sheet is gone at once, as before: nothing can mistake it for open)
+    if(box&&!swap&&motionOn()){const sc=box.scrollTop,dim=o.style.getPropertyValue("--dim"),tf=box.style.transform,g=document.createElement("div"),cp=box.cloneNode(true);
+      cp.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));cp.style.transform=tf;g.className="ov ovghost";g.setAttribute("aria-hidden","true");g.inert=true;if(dim)g.style.setProperty("--dim",dim);
+      g.appendChild(cp);document.body.appendChild(g);cp.scrollTop=sc;SGH=g;requestAnimationFrame(()=>{if(SGH!==g)return;SGH=null;try{sheetOut(g,cp)}catch(e){g.remove()}})}
+    o.hidden=true;o.innerHTML="";o.classList.remove("in","swap");o.style.removeProperty("--dim");if(!focusOpen())document.documentElement.classList.remove("noscroll");scheduleAch();if(st.page!=="main")renderPage()}
   // the end of «ذاكرتها» → time → summary chain shows the session receipt, however the chain was left
   if(!replacing&&st.pendingReceipt){const r=st.pendingReceipt;st.pendingReceipt=null;setTimeout(()=>sheetReceipt(r),60)}
 }
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#ov").hidden)closeSheet();else if(!$("#drawer").hidden){$("#drawer").hidden=true;$("#burger").setAttribute("aria-expanded","false");$("#burger").focus()}});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#ov").hidden)closeSheet();else if(!$("#drawer").hidden){closeDrawer();$("#burger").focus()}});
+(function sheetDrag(){
+  const o=$("#ov");let d=null;
+  const no=t=>!!(t.closest&&t.closest("input,textarea,select,[contenteditable],canvas,audio,video,.scr,.no-drag,.wipe-hold"));
+  const back=(box,y)=>{box.style.transform="";o.style.removeProperty("--dim");anim(box,[{transform:`translateY(${y}px)`},{transform:"translateY(0)"}],{duration:420,easing:EASE})};
+  o.addEventListener("touchstart",e=>{d=null;if(!isPhone()||!motionOn()||e.touches.length!==1)return;const box=o.querySelector(".ovbox");if(!box||!box.contains(e.target)||no(e.target))return;
+    for(let el=e.target;el&&el!==box;el=el.parentElement)if(el.scrollTop>0)return;   // a list inside that's scrolled scrolls first
+    const t=e.touches[0];d={box,x0:t.clientX,y0:t.clientY,on:false,y:0,v:[[t.clientY,e.timeStamp]]}},{passive:true});
+  o.addEventListener("touchmove",e=>{if(!d)return;const t=e.touches[0],dx=t.clientX-d.x0,dy=t.clientY-d.y0;
+    if(!d.on){if(d.box.scrollTop>0||dy<-6||Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)){d=null;return}if(dy<8)return;d.on=true;d.y0=t.clientY;d.box.style.transition="none"}
+    e.preventDefault();const y=Math.max(0,t.clientY-d.y0);d.y=y;d.box.style.transform=`translateY(${y}px)`;
+    o.style.setProperty("--dim",(1-Math.min(1,y/Math.max(1,d.box.offsetHeight))).toFixed(3));d.v.push([t.clientY,e.timeStamp]);if(d.v.length>6)d.v.shift()},{passive:false});
+  const end=()=>{if(!d||!d.on){d=null;return}const {box,y,v}=d;d=null;const a=v[0],z=v[v.length-1],vel=z[1]>a[1]?(z[0]-a[0])/(z[1]-a[1]):0;
+    box.style.transition="";if(y>box.offsetHeight*.28||vel>.55&&y>24){vib(8);closeSheet()}else back(box,y)};
+  o.addEventListener("touchend",end);o.addEventListener("touchcancel",end);
+})();
 let toastT=null;
-function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2600)}
+function toast(msg){const t=$("#toast"),fresh=t.hidden||!!t.__out;t.textContent=msg;clearTimeout(toastT);
+  if(t.__out){t.__out.cancel();t.__out=null}t.hidden=false;
+  if(fresh)anim(t,[{opacity:0,transform:"translate(-50%,18px) scale(.94)"},{opacity:1,transform:"translateX(-50%)"}],{duration:460,easing:"cubic-bezier(.34,1.3,.64,1)"});
+  else anim(t,[{transform:"translateX(-50%) scale(1.04)"},{transform:"translateX(-50%)"}],{duration:240,easing:EASE});
+  toastT=setTimeout(()=>{const a=anim(t,[{opacity:1,transform:"translateX(-50%)"},{opacity:0,transform:"translate(-50%,10px) scale(.96)"}],{duration:240,easing:"ease-in",fill:"forwards"});
+    if(!a){t.hidden=true;return}t.__out=a;a.onfinish=()=>{if(t.__out!==a)return;t.__out=null;t.hidden=true;a.cancel()}},2600)}
 
 // ---------- recordings: Firebase when synced, otherwise this device (IndexedDB) ----------
 let fbAudioRef=null;
@@ -2688,7 +2775,7 @@ function renderSession(){
   if(!s){bar.hidden=true;return}
   const m=mk(s.id),c=clipsOf(s.id),p=c?cprOf(s.id):null,paused=!!m.pz,op=paused?openPause(s.id):null;
   bar.hidden=false;
-  bar.innerHTML=`<span class="sb-dot${paused?" pz":""}"></span><span class="sb-t"><b class="en">${esc(label(BY_ID[s.id]))}</b><span class="num" id="sbClock">${hms(sessMs(s.id))}</span>${op?`<small>⏸ <span class="num" id="sbPz">${mmss((Date.now()-op.s)/1000)}</span> · ${esc(op.r)}</small>`:c?`<small>🎬 ${Math.min(p.i+1,c.c.length)}/${c.c.length}${paused?" · ☕ استراحة":""}</small>`:paused?`<small>☕ موقوفة</small>`:""}</span>
+  H(bar).h=`<span class="sb-dot${paused?" pz":""}"></span><span class="sb-t"><b class="en">${esc(label(BY_ID[s.id]))}</b><span class="num" id="sbClock">${hms(sessMs(s.id))}</span>${op?`<small>⏸ <span class="num" id="sbPz">${mmss((Date.now()-op.s)/1000)}</span> · ${esc(op.r)}</small>`:c?`<small>🎬 ${Math.min(p.i+1,c.c.length)}/${c.c.length}${paused?" · ☕ استراحة":""}</small>`:paused?`<small>☕ موقوفة</small>`:""}</span>
     <span class="sb-btns">${fsndType()!=="off"&&!paused?`<button class="sb-park" id="sbSnd" aria-label="صوت التركيز: تشغيل أو كتم">${fsIcon()}</button>`:""}
     ${paused?`<button class="btn sm sb-open" id="sbRes">▶ استأنف</button>`:`${c?`<button class="btn sm sb-open" id="sbOpen">🎬 افتح</button>`:""}<button class="sb-park" id="sbPause" aria-label="إيقاف مؤقت">⏸</button>`}
     <button class="sb-park" id="sbPark" aria-label="فرّغ فكرة">💭</button><button class="btn primary sm" id="sbDone">✓ ذاكرتها</button><button class="sb-x" id="sbStop" aria-label="وقّف هنا">🔖</button></span>`;
@@ -3102,7 +3189,10 @@ function sfx(k,a){
   }
   try{SFX[k](a)}catch(e){}
 }
-function vib(p){if(!hapOn())return;try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+let HAPL=null;const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1;
+function vib(p){if(!hapOn())return;try{if(navigator.vibrate)navigator.vibrate(p);else if(IOS){
+    if(!HAPL){HAPL=document.createElement("label");HAPL.setAttribute("aria-hidden","true");HAPL.style.cssText="position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
+      HAPL.innerHTML='<input type="checkbox" switch tabindex="-1">';HAPL.addEventListener("click",e=>e.stopPropagation());document.body.appendChild(HAPL)}HAPL.click()}}catch(e){}}
 const MOTION_LS="uqu-motion";
 const reduceMotion=()=>{try{return localStorage.getItem(MOTION_LS)==="low"}catch(e){return false}};
 const applyMotion=()=>document.documentElement.classList.toggle("lowmo",reduceMotion());applyMotion();
@@ -3551,9 +3641,13 @@ function openFocus(id,mode){
   const keep=FS&&FS.id===id;
   const brk=a&&a.id===id&&brkPause(id);
   FS={id,i:p.i,mode:mode||(p.i>=c.c.length?"done":brk?"break":"read"),sel:new Set(),sb:keep?FS.sb:0,cd:0,brk:keep&&FS.brk?FS.brk:(brk?+mk(id).pz+BREAK_MS:0),gain:null,hem:keep&&FS.hem,modeAt:Date.now()};
-  const e=fsEl();e.hidden=false;document.documentElement.classList.add("noscroll");drawFocus();
+  const e=fsEl(),was=!e.hidden;e.hidden=false;document.documentElement.classList.add("noscroll");drawFocus();
+  if(!was)anim(e,[{opacity:0,transform:"translateY(28px)"},{opacity:1,transform:"none"}],{duration:460,easing:EASE});
 }
-function hideFocus(){const e=fsEl();if(e){e.hidden=true;e.innerHTML=""}if($("#ov").hidden)document.documentElement.classList.remove("noscroll");renderSession()}
+function hideFocus(){const e=fsEl();
+  if(e&&!e.hidden&&motionOn()){const g=e.cloneNode(true);g.removeAttribute("id");g.querySelectorAll("[id]").forEach(x=>x.removeAttribute("id"));g.setAttribute("aria-hidden","true");g.inert=true;g.style.pointerEvents="none";
+    const sc=e.scrollTop;document.body.appendChild(g);g.scrollTop=sc;const a=anim(g,[{opacity:1},{opacity:0,transform:"translateY(20px)"}],{duration:280,easing:"ease-in",fill:"forwards"});if(a)a.onfinish=()=>g.remove();setTimeout(()=>g.remove(),600)}
+  if(e){e.hidden=true;e.innerHTML=""}if($("#ov").hidden)document.documentElement.classList.remove("noscroll");renderSession()}
 function clipSug(x){if(!x.k.length)return"";const r=FS.sel.size/x.k.length;return r>=.8?"e":r>=.5?"m":"h"}
 function drawFocus(){
   const e=fsEl();if(!FS||!e||e.hidden)return;
@@ -3881,8 +3975,10 @@ function sheetReceipt(rec){
 }
 
 // ---------- 🏋️ weekly target with progressive overload, and a deload when you overdid it ----------
-function weekInfo(){
-  const ws=weekStartOf(curDay()),ct=clipTimes(),inW=(t,a)=>{const d=dayKeyOf(t);return d>=a&&d<addDays(a,7)};
+let WKI=null,WKIk="";
+function weekInfo(){const k=LV+"|"+curDay();if(k===WKIk&&WKI)return WKI;WKIk=k;return WKI=weekInfo0()}   // once per data change (it reads every clip and sitting)
+function weekInfo0(){
+  const ws=weekStartOf(curDay()),ct=clipTimes(),E={},end=a=>E[a]||(E[a]=addDays(a,7)),inW=(t,a)=>{const d=dayKeyOf(t);return d>=a&&d<end(a)};
   const n=a=>ct.filter(x=>inW(x.t,a)).length,fm=a=>sitsList().filter(x=>inW(x.s,a)).reduce((s,x)=>s+(+x.ms||0),0);
   const done=n(ws),last=n(addDays(ws,-7)),p2=n(addDays(ws,-14)),p3=n(addDays(ws,-21));
   const heavy=last>=8&&p2+p3>0&&last>1.3*((p2+p3)/2);
@@ -4091,7 +4187,7 @@ function renderHub(){
     ${hb.missedY&&!hb.today&&!hb.restToday?`<p class="hub-warn">⚠️ فاتك أمس، لا تفوّته مرتين. أي مذاكرة اليوم تحمي سلسلتك 🔥</p>`:""}
     ${wk.deload&&!hb.restToday?`<p class="hub-warn soft">🛌 الأيام اللي فاتت كانت ثقيلة. وش رايك يوم خفيف؟ <button class="linkbtn" data-hub="rest">خلّه يوم راحة</button></p>`:""}`;
   const csB=AIX(()=>aiCaseToday()?`<button data-hub="case" class="${caseWaiting()?"new":""}">🩺 حالة اليوم${caseWaiting()?" <b>جديدة</b>":" ✓"}</button>`:"","");
-  el.innerHTML=AIX(coachCardHTML,"")+card+(csB?strip.replace('<div class="hub-strip">','<div class="hub-strip">'+csB):strip);
+  H(el).h=AIX(coachCardHTML,"")+card+(csB?strip.replace('<div class="hub-strip">','<div class="hub-strip">'+csB):strip);
   el.querySelectorAll("[data-hub]").forEach(x=>x.onclick=()=>{const k=x.dataset.hub;
     if(k==="focus"&&a){if(mk(a.id).pz&&openPause(a.id))resumeSession(a.id);openFocus(a.id)}else if(k==="rtv")sheetRtv();else if(k==="bm")startFlow(x.dataset.id);
     else if(k==="radar")setPage("radar");else if(k==="career"){st.achTab="c";setPage("career")}else if(k==="rest")setRest(curDay(),true);
@@ -4299,22 +4395,27 @@ const MOD_DAYS=DATA.flatMap(w=>w.days.map(d=>({date:d.date,ar:d.ar,w:w.n})));
 function renderAddRow(el,date){
   const gone=BASE_ALL.filter(b=>mk(b.id).del&&(date?heldDate(b)===date:WEEK_OF[heldDate(b)]===DATA[st.wi].n));
   const def=date||DATA[st.wi].days[st.di].date;
-  el.innerHTML=`<button class="btn addbtn" data-add="${def}">＋ إضافة محاضرة${date?` ${dayAr(date)}`:""}</button>${gone.length?`<div class="gone"><span>🗑️ محذوفة:</span>${gone.map(b=>`<button class="pc" data-undel="${b.id}"><span class="en">${esc(b.topic0||KINDS[b.kind0].ar)}</span> · رجّعها ↩︎</button>`).join("")}</div>`:""}`;
+  H(el).h=`<button class="btn addbtn" data-add="${def}">＋ إضافة محاضرة${date?` ${dayAr(date)}`:""}</button>${gone.length?`<div class="gone"><span>🗑️ محذوفة:</span>${gone.map(b=>`<button class="pc" data-undel="${b.id}"><span class="en">${esc(b.topic0||KINDS[b.kind0].ar)}</span> · رجّعها ↩︎</button>`).join("")}</div>`:""}`;
   el.querySelectorAll("[data-add]").forEach(x=>x.onclick=()=>sheetEdit(null,{day:x.dataset.add}));
   el.querySelectorAll("[data-undel]").forEach(x=>x.onclick=()=>{const m=mk(x.dataset.undel);savePatch(x.dataset.undel,{del:null,...(m.startAt?{startAt:false,pz:false}:{})});toast("رجعت المحاضرة ✓")});
 }
 
 // ---------- ☰ pages ----------
 const PAGES=[["main","🏠","الرئيسية"],["ai","🤖","المساعد"],["career","🩺","مسيرتي"],["offers","🎁","العروض"],["radar","🎯","رادار العائد"],["exams","📝","الاختبارات"],["month","📅","إنجازات الشهر"],["sleep","🌙","خانة النوم"],["ideas","💭","أفكاري"],["settings","⚙️","الإعدادات"]];
+let DRT=null;
+function closeDrawer(){const d=$("#drawer");$("#burger").setAttribute("aria-expanded","false");if(d.hidden)return;clearTimeout(DRT);
+  if(!motionOn()){d.hidden=true;d.classList.remove("out");return}d.classList.add("out");DRT=setTimeout(()=>{d.hidden=true;d.classList.remove("out");const b=d.querySelector(".dr-box");if(b)b.style.transform=""},260)}
 function setPage(pg){
-  st.page=PAGES.some(p=>p[0]===pg)&&(pg!=="ai"||S.aiv)?pg:"main";$("#drawer").hidden=true;$("#burger").setAttribute("aria-expanded","false");
+  const prev=st.page;
+  st.page=PAGES.some(p=>p[0]===pg)&&(pg!=="ai"||S.aiv)?pg:"main";closeDrawer();
   try{history.replaceState(null,"",st.page==="main"?location.pathname+location.search:"#"+st.page)}catch(e){}
   render();window.scrollTo({top:0});
+  if(prev!==st.page)anim($("#pg-"+st.page),[{opacity:0,transform:"translateY(14px)"},{opacity:1,transform:"none"}],{duration:380,easing:EASE});   // the new page rises in
 }
 function openDrawer(){
   const d=$("#drawer"),lg=ledger(),x={total:lg.career},lv=levelOf(x.total),ni=ideasList().filter(i=>!i.x).length,no=offersWaiting();
   d.innerHTML=`<nav class="dr-box" aria-label="القائمة"><div class="dr-h">القائمة</div>${PAGES.filter(([k])=>k!=="ai"||S.aiv).map(([k,i,l])=>`<button class="dr-i" aria-current="${st.page===k?"page":"false"}" data-pg="${k}">${k==="career"?tile(lv.c,"xs"):`<span>${i}</span>`}<span class="dri-t">${l}${k==="career"?`<small>${lv.title} · 🪙 ${nf(lg.bal)}</small>`:""}</span>${k==="ideas"&&ni?`<b class="dri-n">${ni}</b>`:k==="offers"&&no?`<b class="dri-n sun">${no}</b>`:k==="ai"&&AIX(caseWaiting,false)?`<b class="dri-n sun">🩺</b>`:""}</button>${k==="main"?`<hr class="dr-sep">`:k==="ideas"?`<hr class="dr-sep">`:""}`).join("")}</nav>`;
-  d.hidden=false;$("#burger").setAttribute("aria-expanded","true");
+  clearTimeout(DRT);d.classList.remove("out");d.hidden=false;$("#burger").setAttribute("aria-expanded","true");
   d.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>setPage(b.dataset.pg));
   const cur=d.querySelector('[aria-current="page"]');if(cur)cur.focus();
 }
@@ -4525,7 +4626,7 @@ function renderOfferBar(){
     const w=!activeSession()&&!focusOpen()&&offersList().find(x=>offerState(x)==="wait");
     if(w){const left=Math.max(0,offerWaitEnd(w)-Date.now());bar.hidden=false;bar.className="offerbar wait";document.body.classList.add("has-offer");
       bar.style.setProperty("--p",(1-left/OFFER_WAIT).toFixed(3));
-      bar.innerHTML=`<span class="ob-t">${w.first?"🌅":"☀️"} عرضك يختفي بعد <b class="num">${mmss(left/1000)}</b></span><button class="ob-next" data-obw="${w.id}">ابدأ 5 دقايق ›</button>`;
+      H(bar).h=`<span class="ob-t">${w.first?"🌅":"☀️"} عرضك يختفي بعد <b class="num">${mmss(left/1000)}</b></span><button class="ob-next" data-obw="${w.id}">ابدأ 5 دقايق ›</button>`;
       bar.querySelector("[data-obw]").onclick=()=>sheetOffer(w.id);return}
     bar.hidden=true;bar.className="offerbar";document.body.classList.remove("has-offer");return}
   bar.className="offerbar";
@@ -4533,7 +4634,7 @@ function renderOfferBar(){
   if(h.length===OFFER_N&&!comboSeen[o.id]&&bar.dataset.id===o.id){comboSeen[o.id]=1;if(h.every(x=>x.done))toast(`🔥 كومبو! +${PTS.combo} فوق الدبل`)}
   bar.hidden=false;bar.dataset.id=o.id;document.body.classList.add("has-offer");
   bar.style.setProperty("--p",(1-left/(OFFER_MIN*6e4)).toFixed(3));
-  bar.innerHTML=`<span class="ob-t">☀️ <b>×2</b> <b class="num" id="obClock">${mmss(left/1000)}</b></span><span class="ob-dots" aria-label="${h.length} من 3">${[0,1,2].map(i=>`<i class="${i<h.length?"on":""}"></i>`).join("")}</span>
+  H(bar).h=`<span class="ob-t">☀️ <b>×2</b> <b class="num" id="obClock">${mmss(left/1000)}</b></span><span class="ob-dots" aria-label="${h.length} من 3">${[0,1,2].map(i=>`<i class="${i<h.length?"on":""}"></i>`).join("")}</span>
     ${h.length<OFFER_N&&nx?`<button class="ob-next" data-obgo="${nx.b.id}|${nx.t.kind}">التالية: <span class="en">${esc(label(nx.b))}</span> ›</button>`:`<span class="ob-done">${h.length>=OFFER_N?"🔥 كمّلت الثلاث!":"ما فيه مهام ثانية"}</span>`}`;
   const btn=bar.querySelector("[data-obgo]");if(btn)btn.onclick=()=>{const [bid,k]=btn.dataset.obgo.split("|");goTask(bid,k)};
 }
@@ -4566,6 +4667,7 @@ const offersWaiting=()=>offersList().filter(o=>{const s=offerState(o);return s==
 function weekStep(dir){
   st.wi=(st.wi+dir+DATA.length)%DATA.length;st.di=Math.min(st.di,DATA[st.wi].days.length-1);st.open=null;render();
   const el=$("#days");if(el){el.classList.remove("swl","swr");void el.offsetWidth;el.classList.add(dir>0?"swl":"swr")}
+  anim($("#list"),[{opacity:0,transform:`translateX(${dir>0?-26:26}px)`},{opacity:1,transform:"none"}],{duration:340,easing:EASE});
   toast(`الأسبوع ${DATA[st.wi].n}${dir>0&&st.wi===0?" · رجعنا للبداية ↻":dir<0&&st.wi===DATA.length-1?" · آخر أسبوع ↻":""}`);
 }
 function bindSwipe(el,onLeft,onRight){
@@ -4578,7 +4680,10 @@ function bindSwipe(el,onLeft,onRight){
 }
 
 // ---------- 📅 month page: each day green / yellow / red by what was due and done on time ----------
-function dayStats(d){
+// a month of days is worked out once a minute (or when your data changes), not on every page visit
+let DST=new Map(),DSTk="";
+function dayStats(d){const k=LV+"|"+Math.floor(Date.now()/6e4);if(k!==DSTk){DSTk=k;DST=new Map()}if(!DST.has(d))DST.set(d,dayStats0(d));return DST.get(d)}
+function dayStats0(d){
   const due=[],acts=[];
   ALL.filter(needsStudy).forEach(b=>{const m=mk(b.id);
     if(heldDate(b)===d&&hasEnded(b))due.push({k:"study",b,ok:!!m.studied&&lateInfo("study",b,m)<=24});
@@ -4782,15 +4887,16 @@ function renderNext(){
 const weekBlocks=w=>w.days.flatMap(d=>blocksOn(d.date));
 function renderWeeks(){
   const now=defaultPos().wi;
-  $("#weeks").innerHTML=DATA.map((w,i)=>{const p=progress(weekBlocks(w));
+  H($("#weeks")).h=DATA.map((w,i)=>{const p=progress(weekBlocks(w));
     return `<button class="wk${i===now?" now":""}" aria-pressed="${i===st.wi}" data-w="${i}"><span class="t">الأسبوع ${w.n}</span><span class="d"><span class="num en">${dnum(w.days[0].date)}–${dnum(w.days[4].date)}</span> ${MONTHS[Number(w.days[4].date.slice(5,7))-1]}${p!=null?` · <b class="num">${pct(p)}</b>`:""}</span>${p!=null?pbar(p,"thin"):""}</button>`}).join("");
   $("#weeks").querySelectorAll(".wk").forEach(b=>b.onclick=()=>{st.wi=+b.dataset.w;const ds=DATA[st.wi].days;st.di=Math.max(0,ds.findIndex(d=>blocksOn(d.date).length));st.open=null;render()});
-  const cur=$("#weeks").querySelector('[aria-pressed="true"]');
-  if(cur){const wr=$("#weeks"),a=cur.getBoundingClientRect(),c=wr.getBoundingClientRect();if(a.left<c.left||a.right>c.right)wr.scrollLeft+=a.left-c.left-8}
+  if(RWK!==st.wi){RWK=st.wi;requestAnimationFrame(()=>{const wr=$("#weeks"),cur=wr&&wr.querySelector('[aria-pressed="true"]');if(!cur)return;
+    const a=cur.getBoundingClientRect(),c=wr.getBoundingClientRect();if(a.left<c.left||a.right>c.right)wr.scrollTo({left:wr.scrollLeft+a.left-c.left-8,behavior:RWK0?"smooth":"auto"});RWK0=1})}
 }
+let RWK=-1,RWK0=0;
 function renderChips(){
   const used=new Set(ALL.map(b=>b.kind));
-  $("#chips").innerHTML=Object.entries(KINDS).filter(([k])=>used.has(k)).map(([k,v])=>`<button class="chip" style="${kv(k)}" aria-pressed="${st.kinds.has(k)}" data-k="${k}"><i></i>${v.ar}</button>`).join("");
+  H($("#chips")).h=Object.entries(KINDS).filter(([k])=>used.has(k)).map(([k,v])=>`<button class="chip" style="${kv(k)}" aria-pressed="${st.kinds.has(k)}" data-k="${k}"><i></i>${v.ar}</button>`).join("");
   $("#chips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{const k=c.dataset.k;
     if(st.kinds.size===Object.keys(KINDS).length){st.kinds=new Set([k])}
     else if(st.kinds.has(k)){st.kinds.delete(k);if(!st.kinds.size)st.kinds=new Set(Object.keys(KINDS))}
@@ -4799,12 +4905,13 @@ function renderChips(){
 }
 function renderDays(){
   const w=DATA[st.wi];
-  $("#days").innerHTML=w.days.map((d,i)=>{const bl=blocksOn(d.date),p=progress(bl);
+  H($("#days")).h=w.days.map((d,i)=>{const bl=blocksOn(d.date),p=progress(bl);
     return `<button class="day${bl.length?"":" empty"}" aria-pressed="${i===st.di}" data-d="${i}" aria-label="${d.ar} ${fmt(d.date)}${p!=null?`، إنجاز ${p}%`:""}">
     ${d.date===todayISO?'<span class="today">اليوم</span>':""}
     <span class="dn">${d.ar}</span><span class="dd">${dnum(d.date)}</span>
     <span class="dots">${bl.map(b=>`<i style="${kv(b.kind)}"></i>`).join("")}</span>${p!=null?`<span class="dpct num">${pct(p)}</span>${pbar(p,"thin")}`:""}</button>`}).join("");
-  $("#days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{st.di=+b.dataset.d;st.open=null;render()});
+  $("#days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{const dir=+b.dataset.d-st.di;st.di=+b.dataset.d;st.open=null;render();
+    if(dir)anim($("#list"),[{opacity:0,transform:`translateX(${dir>0?-26:26}px)`},{opacity:1,transform:"none"}],{duration:340,easing:EASE})});
 }
 function related(b){
   const key=norm(b.topic||"");if(!key)return[];
@@ -4894,10 +5001,10 @@ function renderDay(){
   const w=DATA[st.wi],d=w.days[st.di],dbl=blocksOn(d.date);
   const blocks=dbl.filter(b=>st.kinds.has(b.kind));
   $("#dayTitle").textContent=`${d.ar} ${fmt(d.date)}`;
-  $("#prog").innerHTML=`<div class="pl">${progLine(progress(dbl),"إنجاز اليوم",avgRecall(dbl))}</div><div class="pl">${progLine(progress(weekBlocks(w)),"الأسبوع",avgRecall(weekBlocks(w)))}</div>`;
-  $("#dayEst").innerHTML=estLine(weekBlocks(w),"من محاضرات هذا الأسبوع")+HOW();
+  H($("#prog")).h=`<div class="pl">${progLine(progress(dbl),"إنجاز اليوم",avgRecall(dbl))}</div><div class="pl">${progLine(progress(weekBlocks(w)),"الأسبوع",avgRecall(weekBlocks(w)))}</div>`;
+  H($("#dayEst")).h=estLine(weekBlocks(w),"من محاضرات هذا الأسبوع")+HOW();
   const how=$("#dayEst details");if(how)how.ontoggle=()=>{st.howOpen=how.open};
-  $("#list").innerHTML=blocks.length?blocks.map(cardHTML).join(""):
+  H($("#list")).h=blocks.length?blocks.map(cardHTML).join(""):
     `<div class="empty-state"><b>${dbl.length?"لا توجد جلسات بهذا الفلتر":"لا توجد محاضرات"}</b>${dbl.length?"غيّر نوع النشاط من الأعلى لعرض بقية الجلسات.":(w.days.some(x=>blocksOn(x.date).length)?"هذا اليوم فاضي في الجدول.":"جدول هذا الأسبوع لم يُعبّأ بعد في الملف.")}</div>`;
   bindCards($("#list"));
   renderAddRow($("#dayAdd"),d.date);
@@ -4905,15 +5012,15 @@ function renderDay(){
 function renderWeek(){
   const w=DATA[st.wi],wb=weekBlocks(w);
   $("#weekTitle").textContent=`الأسبوع ${w.n}`;
-  $("#weekProg").innerHTML=`<div class="pl">${progLine(progress(wb),"إنجاز الأسبوع",avgRecall(wb))}</div>`;
-  $("#weekEst").innerHTML=estLine(wb,"من محاضرات هذا الأسبوع");
+  H($("#weekProg")).h=`<div class="pl">${progLine(progress(wb),"إنجاز الأسبوع",avgRecall(wb))}</div>`;
+  H($("#weekEst")).h=estLine(wb,"من محاضرات هذا الأسبوع");
   renderAddRow($("#weekAdd"),null);
   $("#wGrid").setAttribute("aria-pressed",st.wmode==="grid");$("#wList").setAttribute("aria-pressed",st.wmode==="list");
   $("#wGridBox").hidden=st.wmode!=="grid";$("#wListBox").hidden=st.wmode!=="list";
   if(st.wmode==="list"){
     const box=$("#wListBox");
-    if(!wb.length){box.innerHTML=`<div class="empty-state"><b>لا توجد محاضرات</b>جدول هذا الأسبوع لم يُعبّأ بعد في الملف.</div>`;return}
-    box.innerHTML=w.days.map(d=>{const all=blocksOn(d.date),bl=all.filter(b=>st.kinds.has(b.kind)),p=progress(all);
+    if(!wb.length){H(box).h=`<div class="empty-state"><b>لا توجد محاضرات</b>جدول هذا الأسبوع لم يُعبّأ بعد في الملف.</div>`;return}
+    H(box).h=w.days.map(d=>{const all=blocksOn(d.date),bl=all.filter(b=>st.kinds.has(b.kind)),p=progress(all);
       return `<div class="dgroup"><h3 class="dgh${bl.length?"":" off"}">${d.ar} ${fmt(d.date)}${d.date===todayISO?" <small>· اليوم</small>":""}${p!=null?` <small>· إنجاز ${pct(p)}</small>`:""}${bl.length?"":" <small>· لا توجد محاضرات</small>"}</h3>${bl.map(cardHTML).join("")}</div>`}).join("");
     bindCards(box);return;
   }
@@ -4933,7 +5040,7 @@ function renderWeek(){
   if(!timed.length)h+=`<div style="grid-column:2/7;grid-row:2/5;display:flex;align-items:center;justify-content:center;color:var(--muted)">${wb.length?"أسبوع الاختبارات النهائية":"جدول هذا الأسبوع لم يُعبّأ بعد في الملف."}</div>`;
   const g=$("#grid");g.style.gridTemplateRows=rows.join(" ");
   g.style.setProperty("--dcols",w.days.map(d=>blocksOn(d.date).some(b=>b.from)?"minmax(0,1fr)":"minmax(0,.62fr)").join(" "));
-  g.innerHTML=h;
+  H(g).h=h;
   g.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
 }
 function doctorsList(){const m=new Map();ALL.forEach(b=>{if(!b.dr)return;if(!m.has(b.dr))m.set(b.dr,[]);m.get(b.dr).push(b)});
@@ -4960,7 +5067,7 @@ function renderDocs(){
   bindCards(box);
 }
 function bindCards(root){
-  root.querySelectorAll(".head").forEach(h=>h.onclick=()=>{st.open=st.open===h.dataset.id?null:h.dataset.id;if(st.prompt&&st.prompt.where==="card")st.prompt=null;st.knotFor=null;render()});
+  root.querySelectorAll(".head").forEach(h=>h.onclick=()=>flipCards(root,()=>{st.open=st.open===h.dataset.id?null:h.dataset.id;if(st.prompt&&st.prompt.where==="card")st.prompt=null;st.knotFor=null;render()}));
   root.querySelectorAll("[data-mark]").forEach(b=>b.onclick=()=>{const [id,f]=b.dataset.mark.split("|");clickMark(id,f)});
   root.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>sheetEdit(b.dataset.edit));
   root.querySelectorAll("[data-pgo]").forEach(b=>b.onclick=()=>setPage(b.dataset.pgo));
@@ -4977,6 +5084,27 @@ function bindCards(root){
   root.querySelectorAll("[data-kdel]").forEach(b=>b.onclick=()=>{const [id,k]=b.dataset.kdel.split("|");setKnot(id,k,false)});
   bindPrompts(root);
 }
+// a list that changed: what stayed glides to its new place, what's new fades in, a task just ticked gets a little pop
+const flipKey=el=>{const t=el.querySelector&&el.querySelector("[data-task]");return t?"t|"+t.dataset.task:el.id||"g|"+el.className+"|"+el.textContent.slice(0,48)};
+function flipSnap(root,sel){if(!motionOn()||!root||!root.isConnected||root.offsetParent===null)return null;const m=new Map();root.querySelectorAll(sel).forEach(el=>m.set(flipKey(el),{r:el.getBoundingClientRect(),d:el.classList.contains("done")}));return m}
+function flipPlay(root,sel,before){if(!before)return;root.querySelectorAll(sel).forEach(el=>{const b=before.get(flipKey(el));
+  if(!b){anim(el,[{opacity:0,transform:"scale(.97)"},{opacity:1,transform:"none"}],{duration:300,easing:EASE});return}
+  const dy=b.r.top-el.getBoundingClientRect().top;if(Math.abs(dy)>.5)anim(el,[{transform:`translateY(${dy}px)`},{transform:"none"}],{duration:460,easing:EASE});
+  if(!b.d&&el.classList.contains("done"))anim(el.querySelector(".tcheck"),[{transform:"scale(.6)"},{transform:"scale(1.18)",offset:.6},{transform:"scale(1)"}],{duration:380,easing:"ease-out"})})}
+// FLIP: where everything was → the change → each card glides from its old place; the opened one unfolds
+function flipCards(root,change){
+  if(!motionOn()||!root||!root.isConnected){change();return}
+  const key=el=>el.id||"g|"+el.textContent.slice(0,48),pick=()=>[...root.querySelectorAll(".card,.dgh"),...(()=>{const a=[];let x=root.nextElementSibling;while(x){a.push(x);x=x.nextElementSibling}return a})()];
+  const before=new Map();pick().forEach(el=>before.set(key(el),el.getBoundingClientRect()));const open0=st.open;
+  change();
+  const opened=st.open&&st.open!==open0?"c-"+st.open:"",closed=open0&&open0!==st.open?"c-"+open0:"";
+  pick().forEach(el=>{const r0=before.get(key(el));if(!r0)return;const r1=el.getBoundingClientRect(),dy=r0.top-r1.top;
+    if(el.id===opened){
+      anim(el,[{transform:`translateY(${dy}px)`,clipPath:`inset(0 0 ${Math.max(0,r1.height-r0.height)}px 0 round 12px)`},{transform:"none",clipPath:"inset(0 0 0 0 round 12px)"}],{duration:440,easing:EASE});
+      anim(el.querySelector(".body"),[{opacity:0,transform:"translateY(-8px)"},{opacity:1,transform:"none"}],{duration:320,delay:70,easing:"ease-out",fill:"backwards"});
+      anim(el.querySelector(".chev"),[{transform:"rotate(0deg)"},{transform:"rotate(180deg)"}],{duration:320,easing:EASE});return}
+    if(el.id===closed)anim(el.querySelector(".chev"),[{transform:"rotate(180deg)"},{transform:"rotate(0deg)"}],{duration:320,easing:EASE});
+    if(Math.abs(dy)>.5)anim(el,[{transform:`translateY(${dy}px)`},{transform:"none"}],{duration:440,easing:EASE})})}
 function addKnot(id){
   const i=$("#knotIn"),t=(i&&i.value||"").trim();if(!t){i&&i.focus();return}
   st.knotFor=null;deferred=false;i.blur();
@@ -4984,9 +5112,9 @@ function addKnot(id){
 }
 function go(id){
   const b=BY_ID[id];if(!b)return;
-  if(st.page!=="main"){st.page="main";$("#drawer").hidden=true;try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
+  if(st.page!=="main"){st.page="main";closeDrawer();try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
   const pos=DAY_IDX[heldDate(b)]||[b.wi,b.di];st.wi=pos[0];st.di=pos[1];st.open=id;st.view="day";st.kinds.add(b.kind);render();
-  const el=document.getElementById("c-"+id);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash")}
+  const el=document.getElementById("c-"+id);if(el){el.scrollIntoView({behavior:motionOn()?"smooth":"auto",block:"center"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
 }
 let deferred=false;
 const typing=()=>{const a=document.activeElement;return!!(a&&(a.tagName==="INPUT"||a.tagName==="TEXTAREA")&&(a.id==="knotIn"||a.id==="fxTxt"||a.closest(".prompt")||a.closest(".pg")))};
@@ -5023,8 +5151,17 @@ $("#lowBtn").onclick=()=>{setTop("low",lowOn()?false:todayISO);renderTasks()};
 $("#capMinus").onclick=()=>setPts((S.pts||10)-1);$("#capPlus").onclick=()=>setPts((S.pts||10)+1);
 $("#whenBtn").onclick=sheetSmart;
 bindSwipe($("#days"),()=>weekStep(1),()=>weekStep(-1));bindSwipe($("#dayView .dayhead"),()=>weekStep(1),()=>weekStep(-1));bindSwipe($("#weekView .wtools"),()=>weekStep(1),()=>weekStep(-1));$("#thinkBtn").onclick=openPark;$("#rcBtn").onclick=sheetRecCheck;$("#rsBtn").onclick=sheetReset;
-$("#burger").onclick=()=>{if($("#drawer").hidden)openDrawer();else{$("#drawer").hidden=true;$("#burger").setAttribute("aria-expanded","false")}};
-$("#drawer").onclick=e=>{if(e.target.id==="drawer"){$("#drawer").hidden=true;$("#burger").setAttribute("aria-expanded","false")}};
+$("#burger").onclick=()=>{if($("#drawer").hidden||$("#drawer").classList.contains("out"))openDrawer();else closeDrawer()};
+$("#drawer").onclick=e=>{if(e.target.id==="drawer")closeDrawer()};
+// swipe the drawer back to the right to close it
+(function(){const d=$("#drawer");let s=null;
+  d.addEventListener("touchstart",e=>{const b=d.querySelector(".dr-box");s=b&&e.touches.length===1&&motionOn()?{b,x0:e.touches[0].clientX,y0:e.touches[0].clientY,on:false,x:0,t:e.timeStamp}:null},{passive:true});
+  d.addEventListener("touchmove",e=>{if(!s)return;const t=e.touches[0],dx=t.clientX-s.x0,dy=t.clientY-s.y0;
+    if(!s.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){s=null;return}if(dx<8)return;s.on=true;s.x0=t.clientX}
+    e.preventDefault();s.x=Math.max(0,t.clientX-s.x0);s.b.style.transform=`translateX(${s.x}px)`},{passive:false});
+  const end=e=>{if(!s||!s.on){s=null;return}const {b,x,t}=s;s=null;const v=x/Math.max(1,(e.timeStamp||t)-t);
+    if(x>b.offsetWidth*.3||v>.5)closeDrawer();else{b.style.transform="";anim(b,[{transform:`translateX(${x}px)`},{transform:"translateX(0)"}],{duration:380,easing:EASE})}};
+  d.addEventListener("touchend",end);d.addEventListener("touchcancel",end)})();
 $("#fiveBar").onclick=fiveAct;
 $("#sfxOn").checked=sfxOn();$("#hapOn").checked=hapOn();$("#sfxMed").checked=sfxMedia();$("#moHi").checked=!reduceMotion();
 $("#sfxMed").onchange=e=>{try{localStorage.setItem(SMODE_LS,e.target.checked?"1":"0")}catch(_){}sfx("g")};
@@ -5055,6 +5192,17 @@ let lastSig="";
 setInterval(()=>{todayISO=isoOf(new Date());try{if(timeSig()!==lastSig)render()}catch(e){console.error(e)}},60000);
 // the date is read fresh at every tap, so something done at 00:00:30 isn't filed under yesterday
 ["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{todayISO=isoOf(new Date())},true));
+// ▸ a panel (details) opens and closes with motion: its height follows, nothing jumps
+document.addEventListener("click",e=>{const sm=e.target.closest&&e.target.closest("summary");if(!sm||!motionOn()||e.defaultPrevented)return;const d=sm.parentElement;
+  if(!d||d.tagName!=="DETAILS"||sm!==d.querySelector(":scope>summary")||d.__anim)return;const ov=$("#ov");if(ov&&ov.contains(d)&&Date.now()-(+ov.dataset.t0||0)<320)return;const ia=e.target.closest("button,a,input,select,textarea,label");if(ia&&ia!==sm&&sm.contains(ia))return;
+  const cs=getComputedStyle(d),closedH=sm.offsetHeight+parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)+parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth);
+  const fin=()=>{d.style.overflow="";d.style.height="";d.__anim=null};
+  if(!d.open){requestAnimationFrame(()=>{if(!d.open)return;const h1=d.getBoundingClientRect().height;if(h1-closedH<4)return;d.style.overflow="clip";
+      d.__anim=d.animate([{height:closedH+"px"},{height:h1+"px"}],{duration:Math.min(460,240+(h1-closedH)/6),easing:EASE});d.__anim.onfinish=fin;d.__anim.oncancel=fin})}
+  else{e.preventDefault();const h1=d.getBoundingClientRect().height;d.style.overflow="clip";
+    d.__anim=d.animate([{height:h1+"px"},{height:closedH+"px"}],{duration:Math.min(380,200+(h1-closedH)/8),easing:EASE});d.__anim.onfinish=()=>{d.open=false;fin()};d.__anim.oncancel=fin}},true);
+["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+document.addEventListener("touchstart",()=>{},{passive:true});   // lets :active (the press look) work on iOS
 // a double tap can't land on the next screen's button: taps in the first moment after a sheet appears are ignored
 $("#ov").addEventListener("click",e=>{if(e.isTrusted&&Date.now()-(+$("#ov").dataset.t0||0)<320){e.stopPropagation();e.preventDefault()}},true);
 // ===== v19 AI START =====
@@ -5651,8 +5799,12 @@ function regularReviews(m,endD){const ev=[];if(!m.studied)return ev;
   if(!m.rev1){const d1=r1Due(m),dd=d1<todayISO?todayISO:d1;if(dd<endD){ev.push([dd,"r1"]);const d2=addDays(dd,5);if(d2<endD)ev.push([d2,"r2"])}}
   else if(!m.rev2){const d2=r2Due(m),dd=d2<todayISO?todayISO:d2;if(dd<endD)ev.push([dd,"r2"])}
   return ev}
-function examPlanCalc(e){
-  e=e||nextExam();if(!e)return null;const left=diffDays(todayISO,e.date);if(left<1||left>14)return null;
+// the plan is the same until your data or the hour changes: worked out once, not on every repaint
+let EPC=new Map(),EPCk="";
+function examPlanCalc(e){e=e||nextExam();if(!e)return null;const k=LV+"|"+todayISO+"|"+Math.floor(Date.now()/36e5);if(k!==EPCk){EPCk=k;EPC=new Map()}
+  if(!EPC.has(e.b.id))EPC.set(e.b.id,examPlanCalc0(e));return EPC.get(e.b.id)}
+function examPlanCalc0(e){
+  if(!e)return null;const left=diffDays(todayISO,e.date);if(left<1||left>14)return null;
   const T=examStartMs(e),days=[];for(let d=todayISO;d<e.date;d=addDays(d,1))days.push(d);
   const goal=+S.goal||85,Rt=Math.min(95,Math.max(60,needR(goal))),capDay=Math.max(2,Math.min(6,Math.round((S.pts||10)/3))),now=Date.now();
   const tot=e.scope.reduce((a,b)=>a+Math.max(1,hrs(b)),0)||1,eve=days.map(d=>new Date(d+"T21:00:00").getTime());
@@ -6437,7 +6589,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.4";
+const RN_DEV="ghrunner",APPV="20.5";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
