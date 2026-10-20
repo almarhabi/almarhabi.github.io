@@ -882,6 +882,17 @@ html.lowmo .burst.at,html.lowmo .flashscr,html.lowmo .rays{display:none}html.low
 .gdb-i{display:flex;align-items:center;gap:10px;width:100%;text-align:start;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:11px 12px;font:inherit;font-size:14px;cursor:pointer}
 .gdb-i .gdb-n{flex:1;min-width:0;overflow-wrap:anywhere;direction:auto}.gdb-i small{color:var(--muted);font-size:11.5px;white-space:nowrap}.gdb-i .gdb-go{color:var(--muted);font-size:18px}
 .gdb-i.star{border-color:#d9a400}.gdb-i.on{outline:2px solid var(--accent,#0e5e4a);outline-offset:1px}.gdb-sel{position:sticky;bottom:0}
+/* ===== v20.3: the gate line and the wipe ===== */
+.cs-gate{margin:0 0 4px;align-self:stretch;border:1px solid var(--k-disc);background:color-mix(in srgb,var(--k-disc) 12%,var(--surface));color:var(--ink);border-radius:12px;padding:8px 12px;font-size:13.5px;font-weight:700;text-align:center}
+.lc-wipe{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 8px;width:100%;margin-top:4px;border:1px dashed color-mix(in srgb,var(--k-exam) 60%,var(--line));background:color-mix(in srgb,var(--k-exam) 6%,var(--surface));color:var(--k-exam);border-radius:14px;padding:11px 12px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.lc-wipe span{font-size:16px}.lc-wipe small{flex-basis:100%;font-size:11px;font-weight:500;color:var(--muted)}
+.wipe-box{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:440px;text-align:start}
+.wipe-col{display:flex;flex-direction:column;gap:4px;border-radius:14px;padding:10px 12px;font-size:12.5px;border:1px solid var(--line)}
+.wipe-col>b{font-size:13.5px}.wipe-col.gone{background:color-mix(in srgb,var(--k-exam) 8%,var(--surface));border-color:color-mix(in srgb,var(--k-exam) 40%,var(--line))}
+.wipe-col.stay{background:color-mix(in srgb,var(--s-study) 8%,var(--surface));border-color:color-mix(in srgb,var(--s-study) 40%,var(--line))}
+.wipe-hold{position:relative;overflow:hidden;border:1px solid var(--k-exam);background:var(--k-exam-bg);color:var(--k-exam);border-radius:999px;padding:13px 18px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
+.wipe-hold i{position:absolute;inset:0 auto 0 0;width:0;background:color-mix(in srgb,var(--k-exam) 30%,transparent)}
+.wipe-hold span{position:relative}
 /* ===== v20.1: the 🎬 sheet ===== */
 .cs-ai{gap:10px}.cs-ai>b{font-size:15px}
 .cs-ai #spBox{display:flex;flex-direction:column;align-items:stretch;gap:8px}
@@ -1407,7 +1418,7 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.2</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.3</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1546,8 +1557,8 @@ const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen"
 // ---------- 🛡️ whatever comes from storage or another device is checked before it's used (a broken value can't take the page down) ----------
 const isISO=v=>typeof v==="string"&&/^\d{4}-\d\d-\d\d$/.test(v)&&!isNaN(Date.parse(v+"T12:00:00Z"));
 const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
-const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards","ltAt","akc","spx"],
-  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak","akj","spj"],MK_OBJ=["knots","recs","pre"];
+const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards","ltAt","akc","spx","wpAt"],
+  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak","akj","spj","wpf"],MK_OBJ=["knots","recs","pre"];
 function cleanMark(m){
   if(!isObj(m))return null;
   MK_DATE.forEach(f=>{const v=m[f];if(v==null||v===false||isISO(v))return;
@@ -2165,6 +2176,7 @@ function bindPrompts(root){
     b.onclick=save;[h,mm].forEach(x=>x.onkeydown=ev=>{if(ev.key==="Enter"){ev.preventDefault();save()}})});
   root.querySelectorAll("[data-tedit]").forEach(b=>b.onclick=()=>sheetTime(b.dataset.tedit,false));
   root.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startFlow(b.dataset.start));
+  root.querySelectorAll("[data-wipe]").forEach(b=>b.onclick=()=>sheetWipe(b.dataset.wipe));
   root.querySelectorAll("[data-hit]").forEach(b=>b.onclick=()=>{const [id,n]=b.dataset.hit.split("|"),pre=mk(id).pre;if(pre)savePatch(id,{pre:{...pre,hit:+n}})});
   root.querySelectorAll("[data-cedit]").forEach(b=>b.onclick=()=>sheetCards(b.dataset.cedit));
   root.querySelectorAll("[data-recnew]").forEach(b=>b.onclick=()=>{const [id,stg]=b.dataset.recnew.split("|");sheetSummary(id,stg)});
@@ -2808,7 +2820,7 @@ const offerSlotsLeft=o=>OFFER_N-offerHits(o).length;
 
 let LG=null,LGk="";
 function fines(E,due,doneAt,full,what,n,id){
-  if(!due||due<ledgerStart())return;const now=Date.now();
+  if(!due||due<ledgerStart())return;if(id&&+mk(id).wpAt&&due<=+mk(id).wpAt)return;   const now=Date.now();   // 🧹 a wiped lecture's earlier fines are kept frozen (wpf)
   FINE.forEach(([h,share],i)=>{const t=due+h*HR;if(t<=now&&(!doneAt||doneAt>t)){const a=-Math.round(full*share);
     E.push({at:t,a,t:`⚠️ غرامة ${Math.round(share*100)}%${i?" إضافية":""} · تأخير ${what}`,s:n,k:"fine",id,what,open:!doneAt});
     if(doneAt&&doneAt-t<=RESCUE_MS&&doneAt<=now)E.push({at:doneAt,a:Math.round(-a/2),t:`🛟 إنقاذ: رجع لك نص غرامة ${what}`,s:n,k:"fine",id})}});
@@ -2818,6 +2830,7 @@ function ledger(){
   const E=[],now=Date.now(),add=(at,a,t,s,k,id)=>{if(a)E.push({at,a,t,s:s||"",k,id:id||""})};
   ALL.filter(needsStudy).forEach(b=>{const m=mk(b.id),n=label(b),id=b.id;
     const sAt=m.studied?tsOf(m.studied,m.sAt,18):0;
+    if(m.wpf){const fz=sjson(m.wpf,[]);(Array.isArray(fz)?fz:[]).forEach(f=>{if(isObj(f)&&+f.at>0&&+f.a)E.push({at:+f.at,a:Math.round(+f.a),t:String(f.t||"⚠️ غرامة").slice(0,140),s:n,k:"fine",id,what:String(f.what||"").slice(0,40),open:false})})}
     if(m.studied)add(sAt,PTS.study,"📚 ذاكرت",n,"earn",id);
     fines(E,endMsOf(b),sAt,PTS.study,"المذاكرة",n,id);
     if(m.again)add(tsOf(m.again,m.againAt,19),PTS.again,"🔁 مراجعة صعبة",n,"earn",id);
@@ -3211,7 +3224,8 @@ const curDay=()=>dayKeyOf(Date.now());
 const weekStartOf=iso=>addDays(iso,-new Date(iso+"T12:00:00Z").getUTCDay());   // weeks start on Sunday
 const sjson=(v,def)=>{if(!v||typeof v!=="string")return def;try{const o=JSON.parse(v);return o??def}catch(e){return def}};
 const ago=ms=>{const m=Math.max(1,Math.round((Date.now()-ms)/6e4));return m<60?`${m} دقيقة`:m<1440?cnt(Math.round(m/60),"ساعة","ساعتين","ساعات"):dayWord(Math.round(m/1440))};
-const sitsList=()=>{const l=jget("sits",[]);return Array.isArray(l)?l.filter(x=>x&&x.s&&x.id):[]};
+const wipedBefore=(id,t)=>{const w=+mk(id).wpAt||0;return!!w&&(+t||0)<w};   // 🧹 a wiped lecture's old sessions, pauses and thoughts don't count any more
+const sitsList=()=>{const l=jget("sits",[]);return Array.isArray(l)?l.filter(x=>x&&x.s&&x.id&&!wipedBefore(x.id,x.s)):[]};
 const rtvDaysList=()=>{const l=jget("rtvDays",[]);return Array.isArray(l)?l.filter(x=>x&&x.d&&x.at):[]};
 const restList=()=>String(S.rest||"").split(",").filter(Boolean);
 async function copyText(t){
@@ -3310,9 +3324,9 @@ function parseClips(text,b){
   if(enc.length>24000)return{err:"الرد طويل بشكل غريب. اطلب من Claude نقاط أقصر."};
   return{enc,n,c,warn:[...warn]};
 }
-function sheetClipSetup(id,then){
+function sheetClipSetup(id,then,gated){
   const b=BY_ID[id];if(!b)return;const has=clipsOf(id),started=clipsRated(id),pr=clipPrompt(b);let parsed=null;
-  openSheet(`<div id="csMain" class="csmain"><div class="sh-ic">🎬</div><h2 class="sh-t">${has?"بدّل المقاطع":"وضع المقاطع"}</h2><p class="sh-s en">${esc(label(b))}</p>
+  openSheet(`<div id="csMain" class="csmain">${gated?`<p class="cs-gate">🔒 جهّز مقاطعها أول، وبعدها تبدأ المذاكرة</p>`:""}<div class="sh-ic">🎬</div><h2 class="sh-t">${has?"بدّل المقاطع":"وضع المقاطع"}</h2><p class="sh-s en">${esc(label(b))}</p>
     <p class="sh-s">مقاطع قصيرة: سؤال يشعل الفضول ← قراءة ← تفريغ من راسك.</p>
     ${AIX(()=>clipAiBlock(id),"")}
     <details class="how cs-claude"${S.aiv&&aiOn()?"":" open"}><summary>🤖 Claude: الطريقة اليدوية</summary><div class="cs-cbody">
@@ -3327,7 +3341,7 @@ function sheetClipSetup(id,then){
     <div id="csOut" class="cs-out" aria-live="polite"></div>
     ${has&&started?`<p class="sh-note">⚠️ عندك تقدّم في المقاطع الحالية (${started}). لو بدّلتها يتصفّر التقدّم.</p>`:""}
     <div class="sh-act"><button class="btn primary big" id="csGo" disabled>احفظ المقاطع${then?" وابدأ 🎬":""}</button></div></div></details>
-    ${then?`<div class="sh-act"><button class="btn" id="csPlain">ذاكر بدون مقاطع</button></div>`:""}</div>
+</div>
     <div id="csAlt" class="csalt" hidden></div><button class="ovback" id="csBack" type="button" aria-label="رجوع خطوة" hidden>→</button>`,box=>{
     const inp=box.querySelector("#csIn"),out=box.querySelector("#csOut"),go=box.querySelector("#csGo"),pt=box.querySelector("#csPrompt");
     const check=()=>{const v=inp.value.trim();if(!v){out.innerHTML="";go.disabled=true;parsed=null;return}
@@ -3343,8 +3357,7 @@ function sheetClipSetup(id,then){
     box.querySelector("#csShow").onclick=()=>{pt.hidden=!pt.hidden};
     box.querySelector("#csPaste").onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){inp.value=t;check()}else toast("الحافظة فاضية")}catch(e){toast("الصقه بنفسك داخل المربع");inp.focus()}};
     go.onclick=()=>{if(!parsed)return;const pl=pdfLink?AIX(()=>safeDrive(pdfLink),""):"";savePatch(id,{clips:parsed.enc,cpr:false,nc:false,...(pl?{pdf:pl}:{})});toast(`انحفظت ${cnt(parsed.c.length,"مقطع","مقطعين","مقاطع")} 🎬`);if(then)then();else closeSheet()};
-    const pl=box.querySelector("#csPlain");if(pl)pl.onclick=()=>{savePatch(id,{nc:1});then()};
-    AIX(()=>csInit(box,id),null);
+    AIX(()=>csInit(box,id,then),null);
   });
 }
 
@@ -3383,7 +3396,7 @@ function sheetBack(id,op){
 }
 // ---------- ⏸ a pause needs a real reason; prayer earns points ----------
 const PRAY_R="🕌 الصلاة",DEFAULT_REASONS=[PRAY_R,"🏠 أعمال المنزل","☕ راحة"],PRAY_MIN=4*6e4;
-const pausesList=()=>{const l=jget("pauses",[]);return Array.isArray(l)?l.filter(x=>x&&x.s&&x.id):[]};
+const pausesList=()=>{const l=jget("pauses",[]);return Array.isArray(l)?l.filter(x=>x&&x.s&&x.id&&!wipedBefore(x.id,x.s)):[]};
 const reasonsList=()=>{const l=jget("preasons",[]).filter(r=>typeof r==="string"&&r&&!DEFAULT_REASONS.includes(r));return[...DEFAULT_REASONS,...l.slice(-12)]};
 const openPause=id=>pausesList().filter(p=>p.id===id&&!p.e).sort((a,b)=>b.s-a.s)[0];
 // closes the open pause (and any leftover open one for the same lecture, with no time, so it can't count as a long prayer)
@@ -3429,6 +3442,46 @@ function sheetPause(id){
 function stopSession(id,how){
   endPause(id);st.back=null;const ms=sessMs(id),rec=closeSitting(id,how);
   savePatch(id,{acc:ms,startAt:false,pz:false});focusSync();if(FS&&FS.id===id)hideFocus();return rec;
+}
+// ---------- 🧹 v20.3: wipe one lecture's progress (and the coins it earned); debts it already had stay ----------
+const WIPE_KEEP=new Set(["nm","drx","knd","mv","del","wpAt","wpf"]);   // your timetable edits stay
+const lecHasData=id=>Object.keys(mk(id)).some(f=>!WIPE_KEEP.has(f)&&mk(id)[f]!==false&&mk(id)[f]!=null&&mk(id)[f]!=="");
+let WIPED=null;   // the last wipe, for 30 s of «↺ تراجع»
+function wipeLecture(id){
+  const b=BY_ID[id];if(!b)return null;const m=mk(id),now=Date.now();
+  const fz=ledger().E.filter(e=>e.k==="fine"&&e.id===id&&e.at<=now).map(e=>({at:e.at,a:e.a,t:e.t,what:e.what||""})).slice(-80);
+  const a=activeSession();if(a&&a.id===id){endPause(id);st.back=null;st.sit=null;saveSitLocal();if(FS&&FS.id===id)hideFocus();if(fiveRun&&fiveRun.id===id){fiveRun=null;renderFive()}}
+  const before={},patch={};Object.keys(m).forEach(f=>{if(WIPE_KEEP.has(f))return;before[f]=m[f];patch[f]=false});
+  before.wpAt=m.wpAt??false;before.wpf=m.wpf??false;patch.wpAt=now;patch.wpf=JSON.stringify(fz);
+  const audio=recsOf(id).filter(r=>r.a).map(r=>({k:r.k,w:r.w,mp:r.mp,mw:r.mw}));
+  AIX(()=>{if(spGet(id))spDrop(id)},null);
+  WIPED={id,before,audio,at:now};
+  savePatch(id,patch);focusSync();
+  // things kept only on this device go once the undo time is over
+  const w=WIPED;setTimeout(()=>{if(WIPED!==w)return;WIPED=null;
+    w.audio.forEach(r=>{try{audioStore.del(r.k,r.w);if(r.mp)audioStore.del(r.mp,r.mw||r.w)}catch(e){}});
+    AIX(()=>{["slides","decks"].forEach(n=>idbAI(n,"readwrite",s=>s.delete(id)).catch(()=>{}));idbAI("decks","readwrite",s=>s.delete(id+"|apkg")).catch(()=>{})},null)},30e3);
+  return w}
+function undoWipe(){const w=WIPED;if(!w||Date.now()-w.at>30e3)return false;WIPED=null;savePatch(w.id,w.before);return true}
+function sheetWipe(id){const b=BY_ID[id];if(!b)return;const m=mk(id),L=ledger(),earned=L.E.filter(e=>e.id===id&&e.k!=="fine"&&e.k!=="spend").reduce((a,e)=>a+e.a,0),debt=-L.E.filter(e=>e.id===id&&e.k==="fine").reduce((a,e)=>a+e.a,0);
+  openSheet(`<div class="sh-ic">🧹</div><h2 class="sh-t">تمسح بيانات المحاضرة؟</h2><p class="sh-s en">${esc(label(b))}</p>
+    <div class="wipe-box"><div class="wipe-col gone"><b>ينمسح</b><span>ذاكرتها والمراجعات${m.rv?" والاسترجاع":""}</span><span>المقاطع وتقدّمها</span><span>ANKI والعُقد والتسجيلات</span><span>الوقت والجلسات والأفكار وعلامة الكتاب</span><span>العملات اللي جت منها: <b class="en">${earned>0?"−"+earned:0}</b></span></div>
+      <div class="wipe-col stay"><b>يبقى</b><span>الاسم والوقت والدكتور</span><span>الديون اللي عليها: <b class="en">${debt>0?debt:0}</b></span><span>الإنجازات اللي كسبتها</span></div></div>
+    <p class="sh-note">عندك 30 ثانية تتراجع بعدها.</p>
+    <div class="sh-act"><button class="wipe-hold" id="wpGo" type="button"><i></i><span>اضغط مطوّل عشان تمسح</span></button><button class="btn" id="wpNo">لا، خلّها</button></div>`,box=>{
+    const g=box.querySelector("#wpGo"),bar=g.querySelector("i"),lab=g.querySelector("span");let t0=0,raf=0,done=false;
+    const stop=()=>{if(done)return;t0=0;cancelAnimationFrame(raf);bar.style.width="0%";lab.textContent="اضغط مطوّل عشان تمسح"};
+    const tick=()=>{if(!t0)return;const k=Math.min(1,(Date.now()-t0)/1600);bar.style.width=k*100+"%";if(k<1){raf=requestAnimationFrame(tick);return}
+      done=true;wipeLecture(id);sfx&&sfx("chime");
+      box.innerHTML=`<div class="sh-ic">✨</div><h2 class="sh-t">انمسحت</h2><p class="sh-s en">${esc(label(b))}</p><p class="sh-s">رجعت المحاضرة جديدة. جهّز مقاطعها وابدأ من الصفر.</p>
+        <div class="sh-act"><button class="btn" id="wpUndo">↺ تراجع (<span class="num" id="wpS">30</span>)</button><button class="btn primary" id="wpOk">تمام</button></div>`;
+      const u=box.querySelector("#wpUndo"),sEl=box.querySelector("#wpS");const iv=setInterval(()=>{const left=Math.max(0,30-Math.floor((Date.now()-(WIPED?WIPED.at:0))/1000));if(!u.isConnected||!WIPED){clearInterval(iv);if(u.isConnected)u.remove();return}sEl.textContent=left},500);
+      u.onclick=()=>{if(undoWipe()){toast("رجعت بياناتها ↺");closeSheet()}else{toast("خلص وقت التراجع");u.remove()}};
+      box.querySelector("#wpOk").onclick=()=>closeSheet()};
+    const down=e=>{e.preventDefault();if(done)return;t0=Date.now();lab.textContent="كمّل ضاغط…";raf=requestAnimationFrame(tick)};
+    g.addEventListener("pointerdown",down);["pointerup","pointerleave","pointercancel"].forEach(ev=>g.addEventListener(ev,stop));
+    g.addEventListener("contextmenu",e=>e.preventDefault());
+    box.querySelector("#wpNo").onclick=()=>closeSheet()});
 }
 function closeSitting(id,how){
   const s=st.sit;if(!s||s.id!==id)return null;
@@ -3750,9 +3803,13 @@ function sheetLocked(id){
 }
 
 // ---------- ▶︎ the start flow: retrieval lock → clips → a moment to think → bookmark warm-up → session ----------
+// 🔒 v20.3: anything you study starts only once it has clips (Kimi from Drive, a file, or Claude)
+const needClips=id=>{const b=BY_ID[id];if(!b||!needsStudy(b))return false;const m=mk(id);return!m.studied&&!m.startAt&&!clipsOf(id)};
+function clipGate(id,then){if(!needClips(id))return false;sheetClipSetup(id,then,true);return true}
 function startFlow(id,opt={}){
   const b=BY_ID[id];if(!b)return;
   const a=activeSession();if(a&&a.id===id){if(clipsOf(id))openFocus(id);else go(id);return}
+  if(clipGate(id,()=>startFlow(id,opt)))return;
   if(!mk(id).studied&&!opt.ok&&rtvLocked()){sheetLocked(id);return}
   const run=()=>{startSession(id);if(clipsOf(id))openFocus(id);else toast("بدأت الجلسة ⏱️ ركّز، وأي فكرة تشتتك اركنها بـ 💭")};
   const warm=()=>{const bm=sjson(mk(id).bm,null);if(bm&&bm.at&&!bm.r)sheetWarm(id,run);else run()};
@@ -3771,6 +3828,7 @@ function sheetPrime(id,then){
   });
 }
 function startFive(id,study,t){
+  if(study&&clipGate(id,()=>startFive(id,study,t)))return;
   fiveRun={id,study:!!study,t:t||label(BY_ID[id]),end:Date.now()+300000};
   if(st.page!=="main")setPage("main");else render();
   const tb=$("#tasksBox");if(tb)tb.open=true;renderFive();focusSync();sfx("chime");
@@ -4282,7 +4340,7 @@ function renderRadarPage(){
 // ---------- 💭 ideas: anything that pops into your head during a lecture or a study session ----------
 const ideaKey=x=>x.at?`${x.at}|${x.t||""}`:`${x.d||""}|${x.t||""}`;
 const ideasRaw=()=>jget("parked",[]).filter(x=>isObj(x)&&x.t);
-const ideasList=()=>ideasRaw().filter(x=>!x.del);
+const ideasList=()=>ideasRaw().filter(x=>!x.del&&!(x.l&&BY_ID[x.l]&&wipedBefore(x.l,x.at)));
 const parkedList=ideasList;
 const saveIdeas=l=>{setTop("parked",JSON.stringify(l));renderHeader();if(st.page==="ideas")renderIdeasPage()};
 // edits keep every idea (a deleted one becomes a small marker) and stamp the change time, so two devices merge cleanly
@@ -4790,11 +4848,12 @@ function cardHTML(b){
       ${mvOf(b)||(!b.custom&&b.topic0&&b.topic!==b.topic0)?`<p class="lc-sub">${mvOf(b)?`📌 الموعد الأصلي: ${dayAr(origDate(b))} ${fmt(origDate(b))}${b.from?` · ${rawTime(b.from,b.to)}`:""} (${MVL[moveKind(b)]})`:""}${!b.custom&&b.topic0&&b.topic!==b.topic0?`${mvOf(b)?" · ":""}الاسم الأصلي: <span class="en">${esc(b.topic0)}</span>`:""}</p>`:""}
       ${tiles.length?`<div class="lc-tiles">${tiles.join("")}</div>`:""}
       ${stdy&&!m.studied?`<div class="lc-go">${m.startAt?`<span class="live">⏱️ تذاكرها الحين <span class="num">${hms(sessMs(b.id))}</span></span>${c?`<button class="btn primary" data-focus="${b.id}">🎬 افتح وضع التركيز</button>`:""}`
+        :needClips(b.id)?`<button class="btn primary big lc-start" data-clipset="${b.id}">🎬 جهّز المقاطع عشان تبدأ</button><span class="sessnote">▶︎ المذاكرة تبدأ بعد ما تتقسم</span>`
         :`<button class="btn primary big lc-start" data-start="${b.id}">${rtvLocked()?"🔒 ابدأ المذاكرة":sjson(m.bm,null)?"▶︎ كمّل من علامتك":"▶︎ ابدأ المذاكرة"}</button><span class="sessnote">${rtvLocked()?"تنفتح بعد الاسترجاع":c?`🎬 ${cnt(c.c.length,"مقطع","مقطعين","مقاطع")}${m.acc?` · ذاكرت ${durFmt(Math.round(m.acc/6e4))}`:""}`:m.nc?"بدون مقاطع":"تقدر تجهّز مقاطع قبلها 👇"}</span>`}</div>`:""}
       ${stdy?`<section class="lc-sec lc-clips"><div class="lc-h"><b>🎬 المقاطع</b>${c?`<span class="num">${cr}/${c.c.length}</span>`:""}</div>
         ${c?`${pbar(Math.round(cr/c.c.length*100),"thin")}<details class="lc-more"><summary>شوف المقاطع (${c.c.length})</summary><ol class="clist">${(()=>{const p=cprOf(b.id);return c.c.map((x,i)=>`<li class="${p.r[i]||""}"><span class="en">${esc(x.h)}</span>${x.f?` <small class="num en">${x.f}–${x.t}</small>`:""}</li>`).join("")})()}</ol></details>
           <div class="frow"><button class="btn sm" data-clipset="${b.id}">🔁 بدّل المقاطع</button>${cr?`<button class="btn sm" data-clipreset="${b.id}">↺ صفّر التقدّم</button>`:""}</div>`
-          :`<p class="note" style="margin:0">مقاطع قصيرة، كل مقطع ينتهي بتفريغ من راسك.</p><button class="btn${m.studied?"":" primary"} sm" data-clipset="${b.id}">🎬 جهّز المقاطع</button>`}
+          :`<p class="note" style="margin:0">مقاطع قصيرة، كل مقطع ينتهي بتفريغ من راسك${needClips(b.id)?"، وتطلع هنا أول ما تتقسم.":"."}</p>${needClips(b.id)?"":`<button class="btn sm" data-clipset="${b.id}">🎬 جهّز المقاطع</button>`}`}
         ${AIX(()=>spCardLine(b.id),"")}</section>`:""}
       ${stdy?`<section class="lc-sec"><div class="lc-h"><b>✅ خطواتك</b></div><div class="actions">
         ${MARKS.filter(x=>m[x.f]||({studied:m.startAt,rev1:m.studied,rev2:m.rev1,anki:m.studied,ankiS:m.anki})[x.f]).map(x=>`<button class="sbtn" style="${sv(x.c)}" aria-pressed="${!!m[x.f]}"${locked(x.f)?` aria-disabled="true" title="حل عُقد الفهم أول"`:""} data-mark="${b.id}|${x.f}"><i></i>${m[x.f]?"✓ ":locked(x.f)?"🔒 ":""}${x.ar}${m[x.f]?` <small>${fmt(m[x.f])}</small>`:""}</button>`).join("")||`<span class="note">تبدأ لما تبدأ المذاكرة.</span>`}
@@ -4814,6 +4873,7 @@ function cardHTML(b){
       ${notes.length?`<section class="lc-sec"><div class="lc-h"><b>📝 ملاحظاتك</b></div>${notes.join("")}</section>`:""}
       ${b.dr||rel.length?`<footer class="lc-foot">${b.dr?`<button class="btn sm" data-dr="${esc(b.dr)}">👨‍⚕️ كل محاضرات ${esc(b.dr)}</button>`:""}
         ${rel.length?`<div class="related"><h3>نفس الموضوع في أماكن أخرى</h3>${rel.map(relHTML).join("")}</div>`:""}</footer>`:""}
+      ${stdy&&lecHasData(b.id)?`<button class="lc-wipe" type="button" data-wipe="${b.id}"><span>🧹</span>امسح بيانات المحاضرة<small>تقدّمها وعملاتها · الديون تبقى</small></button>`:""}
     </div>`})():""}
   </article>`;
 }
@@ -6636,7 +6696,7 @@ function clipAiBind(box,id,fill){
 const GDLAST_LS="uqu-gdlast",dShort=iso=>`${dnum(iso)} ${MONTHS[+iso.slice(5,7)-1]}`;
 let CSV=null;
 const csOpen=()=>!!(CSV&&CSV.box&&CSV.box.isConnected);
-function csInit(box,lid){CSV={box,lid,v:"main",stack:null,seq:0,shown:""};const B=box.querySelector("#csBack");if(B)B.onclick=csBackTap;
+function csInit(box,lid,then){CSV={box,lid,v:"main",stack:null,seq:0,shown:"",then:then||null};const B=box.querySelector("#csBack");if(B)B.onclick=csBackTap;
   const s=spState(lid);if(spRunning(lid)||s&&s.st==="err"&&Date.now()-(+(s.own?s.j.at:s.hb)||0)<864e5)csGo("prog")}
 function csLastStack(){try{const o=JSON.parse(localStorage.getItem(GDLAST_LS)||"null");return isObj(o)&&o.root===aiCfg().gdir&&Array.isArray(o.s)?o.s.filter(x=>isObj(x)&&typeof x.id==="string").slice(0,12):[]}catch(e){return[]}}
 function csGo(v,o={}){if(!csOpen())return;const c=CSV,M=c.box.querySelector("#csMain"),A=c.box.querySelector("#csAlt"),B=c.box.querySelector("#csBack");if(!M||!A)return;
@@ -6689,8 +6749,8 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
   if(run)foot=`<p class="sh-note" id="spWho">${s.own?"تقدر تسكّر النافذة أو تطلع من الموقع: يكمل لحاله لما ترجع 💾":`📱 يشتغل على ${esc(s.dn||"جهازك الثاني")} · آخر تحديث <span id="spAgo">${agoTxt(s.hb)}</span>`}</p>
       ${!s.own&&s.stale?`<p class="ce mid">⏸️ ${esc(s.dn||"جهازك الثاني")} ما رسل تحديث من شوي (يمكن الموقع مسكّر هناك). يكمل لما تفتحه هناك${can&&gid?"، أو كمّله من هنا":""}.</p>${can&&gid?`<button class="btn primary" id="spTake">▶ كمّله من هنا</button>`:""}`:""}
       <button class="btn dangerbtn" id="spCancel">إلغاء</button>`;
-  else if(s.st==="done"){foot=`<p class="ce good">✅ تقسّمت لـ ${cnt(s.cn,"مقطع","مقطعين","مقاطع")} 🎬${s.fg?` · 👁️ ${cnt1(s.fg,"صورة وحدة","صورتين","صور")}`:""}</p>`;
-    setTimeout(()=>{if(csOpen()&&CSV.v==="prog"&&CSV.lid===lid)csGo("main")},1800)}
+  else if(s.st==="done"){foot=`<p class="ce good">✅ تقسّمت لـ ${cnt(s.cn,"مقطع","مقطعين","مقاطع")} 🎬${s.fg?` · 👁️ ${cnt1(s.fg,"صورة وحدة","صورتين","صور")}`:""}</p>${c.then&&clipsOf(lid)?`<button class="btn primary big" id="spStartNow">▶︎ ابدأ المذاكرة</button>`:""}`;
+    if(!(c.then&&clipsOf(lid)))setTimeout(()=>{if(csOpen()&&CSV.v==="prog"&&CSV.lid===lid)csGo("main")},1800)}
   else if(s.st==="ready")foot=!s.own&&s.big?`<p class="sh-note">المقاطع الجديدة (${s.cn}) جاهزة على ${esc(s.dn||"جهازك الثاني")}، وهي كبيرة على المزامنة: احفظها من هناك.</p>`
     :`<p class="sh-note">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="sh-act"><button class="btn primary big" id="spOk">💾 احفظ الجديدة (${s.cn})</button><button class="btn" id="spKeep">✕ خلّ القديمة</button></div>`;
   else if(s.st==="err")foot=`<p class="ce bad">❌ ${esc(s.err||"ما تقسّمت")}</p><div class="sh-act">${can&&gid?`<button class="btn primary big" id="spRe">🔁 جرّب نفس الملف</button>`:""}${gasOn()?`<button class="btn" id="spPick2">📂 اختر ملف ثاني</button>`:""}<button class="btn dangerbtn" id="spDrop">إلغاء</button></div>`;
@@ -6700,6 +6760,7 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
     <div class="spw-pc"${er?" hidden":""}><b class="en" id="spPc">${Math.floor(pc)}</b><span>%</span></div><div class="spw-bar"${er?" hidden":""} role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(pc)}"><i id="spBar" style="width:${pc}%"></i></div>
     <p class="sh-note" id="spStep" aria-live="polite"${er?" hidden":""}>${esc(spStepTxt(s))}</p><div class="spw-parts" id="spDots">${s.np>1?Array.from({length:s.np},(_,i)=>`<i class="${i<s.nd?"on":""}"></i>`).join(""):""}</div>${foot}</div>`;
   const q=x=>A.querySelector(x);
+  if(q("#spStartNow"))q("#spStartNow").onclick=()=>{const t=c.then;closeSheet(true);t()};
   if(q("#spCancel"))q("#spCancel").onclick=e=>{const x=e.currentTarget;if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية عشان توقف التقسيم";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="إلغاء"}},3500);return}
     spCancel(lid);toast("انلغى التقسيم");csGo("main")};
   if(q("#spTake"))q("#spTake").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
