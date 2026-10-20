@@ -1,0 +1,9 @@
+{
+  "name": "uqu-runner",
+  "private": true,
+  "description": "Opens the study site headless on GitHub Actions to do the Kimi work your devices asked for (see run.mjs).",
+  "type": "module",
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

@@ -1,0 +1,61 @@
+# ☁️ The runner: the study site itself (index.html), opened headless on GitHub's servers as one more device of yours.
+# It splits the lectures and makes the ANKI decks your devices asked for, and runs the background analysis (the coach,
+# the morning questions, the week report) every hour, even when you don't open the site. See tools/runner/run.mjs.
+# Needs ONE repository secret, UQU_RUNNER, made by the site (Settings → 🤖 → ☁️ الشغل أونلاين على GitHub).
+name: runner
+
+on:
+  repository_dispatch:
+    types: [work]          # a device asked for something (it wakes this right away)
+  schedule:
+    - cron: "17 * * * *"   # every hour: the analysis, and anything a device without a GitHub token asked for
+  workflow_dispatch:
+
+permissions:
+  contents: write          # the ANKI decks go to the anki-jobs branch (built by anki.yml)
+
+# one run at a time; a run does everything that is waiting, so a dropped run loses nothing
+concurrency:
+  group: runner
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 58
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            index.html
+            tools/runner
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install playwright-core (Chrome is already on the runner)
+        run: npm install --prefix tools/runner --no-audit --no-fund --loglevel=error
+
+      - name: Restore the runner's small state (usage, tries, Kimi limits; never a key)
+        uses: actions/cache/restore@v4
+        with:
+          path: .runner-state
+          key: runner-state-${{ github.run_id }}
+          restore-keys: runner-state-
+
+      - name: Run
+        env:
+          UQU_RUNNER: ${{ secrets.UQU_RUNNER }}
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_STATE: .runner-state/state.json
+          RUNNER_MAX_MIN: "50"
+        run: node tools/runner/run.mjs
+
+      - name: Keep the state for the next run
+        if: always() && hashFiles('.runner-state/state.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .runner-state
+          key: runner-state-${{ github.run_id }}

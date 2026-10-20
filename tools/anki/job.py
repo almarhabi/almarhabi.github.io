@@ -15,6 +15,7 @@ BUILDER = os.path.join(HERE, "build_apkg.py")
 ID_RE = re.compile(r"^[a-z0-9]{8,40}$")
 MAX_CARDS, MAX_TEXT, MAX_INPUT = 400, 20000, 3 * 1024 * 1024   # caps are a safety net only: never below what the site sends (HTML-escaped)
 KEEP_DAYS = 14
+MAX_REVIEW = 1_500_000
 TYPES = ("Direct", "Analytic", "Hard")
 CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
@@ -74,6 +75,10 @@ def build(job_id, spec, out_dir):
         if rc == 0 and os.path.isfile(apkg):
             shutil.copyfile(apkg, os.path.join(out_dir, job_id + ".apkg"))
             st.update(ok=True, size=os.path.getsize(apkg), msg=log.splitlines()[-1][:300] if log else "OK")
+            # the site's review of the deck (facts, cards, checks) rides along, so any device can show it; data only, never run
+            rv = spec.get("review")
+            if isinstance(rv, dict) and len(json.dumps(rv, ensure_ascii=False)) <= MAX_REVIEW:
+                st["review"] = rv
         else:
             lines = [l[7:] if l.startswith("ERROR: ") else l for l in log.splitlines() if l.strip()]
             # a Python crash prints a traceback: keep its last line, that's the reason

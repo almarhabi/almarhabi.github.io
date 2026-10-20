@@ -883,6 +883,7 @@ html.lowmo .burst.at,html.lowmo .flashscr,html.lowmo .rays{display:none}html.low
 .gdb-i .gdb-n{flex:1;min-width:0;overflow-wrap:anywhere;direction:auto}.gdb-i small{color:var(--muted);font-size:11.5px;white-space:nowrap}.gdb-i .gdb-go{color:var(--muted);font-size:18px}
 .gdb-i.star{border-color:#d9a400}.gdb-i.on{outline:2px solid var(--accent,#0e5e4a);outline-offset:1px}.gdb-sel{position:sticky;bottom:0}
 /* ===== v20.3: the gate line and the wipe ===== */
+.rnsub{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px}
 .cs-gate{margin:0 0 4px;align-self:stretch;border:1px solid var(--k-disc);background:color-mix(in srgb,var(--k-disc) 12%,var(--surface));color:var(--ink);border-radius:12px;padding:8px 12px;font-size:13.5px;font-weight:700;text-align:center}
 .lc-wipe{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 8px;width:100%;margin-top:4px;border:1px dashed color-mix(in srgb,var(--k-exam) 60%,var(--line));background:color-mix(in srgb,var(--k-exam) 6%,var(--surface));color:var(--k-exam);border-radius:14px;padding:11px 12px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
 .lc-wipe span{font-size:16px}.lc-wipe small{flex-basis:100%;font-size:11px;font-weight:500;color:var(--muted)}
@@ -1369,7 +1370,12 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
         <ol class="note aisteps"><li>افتح <span class="en">github.com/settings/personal-access-tokens/new</span> (Fine-grained token).</li><li><span class="en">Token name</span>: ANKI · <span class="en">Expiration</span>: سنة (أو اللي تبيه).</li><li><span class="en">Repository access</span> ← <span class="en">Only select repositories</span> ← <span class="en" id="ghRepoTxt"></span>.</li><li><span class="en">Permissions</span> ← <span class="en">Repository permissions</span> ← <span class="en">Contents</span>: <b class="en">Read and write</b> (بس هذي).</li><li><span class="en">Generate token</span> ← انسخه والصقه هنا.</li></ol>
         <div class="frow"><input id="ghTok" type="password" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_..."><button class="back" id="ghEye" aria-label="اعرض الـ token">👁️</button></div>
         <div class="frow"><button class="btn sm primary" id="ghSave">حفظ وتجربة</button><button class="btn sm" id="ghDel">احذف الـ token</button></div>
-        <p class="note" id="ghMsg" style="margin:0" aria-live="polite"></p></div></details>
+        <p class="note" id="ghMsg" style="margin:0" aria-live="polite"></p>
+        <div class="rnsub" id="rnBox"><b>☁️ يكمل لحاله لو طلعت من الموقع <span class="note" id="rnSt"></span></b>
+          <p class="note" style="margin:0">التقسيم و ANKI والتحليل يكملون حتى لو سكّرت الموقع. مرة وحدة: «📋 انسخ الإعدادات» ← افتح <span class="en" id="rnUrl"></span> ← <span class="en">Name</span>: <b class="en">UQU_RUNNER</b> ← الصق ← <span class="en">Add secret</span> ← «🧪 جرّب». (فيها مفاتيحك: لا ترسلها لأحد.)</p>
+          <div class="frow"><button class="btn sm" id="rnCopy">📋 انسخ الإعدادات</button><button class="btn sm" id="rnTest">🧪 جرّب</button></div>
+          <textarea id="rnTa" class="cs-ta" rows="3" dir="ltr" readonly hidden></textarea>
+          <p class="note" id="rnMsg" style="margin:0" aria-live="polite"></p></div></div></details>
       <details class="how" id="aiAdv"><summary>⚙️ متقدّم: البروكسي و Drive والحد اليومي و ANKI</summary>
         <div class="aiadv">
         <label class="chk"><input type="checkbox" id="aiAuto"> شغل الخلفية: أسئلة الصبح، المدرب وحالة اليوم، تقرير الأحد، السؤال المعلّق</label>
@@ -1418,7 +1424,7 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.3</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.4</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1553,12 +1559,12 @@ const MARKS=[
 ];
 const LS="uqu-state-v2";
 // top-level fields that sync like the daily cap
-const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp","aiv"];
+const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp","aiv","rnr"];
 // ---------- 🛡️ whatever comes from storage or another device is checked before it's used (a broken value can't take the page down) ----------
 const isISO=v=>typeof v==="string"&&/^\d{4}-\d\d-\d\d$/.test(v)&&!isNaN(Date.parse(v+"T12:00:00Z"));
 const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
 const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards","ltAt","akc","spx","wpAt"],
-  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak","akj","spj","wpf"],MK_OBJ=["knots","recs","pre"];
+  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak","akj","spj","wpf","akq"],MK_OBJ=["knots","recs","pre"];
 function cleanMark(m){
   if(!isObj(m))return null;
   MK_DATE.forEach(f=>{const v=m[f];if(v==null||v===false||isISO(v))return;
@@ -1575,7 +1581,7 @@ function cleanMark(m){
   return m;
 }
 const BAD_K=new Set(["__proto__","constructor","prototype"]);
-const TOP_NUM=["pts","cap","since","nap","thin","goal","aiv"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","xplan","akp"];
+const TOP_NUM=["pts","cap","since","nap","thin","goal","aiv"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","xplan","akp","rnr"];
 function cleanS(o){
   if(!isObj(o))o={marks:{}};
   if(!isObj(o.marks))o.marks={};
@@ -1743,6 +1749,7 @@ function applyRemote(snap){
   if(isLive){merged=true;canW=true;achReady=true;if(key)S.lk=key;try{localStorage.removeItem(LINK_LS)}catch(e){}}
   savePend();cache();render();
   if(S.aiv)try{spFollow()}catch(e){console.warn(e)}
+  if(S.aiv)try{akFollow()}catch(e){console.warn(e)}
   if(isLive&&(need||pendN()))schedFlush();else pump();
 }
 // a fresh copy of the server (after the connection comes back), then whatever was waiting goes up
@@ -4119,9 +4126,9 @@ const rewardsList=()=>rewardsAll().filter(r=>!r.x&&r.n&&+r.c>0);   // a deleted 
 const redeemsList=()=>jget("redeems",[]).filter(r=>isObj(r)&&+r.c>0);
 const tile=(c,cls="")=>`<span class="tile ${cls}" style="--g1:${c.g[0]};--g2:${c.g[1]}"><span class="te">${c.e}</span>${c.b?`<span class="tb">${c.b}</span>`:""}</span>`;
 let achReady=false,achT=null;
-function scheduleAch(){clearTimeout(achT);achT=setTimeout(()=>{try{checkAch()}catch(e){console.error(e)}try{maybeBox()}catch(e){console.warn(e)}try{smartTick()}catch(e){console.warn(e)}},450)}
+function scheduleAch(){if(RUNNER)return;clearTimeout(achT);achT=setTimeout(()=>{try{checkAch()}catch(e){console.error(e)}try{maybeBox()}catch(e){console.warn(e)}try{smartTick()}catch(e){console.warn(e)}},450)}
 function checkAch(){
-  if(!achReady||!$("#ov").hidden)return;
+  if(RUNNER||!achReady||!$("#ov").hidden)return;
   if(!S.since)setTop("since",Date.now());
   const ent=entered;fixPauses();staleCheck();if(forgotCheck())return;
   if(!activeSession()&&!fiveRun){if(napCheck())return;if(dayOfferCheck(ent))return;if(weekCheck())return;if(thinCheck())return}else entered=false;
@@ -5059,12 +5066,13 @@ const cnt1=(n,one,two,few)=>n>10?`${n} ${one.replace(/ (وحدة|واحد)$/,"")
 // and synced, so your other device never pays for it again; small background jobs are batched into one call and wait for an idle, online moment;
 // answers are graded here first and Kimi is asked only when a real judgment is needed.
 const AI_LS="uqu-ai",AIU_LS="uqu-aiuse",AIQ_LS="uqu-aiq",AI_MODEL="kimi-k3";
+const RUNNER=(()=>{try{return localStorage.getItem("uqu-runner")==="1"}catch(e){return false}})();   // ☁️ this page is the GitHub runner (tools/runner/run.mjs)
 const AI_HOST={ai:"https://api.moonshot.ai/v1",cn:"https://api.moonshot.cn/v1"};
 const AI_PRICE={in:3,hit:.3,out:15};   // US$ per million tokens (Kimi K3: input, cached input, output)
 const AI_RUN={};function AI_RUN_DEF(k,f){AI_RUN[k]=f}   // background job kinds → what they do
 function aiCfg(){let o=null;try{o=JSON.parse(localStorage.getItem(AI_LS)||"null")}catch(e){}o=isObj(o)?o:{};
   return{key:typeof o.key==="string"?o.key.trim():"",host:o.host==="cn"?"cn":"ai",proxy:typeof o.proxy==="string"&&/^https:\/\/[^\s"'<>]+$/i.test(o.proxy.trim())?o.proxy.trim().replace(/\/+$/,""):"",
-    gkey:typeof o.gkey==="string"?o.gkey.trim():"",halt:isObj(o.halt)&&o.halt.c?o.halt:null,budget:+o.budget>=20000&&+o.budget<=1e8?Math.round(+o.budget):300000,auto:o.auto!==false,cap:isObj(o.cap)?o.cap:{},cors:+o.cors||0,ok:+o.ok||0,
+    gkey:typeof o.gkey==="string"?o.gkey.trim():"",halt:isObj(o.halt)&&o.halt.c?o.halt:null,budget:+o.budget>=20000&&+o.budget<=1e8?Math.round(+o.budget):300000,auto:o.auto!==false,cap:isObj(o.cap)?o.cap:{},lim:isObj(o.lim)?o.lim:null,cors:+o.cors||0,ok:+o.ok||0,
     gas:typeof o.gas==="string"&&/^https:\/\/script\.google\.com\/(a\/macros\/[^/\s]+|macros)\/s\/[\w-]{20,}\/exec$/.test(o.gas)?o.gas:"",gtok:typeof o.gtok==="string"&&/^[\w-]{16,64}$/.test(o.gtok)?o.gtok:"",gdir:typeof o.gdir==="string"?o.gdir.trim().slice(0,400):"",
     gh:typeof o.gh==="string"&&/^[\x21-\x7e]{20,300}$/.test(o.gh.trim())?o.gh.trim():"",ghr:typeof o.ghr==="string"&&/^[\w.-]{1,100}\/[\w.-]{1,100}$/.test(o.ghr)?o.ghr:""}}
 function aiSet(p){const c={...aiCfg(),...p};try{localStorage.setItem(AI_LS,JSON.stringify(c))}catch(e){}return c}
@@ -5105,7 +5113,10 @@ function aiErrMsg(e){const c=e&&e.code,s=e&&e.status,t=String(e&&e.text||"").toL
   if(s===402||/insufficient|balance|quota|arrear|suspend|exceeded_current/.test(t))return"رصيد حسابك في Kimi خلص. اشحن من منصة Moonshot";
   if(s===403)return"Kimi رفض الطلب (صلاحيات الحساب أو المنطقة)";
   if(s===404||(/model/.test(t)&&/not|exist|found|permission/.test(t)))return"النموذج kimi-k3 مو متاح لحسابك";
-  if(s===429)return"Kimi مزحوم الحين، جرّب بعد دقيقة";
+  if(c==="tpd"||s===429&&/tpd|per day|daily/.test(t))return"خلص حد حسابك اليومي في Kimi (توكنز اليوم). يكمل لحاله بكرة، والحد يرتفع لما يزيد مجموع شحنك";
+  if(s===429){const r=aiRate(e);
+    if(r.k==="lim")return`حسابك في Kimi يسمح بـ ${r.conc?(r.conc===1?"طلب واحد بنفس الوقت":`${r.conc} طلبات بنفس الوقت`):r.rpm?`${r.rpm} طلبات بالدقيقة`:r.tpm?`${kfmt(r.tpm)} توكن بالدقيقة`:"عدد محدود من الطلبات"}، وانتظرت دوره ${e.waited?Math.round(e.waited/6e4)+" دقيقة":""} وما مشى. الحد يرتفع كل ما زاد مجموع شحنك (platform.moonshot.ai ← Limits)`;
+    return"Kimi عليه ضغط من عندهم (مو من حسابك)، وحاولت أكثر من مرة. بيكمل لحاله بعد شوي"}
   if(s>=500)return"Kimi فيه مشكلة من عندهم، جرّب بعد شوي";
   if(s===400)return"Kimi رفض صيغة الطلب: "+(e.text||"").slice(0,120);
   return`خطأ من Kimi (${s||c})`}
@@ -5128,7 +5139,7 @@ async function aiFetch(c,body,o){
   let res;
   try{res=await fetch(aiURL(c),{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+c.key},body:JSON.stringify(body),signal:ctl.signal})}
   catch(e){clearTimeout(idle);throw aiErr(ctl.signal.aborted?why():navigator.onLine===false?"offline":"net",e)}
-  if(!res.ok){clearTimeout(idle);let t="";try{t=await res.text()}catch(e){}throw aiErr("http",null,res.status,t,res.headers.get("retry-after"))}
+  if(!res.ok){clearTimeout(idle);let t="";try{t=await res.text()}catch(e){}const x=aiErr("http",null,res.status,t,res.headers.get("retry-after"));x.rst=res.headers.get("x-ratelimit-reset");throw x}
   const ct=res.headers.get("content-type")||"";
   if(!/event-stream/i.test(ct)||!res.body||!res.body.getReader){let j=null;try{j=await res.json()}catch(e){clearTimeout(idle);throw aiErr("bad",e)}clearTimeout(idle);
     if(j&&j.error)throw aiErr("http",null,500,JSON.stringify(j.error));const ch=j&&j.choices&&j.choices[0]||{};
@@ -5153,15 +5164,52 @@ async function aiFetch(c,body,o){
 function aiJSON(t){let s=String(t||"").trim();if(!s)return null;const f=s.match(/```(?:json)?\s*([\s\S]*?)```/i);if(f&&/[{[]/.test(f[1]))s=f[1];
   const a=s.search(/[{[]/),z=Math.max(s.lastIndexOf("}"),s.lastIndexOf("]"));if(a<0||z<=a)return null;const raw=s.slice(a,z+1),fx=x=>x.replace(/[“”]/g,'"');
   for(const x of[raw,fx(raw),fx(raw).replace(/,\s*([}\]])/g,"$1")]){try{return JSON.parse(x)}catch(e){}}return null}
-// o: {k, rules, data | msgs(sys), schema?, effort, max, tools?, toolChoice?, fg (you're waiting for it), onProg, signal}
+// ---------- 🚦 the Kimi gate: every call waits its turn under the account's limits (learned from Kimi's own 429 answers) ----------
+// Kimi limits an account by its total top-up: calls at the same time, calls a minute, tokens a minute (counted from max tokens) and a day.
+const AIG={run:0,st:[],until:0,wk:new Set()};
+let aiHidAt=0;document.addEventListener("visibilitychange",()=>{if(document.hidden)aiHidAt=Date.now()});
+const aiWasHidden=t0=>document.hidden||aiHidAt>=t0;   // the page slept during this call (iPad freezes a page you leave)
+function aiLim(){const l=aiCfg().lim,ok=isObj(l)&&Date.now()-(+l.at||0)<24*HR,n=v=>ok&&+v>0?Math.round(+v):0;return{conc:n(l&&l.conc)||4,rpm:n(l&&l.rpm),tpm:n(l&&l.tpm)}}
+function aiGateKick(){const w=[...AIG.wk];AIG.wk.clear();w.forEach(f=>f())}
+async function aiGate(tok,signal){
+  for(;;){if(signal&&signal.aborted)throw aiErr("abort");
+    const L=aiLim(),now=Date.now();AIG.st=AIG.st.filter(x=>now-x.at<60e3);const n=AIG.st.length,used=AIG.st.reduce((a,x)=>a+x.t,0);let wait=0;
+    if(now<AIG.until)wait=AIG.until-now;
+    else if(AIG.run>=L.conc)wait=30e3;   // until one finishes
+    else if(L.rpm&&n>=L.rpm)wait=AIG.st[n-L.rpm].at+60e3-now+80;
+    else if(L.tpm&&n&&used+tok>L.tpm)wait=AIG.st[0].at+60e3-now+80;
+    if(wait<=0){AIG.run++;const me={at:now,t:tok};AIG.st.push(me);let done=false;return()=>{if(done)return;done=true;AIG.run--;aiGateKick()}}
+    await new Promise(res=>{const f=()=>{clearTimeout(t);res()},t=setTimeout(()=>{AIG.wk.delete(f);res()},Math.min(wait,30e3));AIG.wk.add(f);if(signal)signal.addEventListener("abort",f,{once:true})})}}
+// what a 429 means: quota (no money) · day (the daily tokens) · lim (the account's rate: learn it) · busy (Kimi itself is overloaded)
+function aiRate(e){const t=String(e&&e.text||""),l=t.toLowerCase(),num=re=>{const m=t.match(re);return m?Math.round(+m[1]):0};
+  const after=num(/after\s+(\d+(?:\.\d+)?)\s*s/i)||(isFinite(+e.ra)&&+e.ra>0?+e.ra:0)||(isFinite(+e.rst)&&+e.rst>0&&+e.rst<3600?+e.rst:0);
+  if(/insufficient|balance|quota|arrear|suspend|exceeded_current/.test(l))return{k:"quota"};
+  if(/\btpd\b|per day|daily/.test(l))return{k:"day"};
+  if(/overload|engine|busy|capacity/.test(l)&&!/rate.?limit|concurren|rpm|tpm/.test(l))return{k:"busy",after};
+  const conc=num(/concurren\w*[^0-9]{0,24}(\d+)/i),rpm=num(/\brpm\b[^0-9]{0,24}(\d+)/i),tpm=num(/\btpm\b[^0-9]{0,40}?limit[^0-9]{0,6}(\d+)/i)||num(/\btpm\b[^0-9]{0,24}(\d+)/i);
+  return{k:/rate|limit|concurren|rpm|tpm|too many/.test(l)||conc||rpm||tpm?"lim":"busy",conc,rpm,tpm,after,cc:/concurren/.test(l)}}
+// o: {k, rules, data | msgs(sys), schema?, effort, max, tools?, toolChoice?, fg (you're waiting for it), onProg, onWait, onGo, signal}
 async function aiCall(o){
   const c0=aiCfg();if(!c0.key)throw aiErr("nokey");if(navigator.onLine===false)throw aiErr("offline");
   const used=aiTokToday();if(!o.fg&&used>=c0.budget*.8)throw aiErr("budget");if(o.fg&&used>=c0.budget&&!o.over)throw aiErr("budget");
-  let tries=0,bad=0,big=false,swapped=false;
+  let tries=0,bad=0,big=false,swapped=false,waited=0,soft=0;const patience=o.patience||(o.fg||RUNNER?15*6e4:2*6e4);
   for(;;){
-    const c=aiCfg(),b=aiBody(o,c,big);let r;
+    const c=aiCfg(),b=aiBody(o,c,big);let r;const t0=Date.now();
+    const rel=await aiGate(tokEst(JSON.stringify(b.messages))+(b.max_tokens||b.max_completion_tokens||0),o.signal);
+    if(o.onGo)try{o.onGo()}catch(e){}
     try{r=await aiFetch(c,b,o)}
-    catch(e){
+    catch(e){rel();
+      // Kimi said "not now": wait what it says (the account's limits are learned on the way); this is never a failure
+      if(e.code==="http"&&(e.status===429||e.status>=500)&&waited<patience){const R=e.status===429?aiRate(e):{k:"busy",after:0};
+        if(R.k==="day"){const x=aiErr("tpd",null,429,e.text);throw x}
+        if(R.k!=="quota"){soft++;
+          if(R.k==="lim"){const l=aiCfg().lim||{},now=Date.now(),fresh=isObj(l)&&now-(+l.at||0)<24*HR;const nl={conc:R.conc||(R.cc?Math.max(1,AIG.run):fresh&&l.conc||0),rpm:R.rpm||(fresh&&l.rpm)||0,tpm:R.tpm||(fresh&&l.tpm)||0,at:now};
+            if(nl.conc||nl.rpm||nl.tpm)aiSet({lim:nl})}
+          const w=Math.min(90e3,Math.max(1500,R.after?R.after*1e3+300:Math.min(60e3,2e3*2**Math.min(5,soft-1))));
+          AIG.until=Math.max(AIG.until,Date.now()+w);waited+=w;
+          if(o.onWait)try{o.onWait({k:R.k,s:Math.round(w/1000),conc:aiLim().conc,rpm:aiLim().rpm,waited})}catch(x){}
+          await sleep(w);if(o.signal&&o.signal.aborted)throw aiErr("abort");continue}}
+      if(e.code==="http"&&e.status===429)e.waited=waited;
       if(e.code==="http"){const t=e.text.toLowerCase(),cap=c.cap;
         // one key belongs to one platform (international .ai or China .cn): a 401 tries the other one once
         if(e.status===401&&!swapped){swapped=true;aiSet({host:c.host==="ai"?"cn":"ai"});continue}
@@ -5169,13 +5217,15 @@ async function aiCall(o){
           if(/reasoning/.test(t)&&cap.eff!==false){aiSet({cap:{...cap,eff:false}});continue}
           if(o.schema&&/response_format|json_schema|schema|strict/.test(t)&&(cap.fmt||"schema")!=="text"){aiSet({cap:{...cap,fmt:(cap.fmt||"schema")==="schema"?"object":"text"}});continue}
           if(/max_completion_tokens/.test(t)&&!cap.mt){aiSet({cap:{...cap,mt:1}});continue}}
-        if((e.status===429||e.status>=500)&&tries<3&&!/insufficient|balance|quota|arrear|suspend/.test(t)){tries++;await sleep(e.ra&&isFinite(+e.ra)?Math.min(30,+e.ra)*1e3:[2500,7000,16000][tries-1]);continue}}
+        }
       if(swapped&&e.status===401)aiSet({host:c.host==="ai"?"cn":"ai"});   // neither platform knows the key: put it back
       // no balance or a dead key: Kimi rests quietly (the site goes on as usual) until you top up or fix the key
       if(e.code==="http"&&(e.status===402||/insufficient|balance|quota|arrear|suspend|exceeded_current/.test(String(e.text).toLowerCase())))aiHalt("money");
       else if(e.code==="http"&&e.status===401)aiHalt("auth");
-      if(e.code==="net"&&!c.proxy)aiSet({cors:Date.now()});
+      if(e.code==="net"&&!c.proxy&&!aiWasHidden(t0))aiSet({cors:Date.now()});   // a page that slept loses its connection: that's not CORS
+      if((e.code==="net"||e.code==="timeout")&&aiWasHidden(t0))e.slept=1;
       throw e}
+    rel();
     const u=isObj(r.usage)?r.usage:{},inT=+u.prompt_tokens||tokEst(JSON.stringify(b.messages)),outT=+u.completion_tokens||tokEst((r.msg.content||"")+(r.msg.reasoning_content||"")+JSON.stringify(r.msg.tool_calls||"")),
       hit=+u.cached_tokens||+(isObj(u.prompt_tokens_details)&&u.prompt_tokens_details.cached_tokens)||0;
     aiUseAdd({k:o.k,i:inT,c:Math.min(hit,inT),o:outT,ms:r.ms});aiSet({ok:Date.now(),cors:0,halt:null});
@@ -5207,12 +5257,12 @@ function aiHalt(code){const c=aiCfg();if(c.halt&&c.halt.c===code)return;aiSet({h
   setTimeout(()=>{toast(code==="money"?"💳 رصيد Kimi خلص · الموقع شغّال عادي، والذكاء يرتاح لين تشحن":"🔑 مفتاح Kimi ما يشتغل · الموقع شغّال عادي، صلّحه من الإعدادات");aiRefresh()},50)}
 const AI_BATCH={rq:3};
 async function aiPump(){
-  if(aiBusy||!aiCanRun())return;const now=Date.now(),q=aiJobs().filter(j=>(j.n||0)<5&&(j.next||0)<=now&&AI_RUN[j.k]).sort((a,b)=>a.pr-b.pr||a.at-b.at);if(!q.length)return;
+  if(aiBusy||!aiCanRun())return;const now=Date.now(),rf=rnFresh(),q=aiJobs().filter(j=>(j.n||0)<5&&(j.next||0)<=now&&AI_RUN[j.k]&&(!rf||j.pr===0)).sort((a,b)=>a.pr-b.pr||a.at-b.at);if(!q.length)return;
   const j=q[0],batch=AI_BATCH[j.k]?q.filter(x=>x.k===j.k).slice(0,AI_BATCH[j.k]):[j];
   aiBusy=true;aiLive.k=j.k;aiLive.keys=batch.map(x=>x.key);aiRefresh();
   try{await AI_RUN[j.k](batch.map(x=>x.a),batch);batch.forEach(x=>aiTried(x.key));AIJ=aiJobs().filter(x=>!batch.includes(x))}
-  catch(e){if(!["budget","offline","nokey"].includes(e.code))batch.forEach(x=>aiTried(x.key));const wait=e.code==="budget"?Math.max(6e4,dayStartMs(addDays(curDay(),1))-Date.now()):e.code==="offline"?3e4:Math.min(6*HR,[6e4,5*6e4,20*6e4,60*6e4][Math.min(3,(j.n||0))]);
-    batch.forEach(x=>{x.n=(x.n||0)+(e.code==="budget"||e.code==="offline"?0:1);x.next=Date.now()+wait;x.err=e.code==="http"?e.status:e.code});
+  catch(e){if(!["budget","offline","nokey","tpd"].includes(e.code)&&!e.slept)batch.forEach(x=>aiTried(x.key));const wait=e.code==="budget"?Math.max(6e4,dayStartMs(addDays(curDay(),1))-Date.now()):e.code==="tpd"?HR:e.code==="offline"?3e4:Math.min(6*HR,[6e4,5*6e4,20*6e4,60*6e4][Math.min(3,(j.n||0))]);
+    batch.forEach(x=>{x.n=(x.n||0)+(e.code==="budget"||e.code==="offline"||e.code==="tpd"||e.slept?0:1);x.next=Date.now()+wait;x.err=e.code==="http"?e.status:e.code});
     AIJ=aiJobs().filter(x=>(x.n||0)<5&&(aiTries().k[x.key]||0)<3);if(e.code!=="offline"&&e.code!=="budget")console.warn("kimi",j.k,e.code,e.status||"",e.text||"")}
   finally{aiBusy=false;aiLive.k=null;aiLive.keys=[];aiSaveQ();aiRefresh();setTimeout(aiPump,500)}
 }
@@ -5864,27 +5914,32 @@ const SPJ_LS="uqu-spj",SPJ_MAXP=3;
 let SPJ=null;const spBusy={},SPCTL={},SPLIVE={},SPPUB={};
 // v20: which device is this (the job's progress is shared with your other device through marks[id].spj)
 const SP_DEV=(()=>{try{let d=localStorage.getItem("uqu-dev");if(!/^[a-z0-9]{6,12}$/.test(d||"")){d=Math.random().toString(36).slice(2,10).padEnd(8,"0");localStorage.setItem("uqu-dev",d)}return d}catch(e){return"t"+Math.random().toString(36).slice(2,9)}})();
-const SP_DEVN=(()=>{const u=navigator.userAgent||"";return/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)?"الآيباد":/iPhone|Android.+Mobile/.test(u)?"الجوال":/Android/.test(u)?"التابلت":"الكمبيوتر"})();
+const SP_DEVN=(()=>{if(RUNNER)return"";const u=navigator.userAgent||"";return/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)?"الآيباد":/iPhone|Android.+Mobile/.test(u)?"الجوال":/Android/.test(u)?"التابلت":"الكمبيوتر"})();
 function spAll(){if(!SPJ){let o=null;try{o=JSON.parse(localStorage.getItem(SPJ_LS)||"null")}catch(e){}SPJ=isObj(o)?o:{};
     for(const k in SPJ){const j=SPJ[k];if(!isObj(j)||!BY_ID[k]||typeof j.gid!=="string"||Date.now()-(+j.at||0)>3*864e5)delete SPJ[k];else j.lid=k}}return SPJ}
 function spSave(){try{const o=spAll();if(Object.keys(o).length)localStorage.setItem(SPJ_LS,JSON.stringify(o));else localStorage.removeItem(SPJ_LS)}catch(e){}}
 const spGet=lid=>spAll()[lid]||null;
 const spActive=j=>!!j&&(j.st==="text"||j.st==="kimi");
 // the shared state another device wrote (checked like everything that comes from outside)
-const SPJ_ST=["text","kimi","done","ready","err","x"];
+const SPJ_ST=["text","kimi","done","ready","err","x","q"];
 function spjOf(lid){const o=sjson(mk(lid).spj,null);if(!isObj(o)||!SPJ_ST.includes(o.st)||typeof o.d!=="string"||!(+o.at>0))return null;
   const n=(v,a,b)=>{v=Math.round(+v||0);return Math.max(a,Math.min(b,v))};
   return{d:o.d.slice(0,16),dn:typeof o.dn==="string"?o.dn.slice(0,20):"",at:+o.at,st:o.st,pc:n(o.pc,0,100),np:n(o.np,0,99),nd:n(o.nd,0,99),hb:+o.hb||+o.at,
     nm:typeof o.nm==="string"?o.nm.slice(0,120):"",gid:typeof o.gid==="string"&&/^[\w-]{10,}$/.test(o.gid)?o.gid:"",pz:typeof o.pz==="string"?o.pz.slice(0,80):"",
     err:typeof o.err==="string"?o.err.slice(0,200):"",cn:n(o.cn,0,999),fg:n(o.fg,0,99),stk:Array.isArray(o.stk)?o.stk.filter(x=>isObj(x)&&typeof x.id==="string"&&/^[\w-]{10,}$/.test(x.id)).map(x=>({id:x.id,n:String(x.n||"").slice(0,80)})).slice(0,12):[],
-    res:o.st==="ready"&&typeof o.res==="string"?o.res:"",big:!!o.big}}
+    res:o.st==="ready"&&typeof o.res==="string"?o.res:"",big:!!o.big,wt:typeof o.wt==="string"?o.wt.slice(0,140):"",by:typeof o.by==="string"?o.by.slice(0,16):""}}
 // the job you see, wherever it runs: this device's own, else your other device's (a cancel aimed at it hides it right away)
 function spState(lid){const j=spGet(lid),x=+mk(lid).spx||0,sj=spjOf(lid);
   if(j&&x!==j.at)return{own:1,j,st:j.st,pc:spPct(j),np:j.parts?j.parts.length:0,nd:j.parts?j.parts.filter(p=>p.st==="done").length:0,nm:j.name||"",why:spActive(j)?spWhy(j):"",err:j.err||"",cn:+j.cn||0,fg:+j.figs||0,at:j.at,stk:j.stk||[]};
   if(sj&&sj.d!==SP_DEV&&sj.st!=="x"&&x!==sj.at&&Date.now()-sj.hb<3*864e5){const stale=(sj.st==="text"||sj.st==="kimi")&&Date.now()-sj.hb>5*60e3;
-    return{own:0,sj,st:sj.st,pc:sj.pc,np:sj.np,nd:sj.nd,nm:sj.nm,why:sj.pz,err:sj.err,cn:sj.cn,fg:sj.fg,at:sj.at,stk:sj.stk,stale,dn:sj.dn,hb:sj.hb,res:sj.res,big:sj.big}}
+    return{own:0,sj,st:sj.st,pc:spShowPc(lid,sj),np:sj.np,nd:sj.nd,nm:sj.nm,why:sj.pz,err:sj.err,cn:sj.cn,fg:sj.fg,at:sj.at,stk:sj.stk,stale,dn:sj.dn,hb:sj.hb,res:sj.res,big:sj.big,wt:sj.wt,rn:sj.d===RN_DEV}}
   return null}
-const spRunning=lid=>{const s=spState(lid);return!!s&&(s.st==="text"||s.st==="kimi")};
+const spLive=st=>st==="text"||st==="kimi"||st==="q";
+// the queue part creeps like the old reading step (0–6%), and what you saw never goes back when the work moves on
+const SPSHOW={},spQPc=at=>6*(1-Math.exp(-Math.max(0,Date.now()-at)/40e3));
+function spShowPc(lid,sj){if(!spLive(sj.st)){delete SPSHOW[lid];return sj.pc}const raw=sj.st==="q"?spQPc(sj.at):sj.pc,o=SPSHOW[lid],k=sj.gid;
+  const v=o&&o.k===k&&!(sj.st==="q"&&sj.at>o.q)?Math.max(o.pc,raw):raw;SPSHOW[lid]={k,pc:v,q:sj.st==="q"?sj.at:o&&o.k===k?o.q:0};return v}   // q = waiting for GitHub to pick it up
+const spRunning=lid=>{const s=spState(lid);return!!s&&(spLive(s.st))};
 // why a job of this device isn't moving right now ("" = it is)
 function spWhy(j){const c=aiCfg();return!S.aiv||!c.key?"Kimi مطفي على هالجهاز":c.halt&&aiHalted(c)?(c.halt.c==="money"?"رصيد Kimi خلص 💳":"مفتاح Kimi ما يشتغل 🔑"):navigator.onLine===false?"بدون إنترنت":!gasOn()?"الجسر مو مربوط على هالجهاز":""}
 // 📊 the percentage: reading 0–15, the parts 15–95 (each by its share of the slides and how far its answer has streamed), saving 95–100; it never goes back
@@ -5895,17 +5950,21 @@ function spPct(j){if(!j)return 0;let pc=+j.pcMax||0;
         g=z.c?.3+.65*Math.min(1,z.c/exp):.3*(1-Math.exp(-Math.max(+z.s||0,z.t0?(Date.now()-z.t0)/1000:0)/45))}f+=(p.b-p.a+1)/n*g});pc=15+80*f}
   else if(j.st==="done"||j.st==="ready")pc=100;
   j.pcMax=Math.max(+j.pcMax||0,Math.min(j.st==="done"||j.st==="ready"?100:99,pc));return Math.round(j.pcMax*10)/10}
-function spStepTxt(s){if(!s)return"";if(s.why&&(s.st==="text"||s.st==="kimi"))return`⏸️ موقوف: ${s.why} · يكمل لحاله أول ما يرجع`;
+// a part waiting for Kimi's limit says so (instead of looking stuck)
+function spWaitTxt(j){const L=SPLIVE[j&&j.lid];if(!L)return"";const w=Object.values(L).map(x=>x&&x.w).filter(x=>x&&Date.now()-x.at<x.s*1e3+3e3)[0];
+  return w?w.k==="lim"?`⏳ حسابك في Kimi يسمح بـ ${w.conc===1?"طلب واحد":w.conc+" طلبات"} بالمرة، الجزء الثاني بالدور`:"⏳ Kimi عليه ضغط، يعيد بعد ثواني":""}
+function spStepTxt(s){if(!s)return"";if(s.why&&(spLive(s.st)))return`⏸️ موقوف: ${s.why} · يكمل لحاله أول ما يرجع`;
   if(s.st==="text")return"☁️ Google يقرأ الملف من Drive…";
-  if(s.st==="kimi")return s.np>1?`🧠 Kimi يقسّم: ${s.nd} من ${s.np} أجزاء خلصت`:"🧠 Kimi يقسّم المحاضرة…";
+  if(s.st==="q")return"☁️ Google يقرأ الملف من Drive…";
+  if(s.st==="kimi"){const w=s.own?spWaitTxt(s.j):s.wt||"";return(s.np>1?`🧠 Kimi يقسّم: ${s.nd} من ${s.np} أجزاء خلصت`:"🧠 Kimi يقسّم المحاضرة…")+(w?` · ${w}`:"")}
   if(s.st==="done")return`✅ تقسّمت لـ ${cnt(s.cn,"مقطع","مقطعين","مقاطع")}${s.fg?` · 👁️ ${cnt1(s.fg,"صورة وحدة","صورتين","صور")}`:""}`;
   if(s.st==="ready")return`✅ مقاطعها الجديدة جاهزة (${s.cn})`;if(s.st==="err")return`❌ ما تقسّمت: ${s.err||""}`;return""}
 // share the job's state with your other device: on every step, every part, every 10% and as a heartbeat (20 s; 3 min while paused)
-function spPub(lid,force){const j=spGet(lid);if(!j||!S.aiv)return;const now=Date.now(),act=spActive(j),pc=Math.round(spPct(j)),nd=j.parts?j.parts.filter(p=>p.st==="done").length:0,why=act?spWhy(j):"",L=SPPUB[lid]||{};
-  if(!(force||L.at!==j.at||L.st!==j.st||L.nd!==nd||L.why!==why||pc>=(L.pc||0)+10||act&&now-(L.t||0)>=(why?180e3:20e3)))return;
+function spPub(lid,force){const j=spGet(lid);if(!j||!S.aiv)return;const now=Date.now(),act=spActive(j),pc=Math.round(spPct(j)),nd=j.parts?j.parts.filter(p=>p.st==="done").length:0,why=act?spWhy(j):"",wt=act?spWaitTxt(j):"",L=SPPUB[lid]||{};
+  if(!(force||L.at!==j.at||L.st!==j.st||L.nd!==nd||L.why!==why||(L.wt||"")!==wt||pc>=(L.pc||0)+10||act&&now-(L.t||0)>=(why?180e3:20e3)))return;
   const o={v:1,d:SP_DEV,dn:SP_DEVN,at:j.at,st:j.st,pc:act?Math.min(99,pc):j.st==="done"||j.st==="ready"?100:pc,np:j.parts?j.parts.length:0,nd,hb:now,nm:String(j.name||"").slice(0,120),gid:j.gid,
-    pz:why.slice(0,80),err:String(j.err||"").slice(0,200),cn:+j.cn||0,fg:+j.figs||0,stk:(j.stk||[]).slice(0,12),...(j.st==="ready"&&typeof j.res==="string"?j.res.length<200000?{res:j.res}:{big:1}:{})};
-  SPPUB[lid]={at:j.at,st:j.st,nd,pc,why,t:now};try{quietPatch(lid,{spj:JSON.stringify(o)})}catch(e){console.warn(e)}}
+    pz:why.slice(0,80),wt:wt.slice(0,140),err:String(j.err||"").slice(0,200),cn:+j.cn||0,fg:+j.figs||0,stk:(j.stk||[]).slice(0,12),...(j.st==="ready"&&typeof j.res==="string"?j.res.length<200000?{res:j.res}:{big:1}:{})};
+  SPPUB[lid]={at:j.at,st:j.st,nd,pc,why,wt,t:now};try{quietPatch(lid,{spj:JSON.stringify(o)})}catch(e){console.warn(e)}}
 function spDrop(lid){const j=spGet(lid);delete spAll()[lid];spSave();delete SPLIVE[lid];if(SPCTL[lid])SPCTL[lid].abort();spRefresh(lid)}
 // ✕ cancel: on the device that runs it the work stops now; from the other device it's a request that device acts on (and you don't wait for it)
 function spCancel(lid){const s=spState(lid);if(!s)return;
@@ -5913,6 +5972,16 @@ function spCancel(lid){const s=spState(lid);if(!s)return;
     if(!sj||sj.d===SP_DEV||sj.at===j.at)try{savePatch(lid,{spj:JSON.stringify({v:1,d:SP_DEV,dn:SP_DEVN,at:j.at,st:"x",hb:Date.now()})})}catch(e){}}
   else try{savePatch(lid,{spx:s.at})}catch(e){}
   spRefresh(lid)}
+// ☁️ v20.4: with the GitHub runner set up, a device only asks (and can leave the site); without it, the split runs here as before
+function spGo(lid,gid,name,stk){if(!RUNNER&&rnOn())spAsk(lid,gid,name,stk);else spStart(lid,gid,name,stk)}
+function spAsk(lid,gid,name,stk){const now=Date.now(),sj=spjOf(lid);if(spGet(lid))spDrop(lid);
+  const at=Math.max(now,sj?sj.at+1:0),st=(Array.isArray(stk)?stk:[]).filter(x=>isObj(x)&&typeof x.id==="string").map(x=>({id:x.id,n:String(x.n||"").slice(0,80)})).slice(0,12);
+  try{savePatch(lid,{spj:JSON.stringify({v:1,d:RN_DEV,dn:"",at,st:"q",hb:now,nm:String(name||"").slice(0,120),gid,stk:st,by:SP_DEV})})}catch(e){console.warn(e)}
+  rnWake("split");spRefresh(lid)}
+// GitHub didn't pick it up and you're still here after 4 minutes: it runs on this device (the newer job wins, so nothing runs twice)
+function spQueueFallback(){if(RUNNER||document.hidden||!aiOn()||!gasOn())return;
+  for(const b of ALL){const s=spState(b.id);if(!s||s.own||!s.sj.gid||spBusy[b.id])continue;
+    if(s.st==="q"&&Date.now()-s.at>=4*60e3||s.rn&&(s.st==="text"||s.st==="kimi")&&Date.now()-s.hb>5*60e3)spStart(b.id,s.sj.gid,s.nm,s.stk)}}
 // start (or restart) splitting lecture lid from Drive file gid; stk = the folders it was picked from (the → arrow goes back there)
 function spStart(lid,gid,name,stk){
   const now=Date.now(),sj=spjOf(lid);
@@ -5955,12 +6024,15 @@ async function spRun(lid){
       for(let i=0;i<todo.length&&!stop;i+=SPJ_MAXP)await Promise.all(todo.slice(i,i+SPJ_MAXP).map(async p=>{const pi=j.parts.indexOf(p);if(stop||signal.aborted)return;
         const im=j.imgs.filter(x=>x.p+1>=p.a&&x.p+1<=p.b).slice(0,8);
         const data=`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · ${j.n} ${j.approx?"sections (no slide breaks in this file: S<n> = section n)":"slides"}\nPART ${pi+1} of ${j.parts.length}: S${p.a}–S${p.b}\nSLIDES\n${j.lines.slice(p.a-1,p.b).join("\n")}${im.length?`\nIMAGES\n${im.map((x,i)=>`IMAGE ${i+1} · slide S${x.p+1}`).join("\n")}`:""}`;
-        p.tries=(p.tries||0)+1;p.st="run";(SPLIVE[lid]||(SPLIVE[lid]={}))[pi]={c:0,s:0,t0:Date.now()};spSave();spRefresh(lid);
+        p.st="run";(SPLIVE[lid]||(SPLIVE[lid]={}))[pi]={c:0,s:0,t0:0};spSave();spRefresh(lid);
         try{const r=await aiCall({k:"split",rules:spPartRules(j,pi),data,schema:SPLIT_PART_S,effort:"low",max:8000,fg:true,signal,check:x=>Array.isArray(x.clips)&&x.clips.length>0,
-            onProg:pr=>{const L=SPLIVE[lid];if(L)L[pi]={...(L[pi]||{}),c:pr.c||0,s:pr.s||0};spTick(lid)},
+            onProg:pr=>{const L=SPLIVE[lid];if(L)L[pi]={...(L[pi]||{}),c:pr.c||0,s:pr.s||0,w:null};spTick(lid)},
+            onGo:()=>{const L=SPLIVE[lid];if(L&&L[pi]&&!L[pi].t0)L[pi].t0=Date.now();if(L&&L[pi])L[pi].w=null;spTick(lid)},
+            onWait:w=>{const L=SPLIVE[lid];if(L)L[pi]={...(L[pi]||{}),w:{...w,at:Date.now()}};spTick(lid)},
             ...(im.length?{msgs:sys=>[{role:"system",content:sys},{role:"user",content:[{type:"text",text:data},...im.map(x=>({type:"image_url",image_url:{url:"ms://"+x.id}}))]}]}:{})});
           p.res={lecture:String(r.json.lecture||""),clips:r.json.clips,figs:(Array.isArray(r.json.figs)?r.json.figs:[]).map(f=>({p:(im[(+f.i||0)-1]||{}).p,d:String(f.d||"")})).filter(f=>Number.isInteger(f.p))};p.st="done";p.err=""}
-        catch(e){p.st="wait";p.err=e.code||"x";if(signal.aborted)stop=e;else if(["budget","nokey","offline"].includes(e.code)||aiHalted(aiCfg()))stop=e;else if(p.tries>=3)stop=e}
+        catch(e){p.st="wait";p.err=e.code||"x";if(!signal.aborted&&!e.slept)p.tries=(p.tries||0)+1;   // a page that slept (you left) doesn't count as a try
+          if(signal.aborted)stop=e;else if(["budget","nokey","offline","tpd"].includes(e.code)||aiHalted(aiCfg()))stop=e;else if(p.tries>=3)stop=e}
         if(spGet(lid)===j){spSave();spRefresh(lid)}}));
       if(signal.aborted||spGet(lid)!==j)return;
       if(j.parts.some(p=>p.st!=="done")){if(stop&&!["offline"].includes(stop.code))throw stop;return}
@@ -5969,7 +6041,7 @@ async function spRun(lid){
     if(signal.aborted||spGet(lid)!==j)return;
     if(e.code==="offline"){j.err="بدون إنترنت · يكمل لما يرجع";spSave()}
     else if(e.code==="gas"&&["net","slow","bad"].includes(e.text)&&(j.tries||0)<3){j.tries=(j.tries||0)+1;j.err=gasErrMsg(e);spSave()}   // a hiccup: again in a bit
-    else if(["budget","nokey"].includes(e.code)||aiHalted(aiCfg())){j.err=aiAnyErr(e)+" · يكمل لحاله بعدها";spSave()}   // paused, not failed
+    else if(["budget","nokey","tpd"].includes(e.code)||aiHalted(aiCfg())){j.err=aiAnyErr(e)+" · يكمل لحاله بعدها";spSave()}   // paused, not failed
     else{j.st="err";j.err=aiAnyErr(e);spSave()}}
   finally{clearInterval(beat);if(spBusy[lid]===j)spBusy[lid]=false;if(SPCTL[lid]===ctl)delete SPCTL[lid];if(spGet(lid)===j){j.run=0;spSave();spRefresh(lid);
       if(spActive(j))setTimeout(()=>spRun(lid),20e3)}}
@@ -6011,7 +6083,9 @@ function spSettle(lid,s,st){if(s.own&&st==="x"){const j=s.j;delete spAll()[lid];
   spRefresh(lid)}
 const SP_TAB=Math.random().toString(36).slice(2,8);
 window.addEventListener("storage",e=>{if(e.key===SPJ_LS){SPJ=null;try{csFollow()}catch(x){}}});
-function spResumeAll(){for(const k in spAll()){const j=spAll()[k];if(spActive(j))spRun(k);else if(j.st==="ready")spPub(k)}spFollow()}
+function spResumeAll(){for(const k in spAll()){const j=spAll()[k];if(spActive(j))spRun(k);else if(j.st==="ready")spPub(k)}spFollow();try{spQueueFallback()}catch(e){console.warn(e)}}
+// leaving the site while this device splits: GitHub is woken to take over if this page stays asleep (> 5 min)
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&!RUNNER&&rnOn()&&Object.values(spAll()).some(spActive))rnWake("watch")});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(spResumeAll,800)});
 window.addEventListener("online",()=>setTimeout(spResumeAll,1500));
 setInterval(()=>{if(document.visibilityState==="visible")spResumeAll()},45e3);
@@ -6025,9 +6099,9 @@ function spFollow(){if(!S.aiv)return;
   try{csFollow()}catch(e){console.warn(e)}}
 // what the card line says about the job (this device's or the other one's)
 function spLine(lid){const s=spState(lid);if(!s)return"";const nm=s.nm?` «<span class="en">${esc(s.nm)}</span>»`:"";
-  if(s.st==="text"||s.st==="kimi"){if(s.why)return`⏸️ التقسيم${nm} موقوف: ${esc(s.why)}${s.own?" · يكمل لحاله أول ما يرجع":` (على ${esc(s.dn||"جهازك الثاني")})`}`;
-    if(!s.own)return`${s.stale?"⏸️":"📱"} يتقسّم على ${esc(s.dn||"جهازك الثاني")}${nm}: <b class="en">${Math.round(s.pc)}%</b>${s.stale?" (ما وصل منه تحديث من شوي)":""}`;
-    return`${s.st==="text"?"⏳ Google يقرأ":"🧠 Kimi يقسّم"}${nm}: <b class="en">${Math.floor(s.pc)}%</b>${s.err?` <small>(${esc(s.err)} · بيعيد)</small>`:""}`}
+  if(spLive(s.st)){const mine=s.own||s.rn||s.st==="q";if(s.why)return`⏸️ التقسيم${nm} موقوف: ${esc(s.why)}${mine?" · يكمل لحاله أول ما يرجع":` (على ${esc(s.dn||"جهازك الثاني")})`}`;
+    if(!mine)return`${s.stale?"⏸️":"📱"} يتقسّم على ${esc(s.dn||"جهازك الثاني")}${nm}: <b class="en">${Math.round(s.pc)}%</b>${s.stale?" (ما وصل منه تحديث من شوي)":""}`;
+    return`${s.st==="kimi"?"🧠 Kimi يقسّم":"⏳ Google يقرأ"}${nm}: <b class="en">${Math.floor(s.pc)}%</b>${s.err?` <small>(${esc(s.err)} · بيعيد)</small>`:""}`}
   if(s.st==="ready")return`✅ مقاطعها الجديدة جاهزة (${s.cn})`;
   if(s.st==="done"){const t=s.own?+s.j.doneAt||0:+s.hb||0;return Date.now()-t<36e5?`✅ تقسّمت${nm} لـ ${cnt(s.cn,"مقطع","مقطعين","مقاطع")}${s.fg?` · 👁️ ${s.fg}`:""}`:""}
   if(s.st==="err")return`❌ ما تقسّمت: ${esc(s.err||"")}`;return""}
@@ -6325,7 +6399,7 @@ const akJobId=()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return A
 // the whole trip: send → run → wait (every 4 s) → bring the .apkg back; the job is kept on the deck, so closing the sheet loses nothing
 async function ghBuild(D,onStep,signal){const repo=ghRepo();let jb=D.job;
   if(!(jb&&jb.st==="wait"&&jb.id&&Date.now()-jb.at<30*60e3)){
-    const id=akJobId(),u8=new TextEncoder().encode(JSON.stringify({v:1,deck:D.deck,cards:D.out}));
+    const id=akJobId(),rv=JSON.stringify(akRvw(D)),u8=new TextEncoder().encode(`{"v":1,"deck":${JSON.stringify(D.deck)},"cards":${JSON.stringify(D.out)}${rv.length<1.4e6?`,"review":${rv}`:""}}`);
     onStep&&onStep("☁️ يرسل البطاقات لـ GitHub…");
     await ghReq(`/repos/${repo}/contents/in/${id}.json`,{method:"PUT",signal,body:{message:`anki: ${D.lec.replace(/[\r\n]/g," ").slice(0,60)}`,content:b64u8(u8),branch:GH_BR}});
     jb=D.job={id,st:"wait",at:Date.now(),kick:0};await aiPut("decks",D.id,D);
@@ -6351,6 +6425,80 @@ async function akjBytes(id,a,signal){const loc=await aiGet("decks",id+"|apkg");i
   else{let r;try{r=await fetch(`https://raw.githubusercontent.com/${a.r}/${GH_BR}/out/${a.j}.apkg`,{cache:"no-store",signal})}catch(e){throw ghErr("net")}if(r.status===404)u8=null;else if(!r.ok)throw ghErr("http",r.status);else u8=new Uint8Array(await r.arrayBuffer())}
   if(!u8)throw ghErr("gone");if(!(u8.length>100&&u8[0]===0x50&&u8[1]===0x4b))throw ghErr("file");
   await aiPut("decks",id+"|apkg",{job:a.j,u8});return u8}
+// the deck's review (the facts, the cards, the checks) travels with the .apkg, so any device can show it (and redo it with /flcard N)
+const akRvw=D=>{const o={...D};delete o.job;delete o.qa;return o};
+async function akReview(id,a,signal){let u8=null;
+  if(ghOn())u8=await ghReq(`/repos/${a.r}/contents/out/${a.j}.json?ref=${GH_BR}`,{raw:true,ok404:true,signal});
+  else{const r=await fetch(`https://raw.githubusercontent.com/${a.r}/${GH_BR}/out/${a.j}.json`,{cache:"no-store",signal}).catch(()=>null);if(r&&r.ok)u8=new Uint8Array(await r.arrayBuffer())}
+  if(!u8)return null;let st=null;try{st=JSON.parse(new TextDecoder().decode(u8))}catch(e){return null}
+  const D=isObj(st)&&st.ok?st.review:null;if(!akDeckOK(D)||D.id!==id)return null;
+  D.job={id:a.j,st:"ok",at:+a.at||Date.now(),done:+a.at||Date.now()};try{await aiPut("decks",id,D)}catch(e){}return D}
+
+// ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
+// Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
+// and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
+const RN_DEV="ghrunner",APPV="20.4";
+const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
+const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
+const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
+let rnWoke=0,rnWokeOpen=0;
+async function rnWake(why,force){if(RUNNER||!ghOn())return false;const now=Date.now();if(!force&&now-rnWoke<45e3)return true;rnWoke=now;
+  try{await ghReq(`/repos/${ghRepo()}/dispatches`,{method:"POST",body:{event_type:"work",client_payload:{why:String(why||"").slice(0,20)}}});return true}
+  catch(e){rnWoke=0;console.warn("runner wake",e.text||e.code||e);return false}}
+// opening the site when the runner hasn't been seen for over an hour wakes it (its hourly round can be late)
+setInterval(()=>{if(document.hidden||!rnOn()||!ghOn())return;const r=rnInfo();if(Date.now()-r.at>70*60e3&&Date.now()-rnWokeOpen>30*60e3){rnWokeOpen=Date.now();rnWake("open")}},60e3);
+// ANKI asked of GitHub: {at, how: new|redo, flN, by, st: q|run|done|err|x, t (its step), j (the job), n, err}
+const akqOf=id=>{const o=sjson(mk(id).akq,null);if(!isObj(o)||!(+o.at>0)||!["q","run","done","err","x"].includes(o.st))return null;
+  return{at:+o.at,how:o.how==="redo"?"redo":"new",flN:Math.max(0,Math.min(300,Math.round(+o.flN||0))),by:typeof o.by==="string"?o.by.slice(0,16):"",st:o.st,
+    t:typeof o.t==="string"?o.t.slice(0,160):"",hb:+o.hb||+o.at,j:typeof o.j==="string"&&/^[a-z0-9]{8,40}$/.test(o.j)?o.j:"",n:Math.max(0,Math.round(+o.n||0)),err:typeof o.err==="string"?o.err.slice(0,300):""}};
+function akAsk(id,how,flN){try{savePatch(id,{akq:JSON.stringify({at:Date.now(),how,flN:flN||0,by:SP_DEV,st:"q"})})}catch(e){console.warn(e)}rnWake("anki")}
+let AKQW=null;   // the open ANKI sheet that follows a GitHub run
+function akFollow(){if(RUNNER)return;
+  if(AKQW){if(!document.querySelector(`#akBox[data-id="${CSS.escape(AKQW.id)}"]`))AKQW=null;else{const q=akqOf(AKQW.id),k=q?`${q.at}|${q.st}|${q.t}|${(akjOf(AKQW.id)||{}).j||""}`:"";if(k!==AKQW.k){AKQW.k=k;AKQW.f()}}}
+  // a toast when the deck you asked for lands (once per request)
+  let seen=[];try{seen=JSON.parse(localStorage.getItem("uqu-akn")||"[]")}catch(e){}if(!Array.isArray(seen))seen=[];let ch=false;
+  ALL.forEach(b=>{const q=akqOf(b.id);if(!q||q.by!==SP_DEV||(q.st!=="done"&&q.st!=="err"))return;const key=b.id+"|"+q.at;if(seen.includes(key))return;seen.push(key);ch=true;
+    if(Date.now()-q.hb>864e5||document.querySelector(`#akBox[data-id="${CSS.escape(b.id)}"]`))return;
+    toast(q.st==="done"?`🃏 بطاقات «${label(b)}» جاهزة (${q.n}) · افتح 🃏`:`❌ ANKI: ${q.err}`)});
+  if(ch)try{localStorage.setItem("uqu-akn",JSON.stringify(seen.slice(-60)))}catch(e){}}
+
+// --- the runner's side ---
+const RNS={t0:Date.now(),beat:0,sm:0,idle:0,end:0,ak:{}};
+function rnBeat(x){if(!RUNNER||!canW)return;const u=aiToday(),c=aiCfg();
+  setTop("rnr",JSON.stringify({at:Date.now(),v:APPV,ok:c.key&&gasOn()?1:0,why:!c.key?"nokey":!gasOn()?"nogas":c.halt&&aiHalted(c)?c.halt.c:"",lim:aiLim(),use:{d:curDay(),i:u.i||0,o:u.o||0,c:u.c||0,n:u.n||0},...(x||{})}));RNS.beat=Date.now()}
+async function rnAnki(id,q){
+  const pub=o=>{const cur=akqOf(id);if(cur&&(cur.at!==q.at||cur.st==="x")&&o.st!=="x")return false;try{savePatch(id,{akq:JSON.stringify({...q,...o,hb:Date.now()})})}catch(e){}return true};
+  RNS.ak[id]=q.at;pub({st:"run",t:"⏳ يبدأ…"});
+  let D0=null;
+  if(q.how==="redo"){const x=await aiGet("decks",id);D0=akDeckOK(x)?x:null;const a=akjOf(id);if(a&&!(D0&&D0.job&&D0.job.id===a.j)){const r=await akReview(id,a).catch(()=>null);if(r)D0=r}
+    if(!D0){pub({st:"err",err:"ما لقيت النسخة السابقة عشان أعيدها بهالعدد. ولّدها من جديد."});return}}
+  const run=akStart(id,q.how,q.flN,D0);let last=0;
+  run.subs.add(t=>{if(Date.now()-last<4e3)return;last=Date.now();if(!pub({st:"run",t}))run.ctl.abort()});
+  try{const D=await run.p;
+    if(run.bErr)pub({st:"err",t:"",err:"البطاقات جاهزة بس الملف ما انبنى: "+akErrMsg(run.bErr)});
+    else pub({st:"done",t:"",j:D.job&&D.job.st==="ok"?D.job.id:"",n:D.cards.length})}
+  catch(e){if(e&&e.code==="abort")pub({st:"x",t:""});else pub({st:"err",t:"",err:akErrMsg(e)})}
+  finally{delete RNS.ak[id]}}
+function rnTick(){
+  if(!RUNNER||!merged||!canW||!achReady)return;   // the first fresh copy of the server comes first
+  const now=Date.now();if(now-RNS.beat>60e3)rnBeat();let busy=0;
+  ALL.forEach(b=>{const id=b.id,own=spGet(id);
+    if(own&&spActive(own)){busy++;if(!spBusy[id])spRun(id);return}
+    const sj=spjOf(id),x=+mk(id).spx||0;if(!sj||x===sj.at||!sj.gid)return;
+    if(sj.st==="q"&&sj.d===SP_DEV){spStart(id,sj.gid,sj.nm,sj.stk);const j=spGet(id);if(j)j.pcMax=Math.max(+j.pcMax||0,spQPc(sj.at)+.5);busy++;return}
+    // a device's split that went quiet (the site was left): taken over here; while it's alive the runner waits for it
+    if((sj.st==="text"||sj.st==="kimi")&&sj.d!==SP_DEV&&now-sj.hb<3*HR){if(now-sj.hb>5*60e3||sj.pz)spStart(id,sj.gid,sj.nm,sj.stk);busy++}});
+  ALL.forEach(b=>{const id=b.id,q=akqOf(id);
+    if(AKRUN[id]){busy++;if(q&&(q.st==="x"||q.at!==RNS.ak[id]))AKRUN[id].ctl.abort();return}
+    if(q&&q.st==="q"&&now-q.at<2*864e5){busy++;rnAnki(id,q).catch(e=>console.warn(e))}});
+  if(now-RNS.sm>10*60e3){RNS.sm=now;smT=0;try{smartTick(true)}catch(e){console.warn(e)}}
+  const aiIdle=!aiBusy&&!aiJobs().some(j=>(j.n||0)<5&&(j.next||0)<=now&&AI_RUN[j.k]),syncIdle=!Object.keys(pending).length&&!Object.keys(pendingTop).length;
+  if(busy||!aiIdle||now-RNS.t0<30e3){RNS.idle=0;RNS.end=0;return}
+  if(++RNS.idle<3)return;
+  if(!RNS.end){RNS.end=now;rnBeat({last:now});return}
+  if(syncIdle&&now-RNS.end>4e3)window.__runnerDone=1}
+if(RUNNER)setInterval(()=>{try{rnTick()}catch(e){console.warn(e)}},3000);
+
 // ANKI's healthy count is the prompt's own: what was generated here (akc), else the last deck built on any device
 const akLastN=id=>{const a=akjOf(id);return a?a.n:0};
 function akAvgPerH(){const L=ALL.filter(b=>needsStudy(b)&&+mk(b.id).akc>0&&hrs(b)>0);return L.length?L.reduce((a,b)=>a+mk(b.id).akc/hrs(b),0)/L.length:12}
@@ -6361,6 +6509,7 @@ function smartTick(force){
   if(!achReady||!S.aiv)return;const now=Date.now();if(!force&&now-smT<20000)return;smT=now;
   try{if(xplanTick())setTimeout(()=>{if(!typing())render()},30)}catch(e){console.warn(e)}
   if(!aiOn())return;const d=curDay();
+  if(rnFresh()){aiPump();return}   // ☁️ the GitHub runner does the background analysis (every hour); this device only runs what you ask now
   // ☀️ the morning bundle: today's coach + today's case (one call, the first time the site is open today)
   if(!aiCoachToday()||(!aiCaseToday()&&caseLectures().length))aiWant("am","am|"+d,{d},1);
   // 🎯 the questions for tomorrow's retrieval, made right after you finish a lecture (batched, 3 lectures a call)
@@ -6523,6 +6672,26 @@ function gdBind(){const msg=t=>{$("#gdMsg").innerHTML=t};
   $("#gdShare").onclick=async e=>{const l=gasShareLink(),ok=await copyText(l);e.target.textContent=ok?"✅ انسخ، الصقه في «رابط الجسر» بجهازك الثاني":"ما قدرت أنسخ";if(!ok)msg(`<span class="en" style="word-break:break-all">${esc(l)}</span>`)};
   $("#gdDel").onclick=()=>{aiSet({gas:"",gdir:""});try{localStorage.removeItem(GDC_LS)}catch(x){}d0();msg("انفك الربط على هالجهاز. السكربت باقي في حسابك (تقدر تحذفه من script.google.com).");gdRender()};
   function d0(){const d=$("#gdBox");if(d)d.dataset.filled=""}}
+// ---------- ☁️ settings: the runner (one GitHub secret holds what it needs: the sync, Kimi, the Drive bridge) ----------
+function rnBlob(){const f=fbSaved(),c=aiCfg();
+  if(!f)return{err:"اربط المزامنة (Firebase) أول: الخادم يشتغل على نفس بياناتك عن طريقها."};
+  if(!c.key)return{err:"حط مفتاح Kimi على هالجهاز أول."};
+  if(!c.gas||!c.gtok)return{err:"اربط Google Drive (الجسر) على هالجهاز أول: الخادم يقرأ المحاضرات منه."};
+  let tz="Asia/Riyadh";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||tz}catch(e){}
+  return{txt:JSON.stringify({v:1,fb:{config:f.config,key:f.key},ai:{key:c.key,host:c.host,gas:c.gas,gtok:c.gtok,gdir:c.gdir,budget:c.budget,img:aiImgOn()?1:0},tz})}}
+function rnRender(){const st0=$("#rnSt");if(!st0)return;const r=rnInfo();
+  st0.textContent=rnOn()?"· ✅ شغّال":r&&!r.ok?"· ⚠️ يحتاج تعديل":r?"· ⏸️ ما اشتغل من يوم":"";
+  $("#rnUrl").textContent=`github.com/${ghRepo()}/settings/secrets/actions/new`;
+  if(r&&!r.ok&&!$("#rnMsg").dataset.busy)$("#rnMsg").innerHTML=`<span class="late">⚠️ آخر جولة: ${r.why==="nokey"?"ما لقى مفتاح Kimi في الـ Secret":r.why==="nogas"?"ما لقى الجسر (Drive) في الـ Secret":"فيه مشكلة"}. انسخ الإعدادات من جديد وبدّل الـ Secret.</span>`}
+function rnBind(){const msg=t=>{$("#rnMsg").innerHTML=t};
+  $("#rnCopy").onclick=async e=>{const b=rnBlob();if(b.err){msg(`<span class="late">❌ ${esc(b.err)}</span>`);return}
+    const ok=await copyText(b.txt),ta=$("#rnTa");e.target.textContent=ok?"✅ انسخت":"انسخها من المربع";if(!ok){ta.hidden=false;ta.value=b.txt;ta.select()}};
+  $("#rnTest").onclick=async e=>{if(!ghOn()){msg(`<span class="late">❌ احفظ الـ token فوق أول.</span>`);return}
+    const t0=Date.now(),btn=e.currentTarget;btn.disabled=true;$("#rnMsg").dataset.busy="1";msg("⏳ يجرّب… (أول مرة ياخذ دقيقة أو دقيقتين)");
+    try{if(!await rnWake("test",true))throw ghErr("http");
+      for(;;){await sleep(3000);const r=rnInfo();if(r&&r.at>t0){msg(r.ok?`✅ شغّال. من الحين يكمل لحاله لو طلعت من الموقع ☁️`:`<span class="late">❌ ${r.why==="nokey"?"ما لقى مفتاح Kimi":r.why==="nogas"?"ما لقى الجسر":"فيه مشكلة"} في الـ Secret. انسخ الإعدادات من جديد.</span>`);break}
+        if(Date.now()-t0>5*60e3){msg(`<span class="late">❌ ما رد خلال 5 دقايق. تأكد إن اسم الـ Secret <b class="en">UQU_RUNNER</b> بالضبط، وإن Actions مسموح (Settings ← Actions ← Allow all actions).</span>`);break}}}
+    catch(x){msg(`<span class="late">❌ ${esc(ghErrMsg(x))}</span>`)}finally{btn.disabled=false;delete $("#rnMsg").dataset.busy;rnRender()}}}
 // ---------- 🃏 settings: the GitHub token that lets this device send cards to the builder (this device only) ----------
 async function ghTest(){const repo=ghRepo(),j=await ghReq(`/repos/${repo}`);
   if(!await ghReq(`/repos/${repo}/branches/${GH_BR}`,{ok404:true}))throw ghErr("nobranch");
@@ -6544,14 +6713,14 @@ function aiSettingsRender(){
   const c=aiCfg(),st0=$("#aiSt");if(!st0)return;gdRender();
   st0.textContent=!c.key?(S.aiv?"شغّال على جهاز ثاني · حط المفتاح هنا بعد":"بدون مفتاح (الموقع زي الإصدار 18)"):!S.aiv?"المفتاح محفوظ · اضغط «حفظ وتجربة» عشان تشتغل الميزات":c.halt?(c.halt.c==="money"?"💳 الرصيد خلص":"🔑 المفتاح ما يشتغل"):c.ok?`✓ شغّال${c.host==="cn"?" (الصين .cn)":""}`:"محفوظ";
   const u=aiToday(),U=aiUse();$("#aiUseBox").innerHTML=c.key?`<p class="note" style="margin:0">📊 اليوم <b class="en">${kfmt(u.i+u.o)}</b> توكن · ${cnt1(u.n,"طلب واحد","طلبين","طلبات")} ≈ <b class="en">${usd(aiCost(u))}</b>${u.c?` · منها كاش ${pct(Math.round(u.c/Math.max(1,u.i)*100))}`:""} · من البداية ≈ <b class="en">${usd(aiCost(U.t))}</b> (${cnt1(U.t.n||0,"طلب واحد","طلبين","طلبات")}). الأسعار: إدخال $3 · كاش $0.30 · إخراج $15 لكل مليون.</p>`:"";
-  const P=akp();ghRender();
+  const P=akp();ghRender();rnRender();
   if(!$("#aiAdv").dataset.filled||!document.activeElement||!$("#aiAdv").contains(document.activeElement)){$("#aiAdv").dataset.filled="1";
     $("#aiAuto").checked=c.auto;$("#aiBudget").value=c.budget;$("#aiProxy").value=c.proxy;$("#aiG").value=c.gkey;
     $("#akSubj").value=P.subj}
   $("#aiBudgetUsd").textContent=`≈ حد أقصى ${usd(c.budget*0.6*AI_PRICE.in/1e6+c.budget*0.4*AI_PRICE.out/1e6)} باليوم`;
 }
 function aiBindSettings(){
-  const msg=t=>{$("#aiMsg").innerHTML=t};ghBind();
+  const msg=t=>{$("#aiMsg").innerHTML=t};ghBind();rnBind();
   $("#aiEye").onclick=()=>{const k=$("#aiKey");k.type=k.type==="password"?"text":"password"};
   $("#aiKey").value=aiCfg().key;
   $("#aiSave").onclick=async()=>{const k=$("#aiKey").value.trim().replace(/^Bearer\s+/i,"");if(!k){msg("الصق المفتاح أول (يبدأ غالبًا بـ sk-).");return}
@@ -6574,7 +6743,7 @@ function aiBindSettings(){
 // ---------- 🃏 the ANKI sheet (v20) ----------
 // a run (generate, /flcard N again, or just the GitHub build) keeps going when the sheet is closed; a toast says when it's ready
 const AKRUN={};
-const akErrMsg=e=>e&&e.code==="gh"?ghErrMsg(e):e&&e.code==="akslides"?"ما عندي سلايدات ولا مقاطع لهالمحاضرة. قسّمها أول من 🎬 عشان تطلع البطاقات من محاضرتك.":aiAnyErr(e);
+const akErrMsg=e=>e&&e.code==="akq"?String(e.text||""):e&&e.code==="gh"?ghErrMsg(e):e&&e.code==="akslides"?"ما عندي سلايدات ولا مقاطع لهالمحاضرة. قسّمها أول من 🎬 عشان تطلع البطاقات من محاضرتك.":aiAnyErr(e);
 function akStart(id,how,flN,D0){if(AKRUN[id])return AKRUN[id];
   const run={how,t:"",ctl:new AbortController(),subs:new Set()};AKRUN[id]=run;
   const step=t=>{run.t=t;run.subs.forEach(f=>{try{f(t)}catch(e){}})};
@@ -6600,10 +6769,10 @@ const akjHTML=a=>`<div class="rcpt"><div class="rc-row"><span>📦 آخر ملف
   <div class="sh-act">${navigator.canShare?`<button class="btn primary" data-akj="share">📤 افتحه في ANKI</button>`:""}<button class="btn" data-akj="dl">⬇️ نزّل <span class="en">${esc(a.file||"ANKI.apkg")}</span></button></div>`;
 function sheetAnki(id){
   const b=BY_ID[id];if(!b)return;
-  if(!aiOn()&&!akjOf(id)){toast("حط مفتاح Kimi أول (الإعدادات ← 🤖)");setPage("settings");return}
+  if(!aiOn()&&!akjOf(id)&&!rnOn()){toast("حط مفتاح Kimi أول (الإعدادات ← 🤖)");setPage("settings");return}
   openSheet(`<div class="sh-ic">🃏</div><h2 class="sh-t">بطاقات ANKI</h2><p class="sh-s en">${esc(label(b))}</p><div id="akBox" class="akbox" data-id="${esc(id)}"></div>`,box=>{
     const R=box.querySelector("#akBox");let D=null,sub=null;
-    sheetCleanup=()=>{Object.values(AKRUN).forEach(r=>r.subs.delete(sub))};
+    sheetCleanup=()=>{Object.values(AKRUN).forEach(r=>r.subs.delete(sub));AKQW=null};
     const bindAkj=a=>{if(!a)return;akPreload(id,a);R.querySelectorAll("[data-akj]").forEach(x=>x.onclick=()=>akSend(id,a,x.dataset.akj==="share"))};
     // ⏳ a run in progress (it goes on if you close the sheet)
     const watch=run=>{freshTap();
@@ -6614,18 +6783,29 @@ function sheetAnki(id){
         run.ctl.abort();x.disabled=true};
       run.p.then(x=>{if(!R.isConnected)return;D=x;show(run.bErr)},e=>{if(!R.isConnected)return;if(e.code==="abort"){aiGet("decks",id).then(x=>{D=akDeckOK(x)?x:D;if(R.isConnected)(D?show():setup())});return}setup(e)})};
     const flVal=()=>{const v=parseInt((R.querySelector("#akFl")||{}).value,10);return v>=1&&v<=300?v:0};
+    // ☁️ asked of GitHub: the step it's on (synced), and the deck when it lands; leaving the site loses nothing
+    const watchR=()=>{const q=akqOf(id);AKQW={id,f:watchR,k:q?`${q.at}|${q.st}|${q.t}|${(akjOf(id)||{}).j||""}`:""};
+      if(!q||q.st==="x"){AKQW=null;load();return}
+      if(q.st==="done"){AKQW=null;load();return}
+      if(q.st==="err"){AKQW=null;setup({code:"akq",text:q.err||"ما ضبط"});return}
+      freshTap();
+      R.innerHTML=`<div class="akrun"><div class="akspin" aria-hidden="true"></div><p class="sh-note" id="akProg" aria-live="polite">${esc(q.st==="run"&&q.t||"⏳ يبدأ…")}</p>
+        <button class="btn sm" id="akStop">✕ وقّف</button><p class="sh-note">تقدر تسكّر النافذة: يكمل لحاله، ويطلع لك تنبيه لما يجهز 🃏</p></div>`;
+      R.querySelector("#akStop").onclick=e=>{const x=e.currentTarget;if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="✕ وقّف"}},3000);return}
+        try{savePatch(id,{akq:JSON.stringify({...akqOf(id),st:"x",hb:Date.now()})})}catch(err){}AKQW=null;load()}};
+    const askR=(how,n)=>{akAsk(id,how,n);watchR()};
     // ✨ before the first deck (or «من جديد»)
-    const setup=async err=>{freshTap();const sl=await aiGet("slides",id);if(!R.isConnected)return;const wl=akWeakList(ankiBlurt(id)),a=akjOf(id);
+    const setup=async err=>{freshTap();AKQW=null;const sl=await aiGet("slides",id);if(!R.isConnected)return;const wl=akWeakList(ankiBlurt(id)),a=akjOf(id);
       const src=sl&&sl.txt?`📄 يقرأ سلايداتها كاملة (${cnt1(sl.n,"شريحة وحدة","شريحتين","شرائح")})`:gasSlidesOK(id)?"☁️ يقرأ سلايداتها من Drive عن طريق الجسر":clipsOf(id)?"🎬 يبني من نقاط مقاطعها (للأدق: قسّمها من Drive عشان يقرأ السلايدات)":"";
       R.innerHTML=`${err?`<p class="ce bad">❌ ${esc(akErrMsg(err))}</p>`:""}
         ${src?`<p class="sh-note">${src}</p>`:`<p class="ce mid">⚠️ ${esc(akErrMsg({code:"akslides"}))}</p>`}
         <div class="rcpt"><div class="rc-row"><span>العدد</span><b>البرومبت يحدده: <span class="en">N = max(⌈D/3⌉, ⌈C/2⌉)</span></b></div>
           <div class="rc-row"><span>🎯 عُقدك وأخطاؤك</span><b>${wl.length?`${wl.length} · لها بطاقات زيادة خارج N، وبدون تكرار فكرة`:"ما فيه للحين"}</b></div>
-          <div class="rc-row"><span>ملف .apkg</span><b>${ghOn()?"GitHub يبنيه بـ build_apkg.py":"⚠️ يحتاج GitHub token (الإعدادات)"}</b></div></div>
+          <div class="rc-row"><span>ملف .apkg</span><b>${ghOn()||rnOn()?"GitHub يبنيه بـ build_apkg.py":"⚠️ يحتاج GitHub token (الإعدادات)"}</b></div></div>
         <div class="frow"><label for="akFl" class="en">/flcard</label><input id="akFl" type="number" inputmode="numeric" min="1" max="300" placeholder="تلقائي" class="akn"><span class="note">اختياري: عدد محدد</span></div>
-        <div class="sh-act"><button class="btn primary big" id="akGo"${aiOn()&&src?"":" disabled"}>✨ ولّد البطاقات</button>${D?`<button class="btn" id="akLast">آخر نسخة (${D.cards.length})</button>`:""}</div>
+        <div class="sh-act"><button class="btn primary big" id="akGo"${(aiOn()||rnOn())&&(src||rnOn())?"":" disabled"}>✨ ولّد البطاقات</button>${D?`<button class="btn" id="akLast">آخر نسخة (${D.cards.length})</button>`:""}</div>
         ${!aiOn()?`<p class="sh-note">التوليد يحتاج مفتاح Kimi على هالجهاز.</p>`:""}${a&&!(D&&D.job&&D.job.id===a.j)?akjHTML(a):""}`;
-      const g=R.querySelector("#akGo");g.onclick=()=>{g.disabled=true;watch(akStart(id,"new",flVal()))};
+      const g=R.querySelector("#akGo");g.onclick=()=>{g.disabled=true;if(rnOn())askR("new",flVal());else watch(akStart(id,"new",flVal()))};
       const l=R.querySelector("#akLast");if(l)l.onclick=()=>show();bindAkj(a)};
     // ✅ the deck, in the prompt's output order: the count line → the file → the coverage line + slide errors
     const show=bErr=>{freshTap();const q=D.qa||akQA(D),j=D.job,dist=[0,0,0,0];D.out.forEach(x=>dist[AKL.indexOf(x.answer)]++);
@@ -6647,19 +6827,24 @@ function sheetAnki(id){
         <details class="how"><summary>🧩 المعلومات (${facts.length})</summary><p class="en" dir="ltr">${facts.map(x=>esc(akFactLine(x))).join("<br>")}</p></details>
         <div class="sh-act">${done?`<p class="ce good">✓ مسجّلة «سويت ANKI» (${D.cards.length})</p>`:`<button class="btn" id="akMark">✓ سجّلها «سويت ANKI» (${cnt1(D.cards.length,"بطاقة وحدة","بطاقتين","بطاقات")})</button>`}<button class="btn" id="akTxt">📋 انسخ كنص</button></div>
         <div class="frow akfu"><label class="en" for="akFl">/flcard</label><input id="akFl" type="number" inputmode="numeric" min="1" max="300" class="akn" placeholder="N" value="${D.flN||""}">
-          <button class="btn sm" id="akRedo"${aiOn()?"":" disabled"}>↺ بهالعدد (نفس المعلومات)</button><button class="btn sm" id="akNew"${aiOn()?"":" disabled"}>↺ من جديد</button></div>`;
+          <button class="btn sm" id="akRedo"${aiOn()||rnOn()?"":" disabled"}>↺ بهالعدد (نفس المعلومات)</button><button class="btn sm" id="akNew"${aiOn()||rnOn()?"":" disabled"}>↺ من جديد</button></div>`;
       const q$=s=>R.querySelector(s);
       if(ok){const ref=akRef(D);akPreload(id,ref);if(q$("#akShare"))q$("#akShare").onclick=()=>akSend(id,ref,true);q$("#akDl").onclick=()=>akSend(id,ref,false)}
       if(q$("#akBuild"))q$("#akBuild").onclick=()=>{const jb=D.job;if(jb&&jb.st==="stop"&&Date.now()-jb.at<30*60e3)jb.st="wait";else if(jb&&jb.st!=="wait")D.job=null;watch(akStart(id,"build",0,D))};
       if(q$("#akSet"))q$("#akSet").onclick=()=>{closeSheet();setPage("settings")};
       q$("#akTxt").onclick=async()=>{const ok=await copyText(akPipe(D));toast(ok?"انسخت البطاقات (Stem | A | B | C | D | Answer | Explain | Why | Source | Tags)":"ما قدرت أنسخ")};
       if(q$("#akMark"))q$("#akMark").onclick=()=>{const m0=mk(id),n=D.cards.length;savePatch(id,{anki:m0.anki||todayISO,...(m0.anki?{}:{ankiAt:Date.now()}),cards:n,akc:n,ak:JSON.stringify({n,at:Date.now(),N:D.count.N,w:wk})});toast("انسجلت 🃏");show()};
-      q$("#akRedo").onclick=()=>{const v=flVal();if(!v){toast("اكتب العدد N (1–300)");return}watch(akStart(id,"redo",v,D))};
+      q$("#akRedo").onclick=()=>{const v=flVal();if(!v){toast("اكتب العدد N (1–300)");return}if(rnOn())askR("redo",v);else watch(akStart(id,"redo",v,D))};
       q$("#akNew").onclick=()=>setup();
       // a build that was still running when the sheet closed picks up where it was
       if(j&&j.st==="wait"&&!bErr&&ghOn()&&Date.now()-j.at<30*60e3)watch(akStart(id,"build",0,D))};
+    // the newest deck: this device's, else the one GitHub (or your other device) built, with its review
+    async function load(){let x=await aiGet("decks",id);const a=akjOf(id);
+      if(a&&!(akDeckOK(x)&&x.job&&x.job.id===a.j)){const r=await akReview(id,a).catch(()=>null);if(r)x=r}
+      if(!R.isConnected)return;D=akDeckOK(x)?x:null;D?show():setup()}
     if(AKRUN[id]){watch(AKRUN[id]);return}
-    aiGet("decks",id).then(x=>{D=akDeckOK(x)?x:null;if(R.isConnected)(D?show():setup())});
+    const aq=akqOf(id);if(aq&&(aq.st==="q"||aq.st==="run")&&Date.now()-aq.hb<6*HR){watchR();return}
+    load();
   });
 }
 // ---------- ✂️ the clip setup sheet's Kimi part ----------
@@ -6686,7 +6871,7 @@ function clipAiBind(box,id,fill){
   const sp=box.querySelector("#spBox");if(sp)spBoxDraw(sp,id);
   const lo=box.querySelector("#csLinkOpen");if(lo)lo.onclick=()=>{const r=box.querySelector(".cs-link");r.hidden=false;lo.hidden=true;const i=box.querySelector("#csLink");if(i)i.focus()};
   const go=box.querySelector("#csAi");if(go)go.onclick=()=>{const l=box.querySelector("#csLink").value.trim(),r=driveRef(l);
-    if(sp&&r){spStart(id,r.id,"",[]);csGo("prog");return}
+    if(sp&&r){spGo(id,r.id,"",[]);csGo("prog");return}
     if(!srcOK(l)){msg.textContent=sp?"الصق رابط ملف من Google Drive (مشاركة ← نسخ الرابط).":"اكتب اسم الملف (مثل pharm-1.pdf) أو رابط ينتهي بـ .pdf أو رابط Google Drive.";return}run({link:safeDrive(l)})};
   const ci=box.querySelector("#csImg");if(ci)ci.onchange=()=>aiImgSet(ci.checked);
   box.querySelector("#csFile").onclick=()=>fi.click();
@@ -6735,19 +6920,19 @@ async function csBrowse(force,note){const c=CSV,A=c.box.querySelector("#csAlt"),
   L.querySelectorAll("[data-file]").forEach(x=>x.onclick=()=>{
     if(spRunning(lid)&&arm!==x.dataset.file){arm=x.dataset.file;L.querySelectorAll(".gdb-i.on").forEach(y=>y.classList.remove("on"));x.classList.add("on");
       toast("فيه تقسيم شغّال · اضغط الملف مرة ثانية عشان تلغيه وتبدأ هذا");setTimeout(()=>{if(arm===x.dataset.file){arm=null;x.classList.remove("on")}},4000);return}
-    if(spRunning(lid))spCancel(lid);spStart(lid,x.dataset.file,x.dataset.n,stack);csGo("prog")})}
+    if(spRunning(lid))spCancel(lid);spGo(lid,x.dataset.file,x.dataset.n,stack);csGo("prog")})}
 // while a split runs, the folder windows carry a way back to its percentage
 function csBanner(){if(!csOpen()||CSV.v!=="browse")return;const el=CSV.box.querySelector("#gbBan");if(!el)return;const s=spState(CSV.lid);
-  if(s&&(s.st==="text"||s.st==="kimi")){el.innerHTML=`<button class="spban" type="button">⏳ التقسيم شغّال <b class="en">${Math.floor(s.pc)}%</b>${s.own?"":` على ${esc(s.dn||"جهازك الثاني")}`} · ارجع للنسبة ‹</button>`;el.firstChild.onclick=()=>csGo("prog")}
+  if(s&&(spLive(s.st))){el.innerHTML=`<button class="spban" type="button">⏳ التقسيم شغّال <b class="en">${Math.floor(s.pc)}%</b>${s.own||s.rn||s.st==="q"?"":` على ${esc(s.dn||"جهازك الثاني")}`} · ارجع للنسبة ‹</button>`;el.firstChild.onclick=()=>csGo("prog")}
   else el.innerHTML=""}
 // ✂️ the progress window
 const csKind=s=>s?s.st+(!s.own&&s.stale?"|stale":"")+(s.own?"":"|o"):"none";
 function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"),lid=c.lid,s=spState(lid),b=BY_ID[lid];
   if(!s){csGo("main");return}c.shown=csKind(s);
-  const run=s.st==="text"||s.st==="kimi",pc=run||s.st==="err"?s.pc:100,gid=s.own?s.j.gid:s.sj&&s.sj.gid,can=gasOn()&&aiOn();
+  const run=spLive(s.st),pc=run||s.st==="err"?s.pc:100,gid=s.own?s.j.gid:s.sj&&s.sj.gid,can=gasOn()&&aiOn();
   let foot="";
-  if(run)foot=`<p class="sh-note" id="spWho">${s.own?"تقدر تسكّر النافذة أو تطلع من الموقع: يكمل لحاله لما ترجع 💾":`📱 يشتغل على ${esc(s.dn||"جهازك الثاني")} · آخر تحديث <span id="spAgo">${agoTxt(s.hb)}</span>`}</p>
-      ${!s.own&&s.stale?`<p class="ce mid">⏸️ ${esc(s.dn||"جهازك الثاني")} ما رسل تحديث من شوي (يمكن الموقع مسكّر هناك). يكمل لما تفتحه هناك${can&&gid?"، أو كمّله من هنا":""}.</p>${can&&gid?`<button class="btn primary" id="spTake">▶ كمّله من هنا</button>`:""}`:""}
+  if(run)foot=`<p class="sh-note" id="spWho">${s.own||s.rn||s.st==="q"?"تقدر تسكّر النافذة أو تطلع من الموقع: يكمل لحاله لما ترجع 💾":`📱 يشتغل على ${esc(s.dn||"جهازك الثاني")} · آخر تحديث <span id="spAgo">${agoTxt(s.hb)}</span>`}</p>
+      ${!s.own&&!s.rn&&s.stale?`<p class="ce mid">⏸️ ${esc(s.dn||"جهازك الثاني")} ما رسل تحديث من شوي (يمكن الموقع مسكّر هناك). يكمل لما تفتحه هناك${can&&gid?"، أو كمّله من هنا":""}.</p>${can&&gid?`<button class="btn primary" id="spTake">▶ كمّله من هنا</button>`:""}`:""}
       <button class="btn dangerbtn" id="spCancel">إلغاء</button>`;
   else if(s.st==="done"){foot=`<p class="ce good">✅ تقسّمت لـ ${cnt(s.cn,"مقطع","مقطعين","مقاطع")} 🎬${s.fg?` · 👁️ ${cnt1(s.fg,"صورة وحدة","صورتين","صور")}`:""}</p>${c.then&&clipsOf(lid)?`<button class="btn primary big" id="spStartNow">▶︎ ابدأ المذاكرة</button>`:""}`;
     if(!(c.then&&clipsOf(lid)))setTimeout(()=>{if(csOpen()&&CSV.v==="prog"&&CSV.lid===lid)csGo("main")},1800)}
@@ -6766,15 +6951,15 @@ function csProg(){if(!csOpen())return;const c=CSV,A=c.box.querySelector("#csAlt"
   if(q("#spTake"))q("#spTake").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
   if(q("#spOk"))q("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};
   if(q("#spKeep"))q("#spKeep").onclick=()=>{spSettle(lid,s,"x");csGo("main")};
-  if(q("#spRe"))q("#spRe").onclick=()=>{spStart(lid,gid,s.nm,s.stk);csGo("prog")};
+  if(q("#spRe"))q("#spRe").onclick=()=>{spGo(lid,gid,s.nm,s.stk);csGo("prog")};
   if(q("#spPick2"))q("#spPick2").onclick=()=>csGo("browse",{stack:s.stk&&s.stk.length?s.stk:csLastStack()});
   if(q("#spDrop"))q("#spDrop").onclick=()=>{if(s.own)spDrop(lid);else spSettle(lid,s,"x");csGo("main")}}
 // the numbers move; the window is redrawn only when the job changes kind (running → done, …)
 function csTick(lid){if(!csOpen()||lid&&CSV.lid!==lid)return;const c=CSV,s=spState(c.lid);
-  if(c.v==="main"){if(s&&(s.st==="text"||s.st==="kimi"))csGo("prog");return}
+  if(c.v==="main"){if(s&&(spLive(s.st)))csGo("prog");return}
   if(c.v==="browse"){csBanner();return}
   if(csKind(s)!==c.shown){csProg();return}
-  const pc=s.st==="text"||s.st==="kimi"||s.st==="err"?s.pc:100,A=c.box.querySelector("#csAlt"),q=x=>A.querySelector(x);
+  const pc=spLive(s.st)||s.st==="err"?s.pc:100,A=c.box.querySelector("#csAlt"),q=x=>A.querySelector(x);
   if(q("#spPc"))q("#spPc").textContent=Math.floor(pc);if(q("#spBar"))q("#spBar").style.width=pc+"%";
   const pb=q(".spw-bar");if(pb)pb.setAttribute("aria-valuenow",Math.floor(pc));
   if(q("#spStep"))q("#spStep").textContent=spStepTxt(s);if(q("#spAgo"))q("#spAgo").textContent=agoTxt(s.hb);
@@ -6783,7 +6968,7 @@ function csFollow(lid){if(!csOpen()||lid&&CSV.lid!==lid)return;if(CSV.v==="main"
 setInterval(()=>{if(csOpen()&&CSV.v==="prog")csTick()},1000);
 // the first window's part: one way in (📂), a quiet line about the last split, and «↻ the same file» when there is one
 function spBoxDraw(sp,lid){if(!sp.isConnected)return;
-  const s=spState(lid),c=aiCfg(),line=spLine(lid),run=s&&(s.st==="text"||s.st==="kimi");
+  const s=spState(lid),c=aiCfg(),line=spLine(lid),run=s&&(spLive(s.st));
   if(run){sp.innerHTML=`<p class="note sp-line" style="margin:0">${line}</p><button class="btn primary big" id="spSee">📊 شوف النسبة</button>`;sp.querySelector("#spSee").onclick=()=>csGo("prog");return}
   if(s&&s.st==="ready"){sp.innerHTML=`<p class="note" style="margin:0">${line}</p><p class="sh-note" style="margin:0">⚠️ عندك تقدّم في المقاطع الحالية، ولو حفظت الجديدة يتصفّر.</p><div class="frow"><button class="btn primary sm" id="spOk">💾 احفظ الجديدة</button><button class="btn sm" id="spX">✕ خلّ القديمة</button></div>`;
     sp.querySelector("#spOk").onclick=()=>{if(spApplyReady(lid))closeSheet()};sp.querySelector("#spX").onclick=()=>{spSettle(lid,s,"x");spBoxDraw(sp,lid)};return}
@@ -6794,7 +6979,7 @@ function spBoxDraw(sp,lid){if(!sp.isConnected)return;
   const q=x=>sp.querySelector(x);
   if(q("#spErr"))q("#spErr").onclick=()=>csGo("prog");
   if(q("#spPick"))q("#spPick").onclick=()=>csGo("browse",{stack:csLastStack()});
-  if(q("#spAgain"))q("#spAgain").onclick=()=>{spStart(lid,last.gid,last.nm,last.stk);csGo("prog")}}
+  if(q("#spAgain"))q("#spAgain").onclick=()=>{spGo(lid,last.gid,last.nm,last.stk);csGo("prog")}}
 aiBindSettings();
 // ===== v19 AI END =====
 renderSync();renderNext();render();connect();
