@@ -974,8 +974,11 @@ textarea.gans{font:inherit;font-size:15px;line-height:1.5;padding:10px}
 
 /* ===== v20.5: feels like an app — no zoom, Apple motion (sheets, drawer, pages, cards, toast), instant press ===== */
 :root{--ease:cubic-bezier(.32,.72,0,1);--spring:cubic-bezier(.34,1.3,.64,1)}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y;-webkit-tap-highlight-color:transparent}
-button,summary,label,a,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+*{touch-action:pan-x pan-y}   /* every element only scrolls: no pinch, no double-tap zoom (canvas games keep their own «none») */
+button,summary,label,a,[role="button"]{-webkit-tap-highlight-color:transparent}
+/* iOS zooms into a text field whose text is under 16px: never on this site */
+@supports (-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea,select{font-size:max(16px,1em)!important}}
 button,summary,[role="button"]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 img{-webkit-touch-callout:none}
 /* the thing you touch answers at once */
@@ -1465,7 +1468,7 @@ html.lowmo .ov.in::before,html.lowmo .ov.in>.ovbox,html.lowmo .ov.swap>.ovbox,ht
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (أغلب جوالات Android بس؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.5</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.5.1</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -5203,7 +5206,8 @@ document.addEventListener("click",e=>{const sm=e.target.closest&&e.target.closes
   else{e.preventDefault();const h1=d.getBoundingClientRect().height;d.style.overflow="clip";d.__closing=1;
     d.__anim=d.animate([{height:h1+"px"},{height:closedH+"px"}],{duration:Math.min(380,200+(h1-closedH)/8),easing:EASE});d.__anim.onfinish=()=>{d.open=false;fin()};d.__anim.oncancel=fin}},true);
 ["gesturestart","gesturechange","gestureend"].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
-document.addEventListener("touchstart",()=>{},{passive:true});   // lets :active (the press look) work on iOS
+document.addEventListener("touchstart",e=>{if(e.touches.length>1&&e.cancelable)e.preventDefault()},{passive:false});   // a second finger never starts a pinch (and :active works on iOS)
+document.addEventListener("touchmove",e=>{if((e.touches.length>1||e.scale&&e.scale!==1)&&e.cancelable)e.preventDefault()},{passive:false});
 // a double tap can't land on the next screen's button: taps in the first moment after a sheet appears are ignored
 $("#ov").addEventListener("click",e=>{if(e.isTrusted&&Date.now()-(+$("#ov").dataset.t0||0)<320){e.stopPropagation();e.preventDefault()}},true);
 // ===== v19 AI START =====
