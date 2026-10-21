@@ -1,0 +1,191 @@
+{
+  "verified_at_utc": "2026-10-21T20:41:20.576398+00:00",
+  "baseline_commit": "e8b0dd6204819245e65e4d8820283250dcbe650c",
+  "application_version": "20.10",
+  "index_sha256": "21da22ef247da619a821aff84403558e45e3d0fe9cc777950f96e28d8e939da8",
+  "scope": "Synthetic isolated fixtures; no live user data, paid AI requests or production database writes.",
+  "fresh_dependency_install": {
+    "npm_ci_runner": "passed",
+    "npm_ci_audit": "passed",
+    "npm_audit_runner": 0,
+    "npm_audit_audit": 0,
+    "python_pip_check": "passed",
+    "python_test_count": 40,
+    "python_tests_skipped": 0,
+    "pip": "26.2.2",
+    "anki": "25.9.5"
+  },
+  "static_checks": {
+    "javascript_syntax_files": 37,
+    "python_syntax_files": 9,
+    "correctness_lint_errors": 0,
+    "csp_hash": "passed",
+    "actionlint": "passed",
+    "bash_syntax": "passed",
+    "git_diff_check": "passed",
+    "typescript": "not applicable; no TypeScript",
+    "compiler_build": "not applicable; static HTML/CSS/JS served directly"
+  },
+  "final_execution_groups": [
+    {
+      "name": "test_objectives.js",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "test_browser.js",
+      "exit": 0,
+      "seconds": 2.58
+    },
+    {
+      "name": "ai-regressions.js",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "ai-concurrency.cjs",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "ai-boundaries.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "ai-loader.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "integration-regressions.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "state-regressions.cjs",
+      "exit": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "state-queue.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "state-errors.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "state-clock.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "state-fuzz.cjs",
+      "exit": 0,
+      "seconds": 19.84
+    },
+    {
+      "name": "security-worker.test.cjs",
+      "exit": 0,
+      "seconds": 0.16
+    },
+    {
+      "name": "security-bridge.test.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "security-gas-client.test.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "security-firebase-config.cjs",
+      "exit": 0,
+      "seconds": 25.16
+    },
+    {
+      "name": "runner",
+      "exit": 0,
+      "seconds": 6.21
+    },
+    {
+      "name": "secret-scan",
+      "exit": 0,
+      "seconds": 0.21
+    },
+    {
+      "name": "security-probes",
+      "exit": 0,
+      "seconds": 3.39
+    },
+    {
+      "name": "state-browser.cjs",
+      "exit": 0,
+      "seconds": 5.0
+    },
+    {
+      "name": "state-wipe.cjs",
+      "exit": 0,
+      "seconds": 0.06
+    },
+    {
+      "name": "state-clock-browser.cjs",
+      "exit": 0,
+      "seconds": 3.34
+    },
+    {
+      "name": "ai-tabs.cjs",
+      "exit": 0,
+      "seconds": 1.47
+    },
+    {
+      "name": "frontend_media.cjs",
+      "exit": 0,
+      "seconds": 20.66
+    },
+    {
+      "name": "frontend_accessibility.cjs",
+      "exit": 0,
+      "seconds": 10.19
+    },
+    {
+      "name": "frontend-chromium",
+      "exit": 0,
+      "seconds": 12.32
+    },
+    {
+      "name": "frontend-firefox",
+      "exit": 0,
+      "seconds": 14.42
+    },
+    {
+      "name": "frontend-webkit",
+      "exit": 0,
+      "seconds": 14.54
+    },
+    {
+      "name": "libraries-chromium",
+      "exit": 0,
+      "seconds": 3.76
+    },
+    {
+      "name": "libraries-webkit",
+      "exit": 0,
+      "seconds": 4.9
+    },
+    {
+      "name": "firebase",
+      "exit": 0,
+      "seconds": 14.69
+    }
+  ],
+  "environment_corrections": [
+    "Fresh npm ci restored declared Playwright1.56.1; installed local Firefox and WebKit binaries selected explicitly.",
+    "Long-poll fixture serves actual owned loopback HTTP responses to avoid artificial IP address-space classification through interception; CSP and browser web security stay enabled."
+  ],
+  "remote_ci_and_pages": "Not yet recorded; see release evidence in PRODUCTION_READINESS.md after publication."
+}

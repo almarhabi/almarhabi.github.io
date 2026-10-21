@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.runner-state/
+.env
+.env.*
+!.env.example
+playwright-report/
+test-results/

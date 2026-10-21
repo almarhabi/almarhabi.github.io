@@ -4,6 +4,13 @@
   "description": "Opens the study site headless on GitHub Actions to do the Kimi work your devices asked for (see run.mjs).",
   "type": "module",
   "dependencies": {
-    "playwright-core": "1.56.1"
+    "playwright-core": "1.56.1",
+    "undici": "6.29.1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test_runner.mjs test_anki_save.mjs"
   }
 }

@@ -23,15 +23,17 @@ jobs:
     timeout-minutes: 6
     steps:
       - name: Builder (main)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: main
           path: site
-          sparse-checkout: tools/anki
+          sparse-checkout: |
+            tools/anki
+            .github/scripts
           persist-credentials: false
 
       - name: Jobs (anki-jobs)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: anki-jobs
           path: jobs
@@ -43,20 +45,14 @@ jobs:
       # A job the site sent while this ran is carried over; --force-with-lease never drops one that lands meanwhile.
       - name: Save the decks
         working-directory: jobs
+        run: bash ../site/.github/scripts/save-anki.sh "$RUNNER_TEMP/done.txt"
+
+      # An unprocessed backlog or a job that arrived during the build needs another run, even if no device sends a new event.
+      - name: Continue the backlog
+        working-directory: jobs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "anki-builder"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          touch "${RUNNER_TEMP:?}/done.txt"
-          for i in 1 2 3 4 5 6; do
-            git fetch -q origin anki-jobs
-            tip=$(git rev-parse FETCH_HEAD)
-            for f in $(git ls-tree --name-only FETCH_HEAD in/); do
-              id=$(basename "$f" .json)
-              if [ ! -e "$f" ] && ! grep -qx "$id" "$RUNNER_TEMP/done.txt"; then git show "FETCH_HEAD:$f" > "$f"; fi
-            done
-            git add -A
-            commit=$(git commit-tree "$(git write-tree)" -m "anki: decks")
-            if git push -q --force-with-lease="anki-jobs:$tip" origin "$commit:refs/heads/anki-jobs"; then exit 0; fi
-            sleep $((i * 2))
-          done
-          exit 1
+          if find in -regextype posix-extended -maxdepth 1 -type f -regex 'in/[a-z0-9]{8,40}\.json' -print -quit | grep -q .; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/dispatches" -f event_type=anki
+          fi

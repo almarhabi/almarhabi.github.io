@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "checked_at_utc": "2026-10-21T19:42:13.810552+00:00",
+  "scripts": [
+    {
+      "url": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js",
+      "integrity": "sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9",
+      "bytes": 31444,
+      "cache_file": "13e8381c8a20ede06144872ef64ca4df59a2d1faf7fc8905f724bae5f28d9a15.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js",
+      "integrity": "sha384-1/m+A1jVWbD3yiK3/vtFvm1+LjK1WLpSoDY+Kaxppwn/yP9BVSgdHTNQVOjrzUO5",
+      "bytes": 166145,
+      "cache_file": "b6d49a98770b06567f0d2daa52cf4422a6eacf8b89567e766e26ab0431181d1a.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+      "integrity": "sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG",
+      "bytes": 97630,
+      "cache_file": "bd0b6a1bcd41db0d27b0cc8375157b4eb24a979275b4ff64ba086b4520e14074.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js",
+      "integrity": "sha384-xuasJXVcyv3hZq0eYpelEkBC8l4yufatZXDsKuyCU2rqfhDCb+ftuE/mSfZAteiK",
+      "bytes": 156043,
+      "cache_file": "456494bc8a16948b8ddff9eb87d238d2806be85a2f85743a62fc732943b00fb3.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js",
+      "integrity": "sha384-xuasJXVcyv3hZq0eYpelEkBC8l4yufatZXDsKuyCU2rqfhDCb+ftuE/mSfZAteiK",
+      "bytes": 156043,
+      "cache_file": "64f2f7328f4cf9f23b702ba9d7c76a2319d2b20883839d9606983a907542f4a7.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+      "integrity": "sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e",
+      "bytes": 320004,
+      "cache_file": "5a2fe4830d333397bf09b81c27fe138caf152ad4814278e7cab048b7de22d20d.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
+      "integrity": "sha384-SnzOobpRMLXZ52iJvZm/C0fYw0OQemTXzTjIsdsfMcrCtCEe9qgzxTd3RSklO5x2",
+      "bytes": 1087212,
+      "cache_file": "c0a5848ab2791a1c5d7b1b6a850f22c4668b2b80e084c55558be48fa436b8202.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
+      "integrity": "sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG",
+      "bytes": 97630,
+      "cache_file": "be84d7ef5c34ed5e1992c8e8490215f0bed051c589b56e65ea5f7b77eda2e97d.js",
+      "content_type": "application/javascript"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs",
+      "integrity": "sha384-z/XbAtvhBXJoK+yvYimnFuTCF6/2wTCDSIFD09/HtIfwFtvDKOMdAe5Z3wOChkmW",
+      "bytes": 398237,
+      "cache_file": "a4ddd5456b648a7a9813b53e79af71a6eec40cb3d2e38f169f194fd3f77dce90.js",
+      "content_type": "text/javascript"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs",
+      "integrity": "sha384-vbNBYP03jHFPlgtK4qSXtazEmGfmpTWlSsfq9OiU20MroW/Q9TbaEXiM7PpeWg+6",
+      "bytes": 1417586,
+      "cache_file": "577683b51b1b7190a688a4609599f566b0fa1e42592376c158fb32de0a2a2c9b.js",
+      "content_type": "text/javascript"
+    }
+  ]
+}

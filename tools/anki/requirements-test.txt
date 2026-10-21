@@ -1,0 +1,15 @@
+# Test-only official Anki backend and its verified, pinned transitive dependencies.
+# The production builder/job processor remain standard-library-only.
+anki==25.9.5
+certifi==2026.10.19
+charset-normalizer==3.5.2
+decorator==5.3.1
+distro==1.9.0
+idna==3.20
+Markdown==3.11.2
+orjson==3.13.0
+protobuf==7.36.2
+PySocks==1.7.1
+requests==2.34.2
+typing_extensions==4.16.0
+urllib3==2.8.0

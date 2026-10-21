@@ -1,0 +1,16 @@
+{
+  "name": "uqu-production-audit",
+  "private": true,
+  "description": "Reproducible static and browser verification for the study site",
+  "scripts": {
+    "lint": "node validate.cjs"
+  },
+  "devDependencies": {
+    "eslint": "10.13.0",
+    "globals": "16.5.0",
+    "axe-core": "4.11.0"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

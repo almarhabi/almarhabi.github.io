@@ -1,0 +1,316 @@
+{
+  "started": "2026-10-21T20:30:31.278Z",
+  "baselineCommit": "e8b0dd6204819245e65e4d8820283250dcbe650c",
+  "browser": "154.0.8037.57",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "cpuThrottle": 4,
+  "samples": 10,
+  "source": {
+    "baseline": {
+      "bytes": 985256,
+      "sha256": "31c2a07dff64240e4a831c2a70ebb593718d41528ba9f15312b197063efbafe0"
+    },
+    "working": {
+      "bytes": 1024836,
+      "sha256": "21da22ef247da619a821aff84403558e45e3d0fe9cc777950f96e28d8e939da8"
+    }
+  },
+  "raw": {
+    "baseline": [
+      {
+        "run": 0,
+        "load": 963,
+        "domContentLoaded": 950.9000000022352,
+        "transferBytes": 985429,
+        "fullRender": 25.199999999254942,
+        "openLecture": 68.39999999850988,
+        "saveBookmark": 85.60000000149012,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 1,
+        "load": 998.5,
+        "domContentLoaded": 877.5,
+        "transferBytes": 985429,
+        "fullRender": 20.199999999254942,
+        "openLecture": 51,
+        "saveBookmark": 69.5,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 2,
+        "load": 959.8000000007451,
+        "domContentLoaded": 825.1000000014901,
+        "transferBytes": 985429,
+        "fullRender": 20.5,
+        "openLecture": 55.399999998509884,
+        "saveBookmark": 78.29999999701977,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 3,
+        "load": 952,
+        "domContentLoaded": 940.8000000007451,
+        "transferBytes": 985429,
+        "fullRender": 18,
+        "openLecture": 53.5,
+        "saveBookmark": 72.80000000074506,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 4,
+        "load": 932.5999999977648,
+        "domContentLoaded": 925,
+        "transferBytes": 985429,
+        "fullRender": 17.300000000745058,
+        "openLecture": 65.79999999701977,
+        "saveBookmark": 69.30000000074506,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 5,
+        "load": 961.8999999985099,
+        "domContentLoaded": 947.6000000014901,
+        "transferBytes": 985429,
+        "fullRender": 20.799999997019768,
+        "openLecture": 60,
+        "saveBookmark": 87.80000000074506,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 6,
+        "load": 899.8000000007451,
+        "domContentLoaded": 889.5,
+        "transferBytes": 985429,
+        "fullRender": 17.5,
+        "openLecture": 50,
+        "saveBookmark": 73,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 7,
+        "load": 913.1000000014901,
+        "domContentLoaded": 902.3000000007451,
+        "transferBytes": 985429,
+        "fullRender": 24.399999998509884,
+        "openLecture": 50.30000000074506,
+        "saveBookmark": 65.09999999776483,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 8,
+        "load": 978,
+        "domContentLoaded": 971,
+        "transferBytes": 985429,
+        "fullRender": 18.600000001490116,
+        "openLecture": 55.69999999925494,
+        "saveBookmark": 69.5,
+        "noteCount": 1,
+        "domNodes": 831
+      },
+      {
+        "run": 9,
+        "load": 1147.7999999970198,
+        "domContentLoaded": 990.2999999970198,
+        "transferBytes": 985429,
+        "fullRender": 14.800000000745058,
+        "openLecture": 62.399999998509884,
+        "saveBookmark": 78.09999999776483,
+        "noteCount": 1,
+        "domNodes": 831
+      }
+    ],
+    "working": [
+      {
+        "run": 0,
+        "load": 983.9000000022352,
+        "domContentLoaded": 859.8000000007451,
+        "transferBytes": 1025009,
+        "fullRender": 16.699999999254942,
+        "openLecture": 55.5,
+        "saveBookmark": 80.19999999925494,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 1,
+        "load": 1003.0999999977648,
+        "domContentLoaded": 991.6999999992549,
+        "transferBytes": 1025009,
+        "fullRender": 22,
+        "openLecture": 60.79999999701977,
+        "saveBookmark": 90.30000000074506,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 2,
+        "load": 1005.8999999985099,
+        "domContentLoaded": 858.6999999992549,
+        "transferBytes": 1025009,
+        "fullRender": 19.399999998509884,
+        "openLecture": 53,
+        "saveBookmark": 75.5,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 3,
+        "load": 899.1000000014901,
+        "domContentLoaded": 888.1999999992549,
+        "transferBytes": 1025009,
+        "fullRender": 16.800000000745058,
+        "openLecture": 52.100000001490116,
+        "saveBookmark": 70.90000000223517,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 4,
+        "load": 1169.199999999255,
+        "domContentLoaded": 1161.2999999970198,
+        "transferBytes": 1025009,
+        "fullRender": 16.900000002235174,
+        "openLecture": 57.30000000074506,
+        "saveBookmark": 68.80000000074506,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 5,
+        "load": 951,
+        "domContentLoaded": 938.3999999985099,
+        "transferBytes": 1025009,
+        "fullRender": 29.300000000745058,
+        "openLecture": 72.90000000223517,
+        "saveBookmark": 87.19999999925494,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 6,
+        "load": 931.7000000029802,
+        "domContentLoaded": 921.5,
+        "transferBytes": 1025009,
+        "fullRender": 30.300000000745058,
+        "openLecture": 53.30000000074506,
+        "saveBookmark": 68.80000000074506,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 7,
+        "load": 1000,
+        "domContentLoaded": 864.0999999977648,
+        "transferBytes": 1025009,
+        "fullRender": 21.099999997764826,
+        "openLecture": 63.20000000298023,
+        "saveBookmark": 71.19999999925494,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 8,
+        "load": 891.0999999977648,
+        "domContentLoaded": 881.0999999977648,
+        "transferBytes": 1025009,
+        "fullRender": 17.099999997764826,
+        "openLecture": 56.5,
+        "saveBookmark": 70.10000000149012,
+        "noteCount": 1,
+        "domNodes": 840
+      },
+      {
+        "run": 9,
+        "load": 1045,
+        "domContentLoaded": 885.8000000007451,
+        "transferBytes": 1025009,
+        "fullRender": 26.199999999254942,
+        "openLecture": 73,
+        "saveBookmark": 96.39999999850988,
+        "noteCount": 1,
+        "domNodes": 840
+      }
+    ]
+  },
+  "faults": [],
+  "summary": {
+    "load": {
+      "baselineMedianMs": 960.85,
+      "workingMedianMs": 991.95,
+      "changePercent": 3.2,
+      "baselineMinMax": [
+        899.8000000007451,
+        1147.7999999970198
+      ],
+      "workingMinMax": [
+        891.0999999977648,
+        1169.199999999255
+      ]
+    },
+    "domContentLoaded": {
+      "baselineMedianMs": 932.9,
+      "workingMedianMs": 887,
+      "changePercent": -4.9,
+      "baselineMinMax": [
+        825.1000000014901,
+        990.2999999970198
+      ],
+      "workingMinMax": [
+        858.6999999992549,
+        1161.2999999970198
+      ]
+    },
+    "fullRender": {
+      "baselineMedianMs": 19.4,
+      "workingMedianMs": 20.25,
+      "changePercent": 4.4,
+      "baselineMinMax": [
+        14.800000000745058,
+        25.199999999254942
+      ],
+      "workingMinMax": [
+        16.699999999254942,
+        30.300000000745058
+      ]
+    },
+    "openLecture": {
+      "baselineMedianMs": 55.55,
+      "workingMedianMs": 56.9,
+      "changePercent": 2.4,
+      "baselineMinMax": [
+        50,
+        68.39999999850988
+      ],
+      "workingMinMax": [
+        52.100000001490116,
+        73
+      ]
+    },
+    "saveBookmark": {
+      "baselineMedianMs": 72.9,
+      "workingMedianMs": 73.35,
+      "changePercent": 0.6,
+      "baselineMinMax": [
+        65.09999999776483,
+        87.80000000074506
+      ],
+      "workingMinMax": [
+        68.80000000074506,
+        96.39999999850988
+      ]
+    }
+  },
+  "finished": "2026-10-21T20:31:01.459Z"
+}

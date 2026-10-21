@@ -24,26 +24,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 58
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           sparse-checkout: |
             index.html
             tools/runner
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
 
       - name: Install playwright-core (Chrome is already on the runner)
-        run: npm install --prefix tools/runner --no-audit --no-fund --loglevel=error
+        run: npm ci --prefix tools/runner --ignore-scripts --no-audit --no-fund --loglevel=error
 
       - name: Restore the runner's small state (usage, tries, Kimi limits; never a key)
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .runner-state
-          key: runner-state-${{ github.run_id }}
-          restore-keys: runner-state-
+          key: runner-state-v2-${{ github.run_id }}
+          restore-keys: runner-state-v2-
 
       - name: Run
         env:
@@ -55,7 +55,7 @@ jobs:
 
       - name: Keep the state for the next run
         if: always() && hashFiles('.runner-state/state.json') != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .runner-state
-          key: runner-state-${{ github.run_id }}
+          key: runner-state-v2-${{ github.run_id }}
