@@ -1498,7 +1498,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <button class="btn" id="rcBtn" style="align-self:flex-start">🔍 افحص تسجيلاتي</button></section>
     <section class="rpage"><div class="rp-h"><b>🎧 صوت التركيز</b></div>
       <p class="note" style="margin:0">يشتغل تلقائيًا مع بداية جلسة المذاكرة (ومع مؤقت 5 دقايق)، ويوقف مع نهايتها أو الإيقاف المؤقت. تكتمه وترجّعه من زر 🔊 في شريط الجلسة تحت، أو من شاشة القفل. لأنه ما ينسمع إلا وقت المذاكرة، مع التكرار يصير دماغك يدخل جو التركيز أول ما يسمعه.</p>
-      <div class="seg sm" role="group" aria-label="صوت التركيز" id="fsndSeg"><button data-fsnd="brown">🟤 Brown noise</button><button data-fsnd="rain">🌧️ مطر</button><button data-fsnd="off">🔇 بدون</button></div>
+      <div class="seg sm" role="group" aria-label="صوت التركيز" id="fsndSeg"><button data-fsnd="brown">🟤 Brown noise</button><button data-fsnd="water">💧 صوت الماء</button><button data-fsnd="off">🔇 بدون</button></div>
       <button class="btn sm" id="fsndTest" style="align-self:flex-start">▶ اسمعه 3 ثواني</button></section>
     <section class="rpage" id="lockSec"><div class="rp-h"><b>🔒 قفل التطبيقات المشتتة</b><span class="note" id="lockSt"></span></div>
       <p class="note" style="margin:0">أول ما تبدأ جلسة مذاكرة، أي تطبيق تختاره (سناب، تيك توك، انستقرام…) يرجّعك على طول للشاشة الرئيسية. ينفتح لحاله لما توقف الجلسة أو تاخذ استراحة. يشتغل على الآيفون والآيباد مع بعض.</p>
@@ -1522,7 +1522,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.7.1</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.8</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -3730,22 +3730,11 @@ function closeSitting(id,how){
 
 // ---------- 🎧 focus sound: plays only while you study, so the sound itself becomes the cue ----------
 const FSND_LS="uqu-fsnd";
-const fsndType=()=>{try{const v=localStorage.getItem(FSND_LS);return v==="rain"||v==="off"?v:"brown"}catch(e){return"brown"}};
+const fsndType=()=>{try{const v=localStorage.getItem(FSND_LS);return v==="water"||v==="rain"?"water":v==="off"?v:"brown"}catch(e){return"brown"}};   // "rain" was the old water choice
 const fsndUrl={};let fsAudio=null,fsBlocked=false;
-// long files (4 min brown / 3 min rain) so the loop point comes rarely, and the end flows into the start
-function makeNoiseWav(type){
-  const sr=11025,sec=type==="rain"?180:240,N=sr*sec,fade=sr*3,buf=new Float32Array(N+fade);
-  if(type==="rain"){let b0=0,b1=0,b2=0;for(let i=0;i<buf.length;i++){const w=Math.random()*2-1;b0=.99765*b0+w*.099046;b1=.963*b1+w*.2965164;b2=.57*b2+w*1.0526913;buf[i]=(b0+b1+b2+w*.1848)*.11}
-    // a soft low "roof" rumble plus scattered droplets
-    let lp=0;for(let i=0;i<buf.length;i++){lp+=(buf[i]-lp)*.05;buf[i]=buf[i]*.8+lp*1.6}
-    for(let k=0;k<sec*14;k++){const at=Math.floor(Math.random()*(buf.length-300)),amp=.02+Math.random()*.05,f=1200+Math.random()*3200;for(let j=0;j<220;j++)buf[at+j]+=amp*Math.exp(-j/28)*Math.sin(2*Math.PI*f*j/sr)}}
-  else{let b=0;for(let i=0;i<buf.length;i++){b=(b+.02*(Math.random()*2-1))/1.02;buf[i]=b*3.5}}
-  for(let i=0;i<fade;i++){const g=i/fade;buf[i]=buf[i]*Math.sqrt(g)+buf[N+i]*Math.sqrt(1-g)}
-  // loudness by average energy (not by the loudest spike), then a gentle soft-clip
-  let e=0;for(let i=0;i<N;i++)e+=buf[i]*buf[i];const g=(type==="rain"?.17:.2)/Math.sqrt(e/N||1),pcm=new Float32Array(N);
-  for(let i=0;i<N;i++)pcm[i]=Math.tanh(buf[i]*g*1.2)/1.2;
-  return encodeWav(pcm,sr);
-}
+// v20.8: real recordings (8-minute pieces that loop with no seam), served with the site
+const FSND_FILE={brown:"sounds/brown.mp3?v=1",water:"sounds/water.mp3?v=1"};
+const fsndSrc=tp=>fsndUrl[tp]||(fsndUrl[tp]=new URL(FSND_FILE[tp],location.href).href);
 const FSMUTE_LS="uqu-fsmute";
 const fsMuted=()=>{try{return localStorage.getItem(FSMUTE_LS)==="1"}catch(e){return false}};
 function fsToggleMute(){const m=!fsMuted();try{localStorage.setItem(FSMUTE_LS,m?"1":"0")}catch(e){}if(!m)fsBlocked=false;focusSync();toast(m?"🔇 صوت التركيز مقفّل":"🔊 صوت التركيز شغّال");renderSession();if(focusOpen())drawFocus();if(fiveRun)renderFive()}
@@ -3759,9 +3748,9 @@ const focusWanted=()=>{const a=activeSession();return!!((a&&!mk(a.id).pz)||(five
 function focusSync(){
   const want=focusWanted()&&fsndType()!=="off"&&!fsMuted()&&!st.recOn;let el;try{el=focusAudio()}catch(e){return}
   if(!want){if(!el.paused)el.pause();if(fsBlocked){fsBlocked=false;renderSession()}return}
-  const tp=fsndType();try{if(!fsndUrl[tp])fsndUrl[tp]=URL.createObjectURL(makeNoiseWav(tp))}catch(e){return}
-  if(el.dataset.tp!==tp){el.src=fsndUrl[tp];el.dataset.tp=tp}
-  try{if("mediaSession" in navigator&&window.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:tp==="rain"?"🌧️ صوت التركيز: مطر":"🟤 صوت التركيز","artist":"جدول المذاكرة"})}catch(e){}
+  const tp=fsndType();
+  if(el.dataset.tp!==tp){el.src=fsndSrc(tp);el.dataset.tp=tp}
+  try{if("mediaSession" in navigator&&window.MediaMetadata)navigator.mediaSession.metadata=new MediaMetadata({title:tp==="water"?"💧 صوت التركيز: ماء":"🟤 صوت التركيز: Brown noise","artist":"جدول المذاكرة"})}catch(e){}
   if(el.paused){const p=el.play();if(p&&p.then)p.then(()=>{fsBlocked=false;renderSession()}).catch(()=>{fsBlocked=true;renderSession()})}
 }
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")focusSync()});
@@ -5368,7 +5357,7 @@ try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted(
 $("#lsNow").onclick=()=>{setTop("since",Date.now());LV++;render();toast("صار السجل من الحين · المتأخر من قبل معفى")};
 const drawFsnd=()=>document.querySelectorAll("[data-fsnd]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.fsnd===fsndType()));drawFsnd();
 document.querySelectorAll("[data-fsnd]").forEach(b=>b.onclick=()=>{try{localStorage.setItem(FSND_LS,b.dataset.fsnd)}catch(e){}drawFsnd();focusSync()});
-$("#fsndTest").onclick=()=>{const tp=fsndType();if(tp==="off"){toast("اختر صوت أول");return}try{if(!fsndUrl[tp])fsndUrl[tp]=URL.createObjectURL(makeNoiseWav(tp));const a=new Audio(fsndUrl[tp]);a.play().catch(()=>{});setTimeout(()=>a.pause(),3000)}catch(e){}};
+$("#fsndTest").onclick=()=>{const tp=fsndType();if(tp==="off"){toast("اختر صوت أول");return}try{const a=new Audio(fsndSrc(tp));a.play().catch(()=>toast("ما اشتغل الصوت، تأكد من النت"));setTimeout(()=>a.pause(),3000)}catch(e){}};
 $("#sfxOn").onchange=e=>{try{localStorage.setItem(SFX_LS,e.target.checked?"1":"0")}catch(_){}if(e.target.checked)sfx("g")};
 $("#hapOn").onchange=e=>{try{localStorage.setItem(HAP_LS,e.target.checked?"1":"0")}catch(_){}if(e.target.checked)vib(40)};
 $("#lockCopy").onclick=async()=>{const u=lockUrl();if(!u)return;toast(await copyText(u)?"📋 نسخت الرابط · الصقه في «الحصول على محتويات URL»":"انسخه بنفسك من المربع تحت")};
@@ -6787,7 +6776,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.7.1";
+const RN_DEV="ghrunner",APPV="20.8";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
