@@ -36,7 +36,7 @@ def clean_card(c):
     o = c.get("options") if isinstance(c.get("options"), dict) else {}
     w = c.get("why") if isinstance(c.get("why"), dict) else {}
     a = text(c.get("answer"), 2).strip().upper()
-    return {
+    out = {
         "type": text(c.get("type"), 20).strip(),
         "section": text(c.get("section"), 80).strip() or "General",
         "hy": c.get("hy") is True,
@@ -49,6 +49,11 @@ def clean_card(c):
         "warning": text(c.get("warning")),
         "source": text(c.get("source"), 120),
     }
+    if "objectives" in c:
+        obj = c.get("objectives")
+        out.update(objectives=[text(o, 12) for o in obj] if isinstance(obj, list) else [],
+                   objective=text(c.get("objective")), tier=text(c.get("tier"), 2), weak=c.get("weak") is True)
+    return out
 
 
 def build(job_id, spec, out_dir):
@@ -64,7 +69,11 @@ def build(job_id, spec, out_dir):
     try:
         os.makedirs(os.path.join(work, "media"))
         with open(os.path.join(work, "cards.json"), "w", encoding="utf-8") as f:
-            json.dump({"deck": deck, "file": "deck.apkg", "media_dir": "media", "cards": cards}, f, ensure_ascii=False)
+            clean = {"deck": deck, "file": "deck.apkg", "media_dir": "media", "cards": cards}
+            if "objectives" in spec:
+                clean.update(objectives=[text(o, 12) for o in spec["objectives"]] if isinstance(spec["objectives"], list) else [],
+                             lecture=text(spec.get("lecture"), 150), cap=max(0, min(300, int(spec.get("cap", 300)))))
+            json.dump(clean, f, ensure_ascii=False)
         try:
             p = subprocess.run([sys.executable, BUILDER, "cards.json"], cwd=work, capture_output=True,
                                text=True, timeout=120)
