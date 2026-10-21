@@ -189,7 +189,23 @@
     "First remote CI WebKit26.0/Linux process crashed natively; that engine is not counted as validated. Matched Chromium154, Firefox153 and WebKit26.5 all pass14 cases. The independent SFX repair is not claimed as fixing the old native crash.",
     "Long-poll fixture serves actual owned loopback HTTP responses; CSP and browser web security stay enabled."
   ],
-  "remote_ci_and_pages": "See current main workflow and source-specific release evidence in PRODUCTION_READINESS.md. Earlier public21da evidence is explicitly historical until this source is published and checked.",
+  "remote_ci_and_pages": {
+    "ci": {
+      "run_id": 39675659756,
+      "url": "https://github.com/almarhabi/almarhabi.github.io/actions/runs/39675659756",
+      "conclusion": "success",
+      "jobs_passed": 4
+    },
+    "pages": {
+      "run_id": 39675658301,
+      "url": "https://github.com/almarhabi/almarhabi.github.io/actions/runs/39675658301",
+      "conclusion": "success"
+    },
+    "public_runtime_file": "audit/public-runtime-results.json",
+    "public_runtime_checks": 6,
+    "mode": "live-public-origin",
+    "scope": "Fresh credential-free Chromium on live HTTPS; fonts suppressed, no backend or paid services tested."
+  },
   "playwright": "1.62.1",
   "frontend_cases_per_engine": 14,
   "additional_matched_media_checks": {
@@ -207,5 +223,7 @@
       "firefox": "success",
       "webkit_26_0_linux": "failure"
     }
-  }
+  },
+  "release_source_commit": "c8acde447a6c1e60d7f914e32086c3c26d48ec3e",
+  "release_evidence_recorded_at_utc": "2026-10-21T21:07:30.313773+00:00"
 }
