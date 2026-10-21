@@ -965,6 +965,10 @@ button.lc-tile{cursor:pointer}
 .spw-parts{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;min-height:2px}.spw-parts i{width:10px;height:10px;border-radius:50%;background:var(--line)}.spw-parts i.on{background:var(--accent)}
 .akout{width:100%;max-width:460px;display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .akout .sh-act{align-self:center}
+.akrep{display:flex;flex-direction:column;gap:2px;margin:0;font-size:13px;line-height:1.5;background:var(--surface-2);border-radius:10px;padding:8px 10px;text-align:left;overflow-wrap:anywhere}
+.akrep b{margin-top:6px;font-size:12px;letter-spacing:.02em}.akrep b:first-child{margin-top:0}.akrep .akmiss{color:var(--k-exam);font-weight:700}
+.akobj{width:100%;max-width:none;text-align:left;font-size:14px;resize:vertical;min-height:96px}
+.akfu{display:flex;flex-direction:column;gap:6px}.akfu .frow{justify-content:center;flex-wrap:wrap}select.akn{width:auto;flex:0 0 auto}
 .akline{margin:0;font-family:var(--f-mono);font-size:12.5px;line-height:1.55;background:var(--surface-2);border-radius:10px;padding:8px 10px;text-align:left;overflow-wrap:anywhere}
 .akerr{background:color-mix(in srgb,#d9a400 18%,var(--surface))}
 .akrun{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
@@ -1473,6 +1477,12 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
         <input id="aiG" dir="ltr" autocomplete="off" placeholder="AIza...">
         <div class="kh gk">🃏 ANKI (يتزامن)</div>
         <div class="aigrid"><label class="fl wide">اسم المادة في ANKI (فاضي = Kimi يحدده من المحاضرة)<input id="akSubj" maxlength="40" dir="ltr" placeholder="Microbiology"></label></div>
+        <div class="aigrid"><label class="fl">دقايق مراجعة ANKI باليوم<input id="akMin" type="number" inputmode="numeric" min="5" max="600" dir="ltr"></label>
+          <label class="fl">ثواني لكل بطاقة<input id="akSec" type="number" inputmode="numeric" min="5" max="120" dir="ltr"></label>
+          <label class="fl">محاضرات تضيفها باليوم<input id="akLpd" type="number" inputmode="numeric" min="1" max="10" dir="ltr"></label>
+          <label class="fl">الاحتفاظ المطلوب (FSRS)<input id="akRet" type="number" inputmode="decimal" min="0.7" max="0.99" step="0.01" dir="ltr"></label></div>
+        <p class="note" id="akCapNote" style="margin:0"></p>
+        <button class="btn sm dangerbtn" id="akDelAll" type="button" style="align-self:flex-start">🗑️ احذف كل بطاقات ANKI القديمة</button>
         <button class="btn sm primary" id="aiSaveAdv" style="align-self:flex-start">حفظ</button>
         </div>
       </details>
@@ -1522,7 +1532,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.8</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">21.0</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1657,12 +1667,12 @@ const MARKS=[
 ];
 const LS="uqu-state-v2";
 // top-level fields that sync like the daily cap
-const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp","aiv","rnr","lock"];
+const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp","aiv","rnr","lock","akdelAll"];
 // ---------- 🛡️ whatever comes from storage or another device is checked before it's used (a broken value can't take the page down) ----------
 const isISO=v=>typeof v==="string"&&/^\d{4}-\d\d-\d\d$/.test(v)&&!isNaN(Date.parse(v+"T12:00:00Z"));
 const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
-const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards","ltAt","akc","spx","wpAt"],
-  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak","akj","spj","wpf","akq"],MK_OBJ=["knots","recs","pre"];
+const MK_DATE=["studied","rev1","rev2","anki","ankiS","again","lite","rv","del"],MK_NUM=["sAt","rev1At","rev2At","ankiAt","ankiSAt","againAt","rvAt","startAt","pz","acc","ss","mins","cards","ltAt","akc","spx","wpAt","akdel"],
+  MK_STR=["clips","cpr","bm","bml","hints","mv","nm","drx","knd","g1","rvg","aiq","rvq","pdf","lt","ak","akj","spj","wpf","akq","akob"],MK_OBJ=["knots","recs","pre"];
 function cleanMark(m){
   if(!isObj(m))return null;
   MK_DATE.forEach(f=>{const v=m[f];if(v==null||v===false||isISO(v))return;
@@ -1679,7 +1689,7 @@ function cleanMark(m){
   return m;
 }
 const BAD_K=new Set(["__proto__","constructor","prototype"]);
-const TOP_NUM=["pts","cap","since","nap","thin","goal","aiv"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","xplan","akp","rnr"];
+const TOP_NUM=["pts","cap","since","nap","thin","goal","aiv","akdelAll"],TOP_JSON=["parked","rewards","redeems","docs","extra","offers","bt","boxes","sits","rtvDays","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","xplan","akp","rnr"];
 function cleanS(o){
   if(!isObj(o))o={marks:{}};
   if(!isObj(o.marks))o.marks={};
@@ -3449,7 +3459,7 @@ async function copyText(t){
   try{const a=document.createElement("textarea");a.value=t;a.setAttribute("readonly","");a.style.cssText="position:fixed;top:-9999px;opacity:0";document.body.appendChild(a);a.select();a.setSelectionRange(0,t.length);const ok=document.execCommand("copy");a.remove();return ok}catch(e){return false}
 }
 
-// ---------- 🎬 clips: the lecture cut into 10–15 minute pieces, each ending with a blurt ----------
+// ---------- 🎬 clips: the lecture cut into 15–25 minute pieces (7+ slides), each ending with a blurt ----------
 const CLIP_T={free:"🧠 فرّغ كل شي",child:"🧒 اشرحها لطفل",exam:"📝 سؤال اختبار",link:"🔗 اربطها باللي قبلها",clinic:"🩺 الأهمية السريرية",why:"❓ ليش؟",compare:"⚖️ قارن"};
 const RATE_L={e:"✅ قدرت",m:"🟡 نص نص",h:"❌ ما قدرت"},clipQ={e:1,m:.7,h:.35};
 // chat apps sometimes stamp citation markers into answers about an attached file: [span_11](start_span), [cite_start], [cite: 3], 【4†source】
@@ -3479,7 +3489,7 @@ function clipPrompt(b){
 "المطلوب: قسّم المحاضرة إلى «مقاطع» مذاكرة قصيرة، وجهّز لكل مقطع سؤال تشويق ونقاط مفتاحية وسؤال تفريغ، وأعطني النتيجة JSON فقط.",
 "",
 "قواعد التقسيم:",
-"1. المقطع من 4 إلى 9 شرائح (ولا مرة أقل من 4)، أو تقريبًا 10 إلى 15 دقيقة مذاكرة. الشرائح الكثيفة (آليات، مسارات، جداول) مقطعها أقصر، وشرائح الصور والعناوين أطول.",
+"1. المقطع من 7 إلى 12 شريحة (ولا مرة أقل من 7)، أو تقريبًا 15 إلى 25 دقيقة مذاكرة. الشرائح الكثيفة (آليات، مسارات، جداول) مقطعها أقصر، وشرائح الصور والعناوين أطول.",
 "2. لا تقطع فكرة أو آلية في نصها؛ حدود المقطع تكون عند تغيّر الموضوع.",
 "3. غطِّ كل الشرائح بالترتيب بدون فراغات ولا تداخل: أول مقطع يبدأ من الشريحة 1، وكل مقطع يبدأ بعد نهاية اللي قبله مباشرة، وآخر مقطع ينتهي عند آخر شريحة.",
 "4. شرائح الغلاف والأهداف (Objectives) والمراجع ادمجها مع أقرب مقطع.",
@@ -3511,7 +3521,7 @@ function clipPrompt(b){
 }
 // Claude's reply → clean clips, or a clear Arabic reason why not
 // ✂️ the 4-slide floor: a clip under 4 slides joins its shorter neighbour (its key points and minutes go along)
-const MIN_SL=4;
+const MIN_SL=7;
 function clipFloor(c){let mg=0;if(!c.length||!(c[0].f>0))return 0;
   for(let i=0;i<c.length&&c.length>1;){const x=c[i];if(x.t-x.f+1>=MIN_SL){i++;continue}
     const L=i>0?c[i-1]:null,R=i<c.length-1?c[i+1]:null,t=!L?R:!R?L:(L.t-L.f<=R.t-R.f?L:R);
@@ -5361,7 +5371,9 @@ $("#fsndTest").onclick=()=>{const tp=fsndType();if(tp==="off"){toast("اختر �
 $("#sfxOn").onchange=e=>{try{localStorage.setItem(SFX_LS,e.target.checked?"1":"0")}catch(_){}if(e.target.checked)sfx("g")};
 $("#hapOn").onchange=e=>{try{localStorage.setItem(HAP_LS,e.target.checked?"1":"0")}catch(_){}if(e.target.checked)vib(40)};
 $("#lockCopy").onclick=async()=>{const u=lockUrl();if(!u)return;toast(await copyText(u)?"📋 نسخت الرابط · الصقه في «الحصول على محتويات URL»":"انسخه بنفسك من المربع تحت")};
-$("#lockTest").onclick=lockTest;$("#lockUrl").onfocus=e=>{try{e.target.select()}catch(_){}};
+$("#lockTest").onclick=lockTest;
+$("#akDelAll").onclick=async e=>{const b=e.currentTarget;if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="متأكد؟ تنحذف من كل أجهزتك · اضغط مرة ثانية";setTimeout(()=>{if(b.isConnected){b.dataset.sure="";b.textContent="🗑️ احذف كل بطاقات ANKI القديمة"}},4000);return}
+  b.disabled=true;await akDeleteAll();b.dataset.sure="";b.textContent="🗑️ احذف كل بطاقات ANKI القديمة";b.disabled=false;toast("🗑️ انحذفت كل بطاقات ANKI القديمة · سجل «سويت ANKI» باقي")};$("#lockUrl").onfocus=e=>{try{e.target.select()}catch(_){}};
 $("#sfxTest").onclick=()=>{const was=sfxOn();if(!was)toast("الأصوات مقفلة، فعّلها فوق");else{sfx("j");vib([40,40,90])}};
 $("#fiveBar").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fiveAct(e)}};
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(PAGES.some(p=>p[0]===h)&&h!==st.page)setPage(h)});
@@ -6126,10 +6138,10 @@ function packSlides(pages,keepAll){
   const txt=out.map((s,i)=>`S${i+1}: ${s||"·"}`).join("\n");
   return{n,txt,empty,cut,raw:lines.reduce((a,L)=>a+L.join(" ").length,0),chars:txt.length}}
 // each slide on its own numbered line, and a picture sent with the request is named inside the slide it sits on: "S5: … [IMAGE 2]"
-const spSlideLines=(j,p,im)=>j.lines.slice(p.a-1,p.b).map((l,i)=>{const n=p.a+i,tags=(im||[]).map((x,k)=>x.p+1===n?`[IMAGE ${k+1}]`:"").filter(Boolean);return tags.length?`${l} ${tags.join(" ")}`:l}).join("\n");
+const spSlideLines=(j,p,im)=>j.lines.slice(p.a-1,p.b).map((l,i)=>{const n=p.a+i,tags=(im||[]).map((x,k)=>x.p+1===n?`[IMAGE ${k+1}]`:"").filter(Boolean);return slSep(tags.length?`${l} ${tags.join(" ")}`:l)}).join("\n");
 const SPLIT_RULES=`TASK=split
-Cut this lecture into short study clips. SLIDES are "S<n>: text", ONE line per slide (each line is a separate slide; "·" = picture-only slide; "[IMAGE k]" = attached picture k is on that slide).
-Rules: each clip 4–9 slides (~10–15 min), NEVER fewer than 4 slides; dense slides (mechanisms, pathways, tables) → shorter clips, picture/title slides → longer; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
+Cut this lecture into short study clips. SLIDES: each slide is its own block, opened by its separator line "===== SLIDE n =====" (n = its number; "·" = a picture-only slide; "[IMAGE k]" = attached picture k is on that slide). Clip boundaries use these slide numbers.
+Rules: each clip 7–12 slides (~15–25 min), NEVER fewer than 7 slides (a lecture shorter than 7 slides is one clip); dense slides (mechanisms, pathways, tables) → nearer 7, picture/title slides → nearer 12; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
 Per clip: "title" English title as on the slides; "ar" Arabic title 2–5 words; "from"/"to" first and last slide; "min" expected minutes; "hook" ONE curiosity question in Arabic (English terms kept) that the clip answers, without giving the answer; "keys" 3–5 high-yield points in English, slide wording, one short line each; "type" the blurt type, one of free, child, exam, link, clinic, why, compare — vary them, never the same type in two clips in a row, no "link" in the first clip; "prompt" the blurt question in Arabic (English terms kept) matching its type: free: اذكر كل اللي تتذكره عن … · child: اشرح … لطفل عمره 10 سنين · exam: وش السؤال اللي ممكن يجي على … في الاختبار؟ وجاوبه · link: وش علاقة … بـ … (من مقطع سابق)؟ · clinic: وين تظهر الأهمية السريرية لـ …؟ · why: ليش …؟ · compare: قارن بين … و …
 "lecture" = the lecture title as on the slides.`;
 const SPLIT_S=sObj({lecture:S_STR,clips:sArr(sObj({title:S_STR,ar:S_STR,from:S_INT,to:S_INT,min:S_INT,hook:S_STR,keys:sArr(S_STR),type:{type:"string",enum:Object.keys(CLIP_T)},prompt:S_STR}))});
@@ -6142,7 +6154,7 @@ async function aiSplit(id,src,onStep,signal){
   if(pk.empty>pk.n*.6&&!figs)throw aiErr("file",null,0,"scan");
   aiPut("slides",id,{at:Date.now(),n:pk.n,txt:pk.txt,name:f.name});
   onStep&&onStep(`🧠 Kimi يقسّم ${cnt1(pk.n,"شريحة وحدة","شريحتين","شرائح")}…`,pk);
-  const r=await aiCall({k:"split",rules:SPLIT_RULES,data:`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · ${pk.n} ${f.approx?"sections (this file had no slide breaks: S<n> = section n, use them as slides)":"slides"}\nSLIDES\n${pk.txt}`,schema:SPLIT_S,effort:"high",max:24000,fg:true,signal,
+  const r=await aiCall({k:"split",rules:SPLIT_RULES,data:`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · ${pk.n} ${f.approx?"sections (this file had no slide breaks: S<n> = section n, use them as slides)":"slides"}\nSLIDES\n${slSep(pk.txt)}`,schema:SPLIT_S,effort:"high",max:24000,fg:true,signal,
     check:j=>Array.isArray(j.clips)&&j.clips.length>0,onProg:p=>onStep&&onStep(p.c?`✍️ Kimi يكتب المقاطع… ${kfmt(p.c)}`:`🧠 Kimi يفكر… ${kfmt(p.r)}`,pk)});
   return{json:JSON.stringify({app:"uqu-clips",v:1,lecture:String(r.json.lecture||label(b)),slides:pk.n,clips:r.json.clips}),pk,link:f.link||"",approx:!!f.approx,how:f.how||"",figs,imgs:(f.images||[]).length,seeErr,imgErr:f.imgErr||""}}
 function fileErrMsg(e){const t=String(e&&e.text||"");return t==="scan"?"السلايدات صور بدون نص (Scan)، فما أقدر أقرأها. صدّرها من PowerPoint كـ PDF، أو استخدم الطريقة اليدوية مع Claude تحت."
@@ -6450,99 +6462,125 @@ function spRefresh(lid){document.querySelectorAll(`[data-spl="${CSS.escape(lid)}
 // the streamed answer moved: only the numbers on screen change (and the shared state, when it's due)
 function spTick(lid){spPub(lid);try{csTick(lid)}catch(e){}
   const t=spLine(lid);document.querySelectorAll(`[data-spl="${CSS.escape(lid)}"]`).forEach(el=>{if(t)el.innerHTML=t})}
-// ---------- 🃏 v20: ANKI — your MCQ prompt word for word (tools/anki/PROMPT.md). Kimi writes the cards as JSON, the site counts and checks them,
-// and GitHub turns them into the .apkg with your build_apkg.py (tools/anki/, run by .github/workflows/anki.yml). Saving tokens doesn't apply here.
-const AK_PROMPT="# MCQ Anki Deck from a Lecture\n\n## Role\nMedical item writer + spaced-repetition designer. Turn one lecture into the smallest MCQ Anki deck that still tests every examinable detail.\n\n## Input\n- Full lecture text, in slide order.\n- Lecture images as separate files. The text does NOT contain what is inside images; read every image as source.\n- Optional `/flcard N` → make exactly N cards.\n\n## Evidence the rules rest on\n1. Retrieval beats rereading; recall must be effortful but answerable.\n2. Same-family (competitive) distractors make you retrieve the distractors' facts too → pack details into options.\n3. Explanations beat answer-only feedback; correcting every distractor prevents learning false lures.\n4. Practice the question type you will face: mix factual and applied items.\n5. Every card costs future reviews. Duplicates, lists, vague stems, and look-alike cards become leeches. Fewer, sharper cards.\n\n## 1. Extract\n- Classify every image:\n  - INFO (text, table, flowchart, labels) → extract its facts like text.\n  - CLINICAL (photo/micrograph of a named sign or disease) → candidate image card.\n  - LABELED (diagram with examinable labels) → candidate masked-label card.\n  - NOISE (logo, decoration, cartoon, duplicate) → ignore.\n  Map each image to its slide (file name, order, or matching heading).\n- List every examinable fact as one atomic line: `ID | slide | section | fact | family | tier`. Merge repeats (summary, case, and recap slides) into one ID.\n- Drop: title, outline, objectives text, references, thanks, decoration. Use objectives, summary, cases, and the lecturer's own questions only as signals of importance.\n\n## 2. Select\n- CORE (must be a correct answer at least once): mechanisms; structure/classification; agent–disease links; discriminating clinical features; complications and at-risk hosts; stated treatment, prevention, vaccines; rules and their exceptions (\"all … except\"); mnemonics; confusable pairs; anything emphasized (color, bold, enlarged, \"remember\", repeated, boxed, in summary/case/lecturer's questions).\n- SUPPORT (may be tested only as a corrected distractor or in back text): minor numbers, history, epidemiology, non-emphasized examples.\n- Family = facts sharing one dimension (structure, replication site, disease, host, route, schedule…). Families supply distractors.\n\n## 3. Count\n- D = CORE + SUPPORT; C = CORE.\n- N = max(⌈D/3⌉, ⌈C/2⌉). `/flcard N` overrides.\n  (Each card carries ≥3 facts: one key + same-family distractors. A compound key carries ≤2 CORE facts.)\n- Types: 50% Direct, 25% Analytic, 25% Hard (nearest whole numbers). Image cards count inside N, ≤20% of N.\n- Print, then build without waiting:\n  `Details D (CORE C · SUPPORT S · DROPPED X) → N cards → Direct a · Analytic b · Hard c · Image k`\n\n## 4. Write\nCoverage\n- Every CORE fact is a key once. Every SUPPORT fact appears at least once (key, corrected distractor, or back text).\n- Never test the same fact in the same direction twice. Reverse direction only for CORE confusable pairs.\n\nTypes\n- Direct: one precise, non-trivial fact.\n- Analytic: 2–4-line vignette or mechanism chain (cause → mechanism → consequence) linking 2–3 source facts; USMLE Step 1 style.\n- Hard: confusable pairs, exceptions, misconceptions. Difficulty from reasoning, never obscurity.\n\nItem rules\n- One focused question, answerable before reading the options.\n- Exactly 4 options, homogeneous, ≤15 words each, near-equal length; the key is never the longest.\n- Each distractor = a real source fact from the same family, attached to the wrong item. Never invented, never absurd.\n- If one option is compound (e.g., \"ssDNA; naked\"), all are.\n- Banned: all/none of the above, \"A and B\", true/false, absolute-word cues, stem words echoed only in the key.\n- \"Which statement is correct?\" ≤20% of N, Hard only. NOT/EXCEPT ≤10% of N, written **NOT** / **EXCEPT**.\n- Never copy the lecturer's questions; test the same point from another angle.\n- Keys and vignettes use source facts only.\n- Keys spread evenly A–D (±1); never the same letter 3× in a row. (The template also reshuffles options each review.)\n- Explanations name option text, never letters.\n\n## 5. Images\n- CLINICAL card: show the image, ask what it implies (agent, property, risk), not only its name. Crop out any caption or title that gives the answer.\n- LABELED card: cover the target label with an opaque box in the local background color (use OCR, e.g. tesseract, for coordinates). Ask for the hidden label or what it implies. Put the unmasked image on the back.\n- View every output image before use: answer fully hidden, no other clue, readable. If unverifiable, skip the image.\n- Resize to ≤900 px wide, JPEG quality 80. Name: `<deckslug>_s<slide>_<n>.jpg`.\n\n## 6. Back\nIn order:\n1. Front (same option order).\n2. Key in green + ≤2-line explanation (why; link to mechanism).\n3. Each distractor in red + 1 line: why wrong and where that fact belongs.\n4. Scientifically wrong slide: keep the slide's version as key (the exam follows it) and add `⚠️ Slide error:` + the correct fact.\n5. `Source: Slide N`.\n\n## 7. Build\n- The cards go out as JSON in the `cards.json` format (see SITE below); the site checks them with the same rules as `build_apkg.py`, and GitHub runs `python3 build_apkg.py cards.json` (`tools/anki/` in the site's repository). Fix every validation error that comes back.\n- Deck `Course::Lecture title` (title alone if course unknown); file = lecture title.\n- Tags: section, type, `HY` (key fact emphasized by the lecturer), `Image`, `SlideError`.\n- IDs are derived from deck + stem, so re-importing updates cards instead of duplicating them.\n\n## 8. QA before delivering\n- Uncovered CORE/SUPPORT IDs = 0.\n- Every key re-checked against its slide.\n- No duplicate or near-duplicate items; no item answerable from options alone.\n- Type split, key balance, option length/words pass.\n\n## Output\n1. The count line.\n2. The `.apkg` file.\n3. One line: `Coverage CORE c/c · SUPPORT s/s` + list of ⚠️ slide errors.";
-const AK_SITE=`## SITE (how this prompt runs inside his study site; nothing above changes)
-- No code execution and no files here: you answer in JSON only, in two stages. The site does the counting (step 3), the checks, the A–D letters and the build.
-- STAGE 1 = steps 1–2. STAGE 2 = steps 4, 6 and 8, with the numbers the site computed from your STAGE 1 list (it prints the count line).
-- Picture cards are OFF for now, so Image k = 0. Pictures reach you as "[Figure: …]" lines inside their slide's text: read them as source (INFO).
-- The site re-deals the answer letters evenly afterwards, moving each option together with its "why". So write each "why" under its own option's letter, and never name letters in explanations.
-- WEAK SPOTS = his knots, the points he missed in his clips, what he forgot by the next morning, and his morning-quiz mistakes. Each one is tested as the KEY of exactly one card. A weak spot that is already the key of one of the N cards gets no second card; any other weak spot gets ONE extra card, outside N. Never two cards on the same idea.
+// ---------- 🃏 v21: ANKI — your objectives-first MCQ prompt word for word (tools/anki/PROMPT.md). Kimi writes the cards as JSON, the site
+// does the math (cap, tiers, allocation), the checks and the letters, and GitHub builds the .apkg with tools/anki/build_apkg.py (model «MCQ 4-Option»).
+const AK_PROMPT="ROLE\nYou are an expert medical educator and spaced-repetition specialist (Anki/FSRS, SuperMemo \"20 Rules of Formulating Knowledge\"). Convert the lecture I provide into the SMALLEST set of high-yield MCQ Anki flashcards that gives the MAXIMUM exam and clinical return, while keeping my daily review load sustainable. The lecture's learning objectives are the backbone of the deck: every card must serve them, and every objective must be tested.\n\nCORE DELIVERABLE (non-negotiable)\nCreate an .apkg MCQ flashcards file (Anki). Each flashcard has the question and all four choices on the front, and the answer review on the back. All card content is in English.\n\nMY PARAMETERS (use defaults if left blank)\n- Level: 2nd-year medical student\n- Subject / lecture name: [__]\n- Daily Anki review budget: [__] minutes (default 60)\n- Average seconds per review: [__] (default 20, because MCQ cards are slower than basic cards)\n- Lectures I add per day: [__] (default 2)\n- Days until exam: [__]\n- FSRS desired retention: [__] (default 0.90)\n- Optional: my \"blurt\" (everything I recalled from memory before re-reading the lecture): [paste or leave blank]\n\nSTEP 0 — UNDERSTAND BEFORE CARDING\nRead the whole lecture first. Identify its core story: main mechanisms, causal chains, and how topics connect. Never card something the lecture does not explain clearly; flag ambiguous points instead.\n\nSTEP 1 — OBJECTIVES MAP (the backbone of the deck)\n- Extract the learning objectives verbatim from the objectives slide and number them O1, O2, O3…\n- If the lecture has no objectives slide: infer 3–6 objectives from the title, outline, summary slides, and the professor's cases or questions. Label them \"Inferred\" and show them.\n- For each objective, record its action verb and the slides that serve it.\n- The verb sets the question type for that objective:\n  - Define / Name / List / Know / Identify → precise identification with homogeneous distractors from the same family (never \"list all X\")\n  - Understand / Explain / Describe → mechanism, \"why\", or \"what happens if\" questions\n  - Differentiate / Compare / Contrast / Distinguish → discrimination questions: confusable pairs in the options, compound options that test both directions\n  - Classify → given features, choose the class (or given the class, choose the features)\n  - Apply / Diagnose / Manage / Interpret → short clinical vignettes\n- Treat the professor's cases, summary slide, and repeated points as signals of how each objective will be examined.\n\nSTEP 2 — CALCULATE MY CARD CAP (show the math in 2 lines)\n- Reviews/day = (budget minutes × 60) ÷ seconds per review\n- New cards/day ≈ Reviews/day ÷ 10 (use ÷ 15 if desired retention ≥ 0.93)\n- Cap for this lecture = New cards/day ÷ lectures per day (round down)\n- If days until exam < 7: halve the cap and card Tier 1 only.\n\nSTEP 3 — EXTRACT KNOWLEDGE UNITS\nList every testable atomic unit (one idea each). Link each unit to the objective(s) it serves. Merge duplicates. Drop anything a 2nd-year medical student already knows.\n\nSTEP 4 — SCORE EACH UNIT (0–13)\n- Objective alignment (0–3): 3 = directly answers an objective (objective-core) | 2 = needed to achieve an objective | 1 = background support | 0 = no objective link\n- Exam likelihood (0–3): bolded, repeated, on the summary slide, in the professor's cases, classic exam topic\n- Conceptual centrality (0–3): other facts depend on it or can be derived from it (mechanisms > isolated details)\n- Confusability (0–2): easily mixed up with a similar concept, counterintuitive, or an exception to a rule\n- Clinical relevance (0–2): affects diagnosis, treatment, adverse effects, contraindications, interactions\n- If I provided a blurt: +2 to units I missed or got wrong; −2 to units I recalled correctly and completely\nTier 1 = 10–13 | Tier 2 = 7–9 | Tier 3 = ≤6\nOverrides:\n- Objective-core units (alignment = 3) are Tier 1 regardless of total score.\n- Units with alignment = 0 cannot exceed Tier 2 unless the lecture clearly emphasises them (repeated, in a case, or on the summary slide).\n\nSTEP 5 — ALLOCATE THE CAP BY OBJECTIVE\n- Every objective must be the CORRECT ANSWER of at least one card. Appearing only as a distractor does not count as coverage.\n- Distribute the remaining cap across objectives in proportion to their weight (share of lecture content + professor emphasis).\n- At least 80% of cards must map to an objective; use the rest only for emphasised Tier 1 units outside the objectives.\n- Prefer cards that serve two objectives at once (e.g., a clinical vignette whose answer is the virus's classification).\n- If there are more objectives than the cap allows: merge closely related objectives into compound questions. Never drop an objective, and never silently exceed the cap.\n\nSTEP 6 — COMPRESS BEFORE WRITING\n- If several facts follow from one mechanism, write ONE mechanism-based question instead of many fact questions.\n- Use wrong options to carry real details from the same family, then correct them on the back, so each card reviews 3–4 details.\n- If Tier 1 alone exceeds the cap: compress further; if it still exceeds, report the overflow (objective-linked units first) and list which cards to defer.\n- Final count = the smaller of (cap) and (units that truly deserve a card). Never pad to reach the cap.\n\nSTEP 7 — MCQ CARD-WRITING RULES\n1. One tested idea per card, written at the depth demanded by its objective's verb.\n2. Cover-the-options rule: the stem must be answerable BEFORE reading the choices and must end with a clear, specific question.\n3. Exactly four options (A–D) with ONE single best answer.\n4. Distractors must be plausible and homogeneous (same category: all drugs, all mechanisms, all receptors…), ideally concepts from the lecture that students commonly confuse with the correct answer.\n5. No \"all of the above\", \"none of the above\", or combination options (e.g., \"A and C\"). Avoid negative stems; if unavoidable, CAPITALIZE the negative word (NOT, EXCEPT).\n6. All four options must have similar length, detail, and grammatical form. The correct answer must never be the longest or most qualified option, and must not repeat key words from the stem.\n7. Distribute correct answers evenly across A, B, C, D over the whole deck; never the same letter more than twice in a row.\n8. Prefer analytical questions: mechanism, what-happens-if, discrimination between confusable pairs, and short (1–3 line) clinical vignettes. Keep pure-recall questions only for core definitions or exam-tested numbers.\n9. Never copy the professor's own questions or cases verbatim; test the same point from a different angle.\n10. Back side (answer review), in this order:\n   - Correct: [letter]) [option text] + 1–2 lines explaining the mechanism or reasoning\n   - Why not the others: one short line per wrong option, saying where that detail actually belongs\n   - Slide error (only if needed): keep the professor's version as the answer and add a line starting with ⚠️ giving the scientifically correct fact\n   - Objective: O# — [short objective text]\n   - Source: Slide N\n11. Use the lecture's exact terminology. Expand abbreviations on first use. All card content in English only.\n\nSTEP 8 — QUALITY AUDIT (check every card; rewrite any that fail)\n- Is every objective the correct answer of at least one card?\n- Does each card's question type match its objective's verb?\n- Answerable in under 20 seconds? Stem answerable without seeing the options?\n- Exactly one defensible best answer? All distractors plausible, with no length or wording clues?\n- Leech risk (long stem, vague, too similar to another card)? → split, rephrase, or add a distinguishing cue.\n- Are correct answers evenly distributed across A/B/C/D?\n\nSTEP 9 — BUILD THE .APKG FILE\nUse Python with the genanki library; if it cannot be installed, write the .apkg directly (SQLite collection.anki2 + media file, zipped).\n- Deck name: [Subject]::[LectureName]; file named after the lecture title\n- Note model \"MCQ 4-Option\" with fields: Question, OptionA, OptionB, OptionC, OptionD, Correct, Review, Objective, Source\n- Front template: the Question, then each option on its own line, labeled A) B) C) D)\n- Back template: {{FrontSide}}, a divider, then the review: correct option in green, wrong options in red, slide-error warning in amber, objective line in blue, then the source\n- Clean, readable, mobile-friendly CSS with night-mode support\n- Fixed random IDs for model_id and deck_id\n- Tags per note: [LectureName]::[Section], T1 or T2, one of Mechanism / Clinical / Discrimination / Definition, and [LectureName]::Obj::O# for every objective the card serves\n- After building: validate (note count, four non-empty options, Correct is one of A–D, every objective tagged as a correct answer at least once) and deliver it as a downloadable file.\n- Fallback: if you cannot create files, output the cards in one code block, one per line: Question | A | B | C | D | Correct | Why | WhyNot | Objective | Source | Tags. Never use \"|\" inside a field.\n\nCHAT OUTPUT (short, alongside the file; no extra commentary)\nA. Objectives map: O# — objective text → verb → card numbers that answer it\nB. Budget: Cap = X | Cards produced = Y | Overflow = Z (if any)\nC. Coverage map: each lecture section → number of cards (one line each)\nD. Answer distribution: A = _, B = _, C = _, D = _\nE. Overflow (deferred Tier 1, objective-linked first) and Not carded (Tier 3): ≤ 10 bullets each, to read once before the exam\n\nFOLLOW-UP COMMANDS I MAY USE\n- \"add N\" → add the next N highest-scoring units (objective-linked first) and rebuild the .apkg\n- \"cut to N\" → keep the N highest-scoring cards, still keeping ≥ 1 card per objective, and rebuild\n- \"focus O#\" → add 2–3 cards for that objective at the depth its verb demands, and rebuild\n- \"harder\" → convert eligible recall questions into mechanism, discrimination, or vignette questions";
+const AK_SITE=`## SITE (how this prompt runs inside his study site; the rules above don't change)
+- No code and no files here: you answer in JSON only, in two stages. The site does step 2 (the cap, from his settings), rule 7's letters (it re-deals A–D evenly afterwards, moving each option together with its "why"; so write each "why" under its own option's letter and never name letters in explanations), the step-8 checks that code can do, step 9 (the .apkg) and the chat output A–E (from your JSON).
+- STAGE 1 = steps 0, 1, 3 and 4. STAGE 2 = steps 5, 6, 7 and 8, with the cap and the allocation the site computed from your STAGE 1. A FOLLOW-UP request is one of the follow-up commands.
+- SLIDES: each slide is its own block, opened by the line "===== SLIDE n =====" (n = its number; "·" = a picture-only slide). "[Figure: …]" lines describe a picture on that slide: read them as source.
+- OBJECTIVES: when the request gives an OBJECTIVES block, those are this lecture's learning objectives (from its objectives slide, or typed by him): use them verbatim, in that order, as O1, O2… Only when it says none were found: infer 3–6 and mark them inferred.
+- BLURT: RECALLED = what he recalled correctly in his clip checks; MISSED = what he missed, didn't understand, forgot by the next morning, or got wrong in his morning quiz. Use it for step 4's blurt line.
 - Write NOT / EXCEPT as **NOT** / **EXCEPT**; the site makes them bold.`;
 const AK_RULES="TASK=anki\n"+AK_PROMPT+"\n\n"+AK_SITE;
-const AK_T1=`STAGE 1 of 2: do steps 1 (Extract) and 2 (Select) for the lecture above. JSON only.
-"facts": every examinable fact as one atomic line, in slide order: "id" F1, F2…; "s" its slide number; "sec" its section (≤ 5 words); "f" the fact (≤ 30 words, the source's own terms); "fam" its family (≤ 4 words); "t" "C" = CORE or "S" = SUPPORT. Merge repeats into one id. Dropped items are not listed: "dropped" = how many you dropped.
-"weak": for each WEAK SPOT n above: "ids" = the fact ids it is about. A weak spot that is not among the lecture's facts goes into "extra" as one atomic fact ("id" W1, W2…, "sec", "f", "fam"), and its "ids" point to it. No weak spots → both empty.
-"course": the course in 1–3 words (e.g. Microbiology), or "" if you can't tell. "errs": every scientifically wrong slide as "S<n>: what the slide says → the correct fact" (or empty).`;
-const AK_TY=["Direct","Analytic","Hard"],AKL="ABCD",S_BOOL={type:"boolean"};
-const AK1_S=sObj({course:S_STR,facts:sArr(sObj({id:S_STR,s:S_INT,sec:S_STR,f:S_STR,fam:S_STR,t:{type:"string",enum:["C","S"]}})),dropped:S_INT,
-  extra:sArr(sObj({id:S_STR,sec:S_STR,f:S_STR,fam:S_STR})),weak:sArr(sObj({n:S_INT,ids:sArr(S_STR)})),errs:sArr(S_STR)});
+const AK_T1=`STAGE 1 of 2: steps 0, 1, 3 and 4 for the lecture above. JSON only.
+"objectives" = the objectives map (step 1), in order: "id" O1, O2…; "t" the objective verbatim (inferred: your wording); "verb" its action verb (one word, e.g. Explain); "inf" true only when inferred; "slides" the slide numbers that serve it; "w" its weight 1–5 (share of the lecture's content + the professor's emphasis).
+"units" = every testable knowledge unit (step 3), in slide order: "id" U1, U2…; "s" its main slide; "sec" its section (≤ 5 words); "f" the unit, one idea (≤ 30 words, the lecture's terms); "fam" its family (≤ 4 words: the category its distractors come from); "o" the objective ids it serves ([] if none); and its step-4 scores: "al" objective alignment 0–3, "ex" exam likelihood 0–3, "ce" conceptual centrality 0–3, "cf" confusability 0–2, "cl" clinical relevance 0–2, "bl" the blurt line (+2 missed or wrong, −2 recalled correctly and completely, else 0), "emph" true when the lecture clearly emphasises it (repeated, in a case, or on the summary slide).
+"known" = how many units you dropped as already known to a 2nd-year student. "amb" = the ambiguous or unclear points you did NOT card (step 0), one short line each. "errs" = every scientifically wrong slide as "S<n>: what the slide says → the correct fact". "course" = the course in 1–3 words (e.g. Microbiology), or "".`;
+const AK_TY=["Mechanism","Clinical","Discrimination","Definition"],AK_TIER=["T1","T2"],AKL="ABCD",S_BOOL={type:"boolean"};
+const AK1_S=sObj({course:S_STR,objectives:sArr(sObj({id:S_STR,t:S_STR,verb:S_STR,inf:S_BOOL,slides:sArr(S_INT),w:S_INT})),
+  units:sArr(sObj({id:S_STR,s:S_INT,sec:S_STR,f:S_STR,fam:S_STR,o:sArr(S_STR),al:S_INT,ex:S_INT,ce:S_INT,cf:S_INT,cl:S_INT,bl:S_INT,emph:S_BOOL})),
+  known:S_INT,amb:sArr(S_STR),errs:sArr(S_STR)});
 const AK_OPT=sObj({A:S_STR,B:S_STR,C:S_STR,D:S_STR});
-const AK_CARD=sObj({type:{type:"string",enum:AK_TY},section:S_STR,hy:S_BOOL,stem:S_STR,options:AK_OPT,answer:{type:"string",enum:["A","B","C","D"]},explain:S_STR,why:AK_OPT,warning:S_STR,source:S_STR,keys:sArr(S_STR),ids:sArr(S_STR),weak:S_BOOL});
-const AK2_S=sObj({cards:sArr(AK_CARD),cov:S_STR});
+const AK_CARD=sObj({type:{type:"string",enum:AK_TY},tier:{type:"string",enum:AK_TIER},obj:sArr(S_STR),section:S_STR,stem:S_STR,options:AK_OPT,answer:{type:"string",enum:["A","B","C","D"]},
+  explain:S_STR,why:AK_OPT,warning:S_STR,source:S_STR,keys:sArr(S_STR),ids:sArr(S_STR)});
+const AK2_S=sObj({cards:sArr(AK_CARD)});
 const AKFIX_S=sObj({cards:sArr(sObj({i:S_INT,...AK_CARD.properties}))});
-const AK_CARD_HOW=`Per card: "type" Direct | Analytic | Hard; "section"; "hy" true when the key fact was emphasized by the lecturer; "stem"; "options" A–D; "answer" its letter; "explain" ≤ 2 lines (why; link to the mechanism); "why" one line for each wrong option (why wrong and where that fact belongs), "" under the answer's letter; "warning" "" or, for a scientifically wrong slide, the correct fact (the key keeps the slide's version); "source" "Slide N"; "keys" the fact id its correct answer tests (two ids only for a compound key, which carries ≤ 2 CORE facts); "ids" every fact id the card uses (the keys, each distractor's own fact, the back text); "weak" true only for an extra weak-spot card.`;
+const AK_VERB=[[/^(define|name|list|know|identify|state|recall|recogni[sz]e|outline|label|enumerate|mention)/i,["Definition"]],
+  [/^(understand|explain|describe|discuss|illustrate|summari[sz]e|elaborate|appreciate|review)/i,["Mechanism"]],
+  [/^(differentiate|compare|contrast|distinguish|discriminate)/i,["Discrimination"]],[/^(classify|categori[sz]e)/i,["Definition","Discrimination"]],
+  [/^(apply|diagnose|manage|interpret|treat|investigate|correlate|analy[sz]e|evaluate|use|approach|recogni[sz]e clinical)/i,["Clinical"]]];
+const akVerbTypes=v=>{const x=AK_VERB.find(([re])=>re.test(String(v||"").trim()));return x?x[1]:AK_TY};
+const AK_CARD_HOW=`Per card: "type" Mechanism | Clinical | Discrimination | Definition (the type its objective's verb sets, step 1); "tier" T1 | T2 (the best tier among its keys); "obj" the objective ids its CORRECT answer serves (1–2; [] only for an emphasised Tier 1 unit outside the objectives); "section"; "stem" (ends with a clear, specific question, answerable before reading the options); "options" A–D; "answer" its letter; "explain" 1–2 lines on the mechanism or reasoning; "why" one short line per wrong option saying where that detail actually belongs, "" under the answer's letter; "warning" "" or, when the slide is scientifically wrong, the correct fact (the answer keeps the professor's version); "source" "Slide N"; "keys" the unit id(s) its correct answer tests (1–2); "ids" every unit id the card uses (its keys, each distractor's own unit, the back text).`;
 const akT=(v,n)=>cleanCite(typeof v==="string"?v:v==null||typeof v==="object"?"":String(v)).replace(/\r/g,"").trim().slice(0,n);
 const akId=v=>akT(v,12).toUpperCase().replace(/\s+/g,"");
-// stage 1 → clean lists (whatever Kimi sends, nothing broken gets through)
-function akFacts(j){const F=[],seen=new Set();
-  (Array.isArray(j.facts)?j.facts:[]).forEach(x=>{if(!isObj(x))return;const id=akId(x.id),f=akT(x.f,400);if(!/^F\d{1,4}$/.test(id)||seen.has(id)||!f)return;seen.add(id);
-    F.push({id,s:Math.max(0,Math.min(999,Math.round(+x.s||0))),sec:akT(x.sec,60)||"General",f,fam:akT(x.fam,60),t:x.t==="C"?"C":"S"})});
-  const W=[];(Array.isArray(j.extra)?j.extra:[]).forEach(x=>{if(!isObj(x))return;const id=akId(x.id),f=akT(x.f,400);if(!/^W\d{1,3}$/.test(id)||seen.has(id)||!f)return;seen.add(id);
-    W.push({id,s:0,sec:akT(x.sec,60)||"Weak spots",f,fam:akT(x.fam,60),t:"W"})});
-  const weak=new Set();(Array.isArray(j.weak)?j.weak:[]).forEach(x=>{if(isObj(x)&&Array.isArray(x.ids))x.ids.forEach(i=>{i=akId(i);if(seen.has(i))weak.add(i)})});
-  W.forEach(w=>weak.add(w.id));
-  return{F,W,weak:[...weak],X:Math.max(0,Math.min(9999,Math.round(+j.dropped||0))),course:akT(j.course,40).replace(/[:"\\|]/g,"").trim(),
+const akN=(v,a,b)=>Math.max(a,Math.min(b,Math.round(+v||0)));
+// slides as Kimi reads them: each one opened by its own separator line
+const slSep=txt=>String(txt||"").split("\n").map(l=>{const m=l.match(/^S(\d+):\s?(.*)$/);return m?`===== SLIDE ${m[1]} =====\n${m[2]||"·"}`:l}).join("\n");
+// the objectives slide(s) in the slides text ("Objectives", "Learning outcomes", "By the end of this lecture…")
+const AK_OBJ_RE=/\b(learning\s+)?objectives?\b|\blearning\s+outcomes?\b|\bILOs?\b|\bby the end of (this|the) (lecture|session|class|lesson)\b|\bintended learning\b|\baims?\s*(and|&)\s*objectives\b/i;
+function akObjFind(txt){const L=String(txt||"").split("\n").map(l=>l.match(/^S(\d+):\s?(.*)$/)).filter(Boolean),hit=L.filter(m=>AK_OBJ_RE.test(m[2])&&m[2].length>25);
+  if(!hit.length)return"";const first=+hit[0][1],keep=hit.filter(m=>+m[1]-first<=2).slice(0,3);
+  return keep.map(m=>`S${m[1]}: ${m[2]}`).join("\n").slice(0,3000)}
+// stage 1 → clean lists (whatever Kimi sends, nothing broken gets through), scores and tiers worked out here
+function akUnits(j){const O=[],U=[],oid=new Set();
+  (Array.isArray(j.objectives)?j.objectives:[]).forEach(x=>{if(!isObj(x))return;const id=akId(x.id),t=akT(x.t,500);if(!/^O\d{1,2}$/.test(id)||oid.has(id)||!t)return;oid.add(id);
+    O.push({id,t,verb:akT(x.verb,24).replace(/[^A-Za-z-]/g,"")||"Know",inf:x.inf===true,slides:(Array.isArray(x.slides)?x.slides:[]).map(n=>akN(n,0,999)).filter(Boolean).slice(0,40),w:akN(x.w,1,5)||1})});
+  const seen=new Set();
+  (Array.isArray(j.units)?j.units:[]).forEach(x=>{if(!isObj(x))return;const id=akId(x.id),f=akT(x.f,400);if(!/^U\d{1,4}$/.test(id)||seen.has(id)||!f)return;seen.add(id);
+    const o=[...new Set((Array.isArray(x.o)?x.o:[]).map(akId).filter(i=>oid.has(i)))],al=o.length?akN(x.al,0,3):0,
+      p={al,ex:akN(x.ex,0,3),ce:akN(x.ce,0,3),cf:akN(x.cf,0,2),cl:akN(x.cl,0,2),bl:Math.max(-2,Math.min(2,Math.round(+x.bl||0)))};
+    const sc=Math.max(0,Math.min(13,p.al+p.ex+p.ce+p.cf+p.cl+p.bl)),emph=x.emph===true;
+    // Tier 1 = 10–13 · Tier 2 = 7–9 · Tier 3 ≤ 6; objective-core is Tier 1; no objective link caps at Tier 2 unless clearly emphasised
+    let tier=sc>=10?1:sc>=7?2:3;if(al===3)tier=1;if(al===0&&!emph&&tier<2)tier=2;
+    U.push({id,s:akN(x.s,0,999),sec:akT(x.sec,60)||"General",f,fam:akT(x.fam,60),o,...p,sc,emph,tier})});
+  return{O,U,known:akN(j.known,0,9999),course:akT(j.course,40).replace(/[:"\\|]/g,"").trim(),
+    amb:[...new Set((Array.isArray(j.amb)?j.amb:[]).map(e=>akT(e,240)).filter(Boolean))].slice(0,15),
     errs:[...new Set((Array.isArray(j.errs)?j.errs:[]).map(e=>akT(e,300)).filter(Boolean))].slice(0,20)}}
-// step 3, here: N = max(⌈D/3⌉, ⌈C/2⌉) or /flcard N; 50 / 25 / 25 to the nearest whole numbers that add up to N exactly (largest remainder)
-function akCount(F,flN){const C=F.filter(x=>x.t==="C").length,D=F.length,S=D-C;let N=flN>0?flN:Math.max(Math.ceil(D/3),Math.ceil(C/2));N=Math.max(1,Math.min(300,Math.round(N)));
-  const ex=[N*.5,N*.25,N*.25],fl=ex.map(Math.floor);let r=N-fl[0]-fl[1]-fl[2];
-  ex.map((v,i)=>({i,f:v-fl[i]})).sort((p,q)=>q.f-p.f||p.i-q.i).forEach(z=>{if(r>0){fl[z.i]++;r--}});
-  return{D,C,S,N,a:fl[0],b:fl[1],c:fl[2],k:0}}
-const akLine=(c,X)=>`Details ${c.D} (CORE ${c.C} · SUPPORT ${c.S} · DROPPED ${X}) → ${c.N} cards → Direct ${c.a} · Analytic ${c.b} · Hard ${c.c} · Image ${c.k}`;
-const akFactLine=x=>`${x.id} | ${x.s?"S"+x.s:"-"} | ${x.sec} | ${x.f} | ${x.fam||"-"} | ${x.t==="W"?"WEAK (outside the lecture)":x.t==="C"?"CORE":"SUPPORT"}`;
-// one card from Kimi → the cards.json shape (+ key / ids / weak for the checks), or null
-function akCard(x){if(!isObj(x))return null;const o=isObj(x.options)?x.options:{},w=isObj(x.why)?x.why:{},A=akT(x.answer,2).toUpperCase();
-  const c={type:AK_TY.includes(x.type)?x.type:"Direct",section:akT(x.section,60)||"General",hy:x.hy===true,stem:akT(x.stem,1400),options:{},answer:A.length===1&&AKL.includes(A)?A:"",
-    explain:akT(x.explain,800),why:{},warning:akT(x.warning,500),source:akT(x.source,40),
-    keys:[...new Set((Array.isArray(x.keys)?x.keys:x.key?[x.key]:[]).map(akId).filter(i=>/^[FW]\d{1,4}$/.test(i)))].slice(0,3),
-    ids:[...new Set((Array.isArray(x.ids)?x.ids:[]).map(akId).filter(i=>/^[FW]\d{1,4}$/.test(i)))].slice(0,16),weak:x.weak===true};
+// step 2 (the cap) + step 5 (the allocation by objective), shown as the prompt asks
+function akBudget(O,U,days){const P=akp(),rev=Math.floor(P.min*60/P.sec),div=P.ret>=.93?15:10,nd=Math.floor(rev/div),cap0=Math.max(1,Math.floor(nd/P.lpd)),half=days!=null&&days<7;
+  const cap=half?Math.max(1,Math.floor(cap0/2)):cap0,pool=U.filter(u=>u.tier===1||(!half&&u.tier===2)),F=Math.max(1,Math.min(cap,pool.length||1)),K=O.length;
+  const out1=U.filter(u=>u.tier===1&&!u.o.length).length,r=K?Math.min(out1,Math.floor(F*.2)):F;const alloc={};
+  if(K&&K<=F){O.forEach(o=>alloc[o.id]=1);let left=F-K-r;if(left>0){const W=O.reduce((a,o)=>a+o.w,0),ex=O.map(o=>left*o.w/W),fl=ex.map(Math.floor);let rem=left-fl.reduce((a,b)=>a+b,0);
+      ex.map((v,i)=>({i,f:v-fl[i]})).sort((p,q)=>q.f-p.f||p.i-q.i).forEach(z=>{if(rem>0){fl[z.i]++;rem--}});O.forEach((o,i)=>alloc[o.id]+=fl[i])}}
+  const math=[`Reviews/day = ${P.min} × 60 ÷ ${P.sec} = ${rev} · New cards/day = ${rev} ÷ ${div} = ${nd}`,`Cap = ${nd} ÷ ${P.lpd} = ${cap0}${half?` · exam in ${days} days → halved to ${cap}, Tier 1 only`:""}`];
+  return{min:P.min,sec:P.sec,lpd:P.lpd,ret:P.ret,rev,div,nd,cap0,cap,half,days,pool:pool.length,F,K,r,alloc,math}}
+const akAllocLine=B=>B.K>B.F?`${B.K} objectives > ${B.F} cards: merge closely related objectives into compound questions; every objective must still be the CORRECT answer of ≥ 1 card.`
+  :Object.entries(B.alloc).map(([o,n])=>`${o} ${n}`).join(" · ")+(B.r?` · outside the objectives ≤ ${B.r} (emphasised Tier 1 only)`:" · outside the objectives 0");
+const akUnitLine=u=>`${u.id} | ${u.s?"S"+u.s:"-"} | ${u.sec} | ${u.f} | ${u.fam||"-"} | ${u.o.join(",")||"-"} | ${u.sc} | T${u.tier}`;
+const akUnitsTxt=D=>"OBJECTIVES MAP\n"+D.obj.map(o=>`${o.id}${o.inf?" (Inferred)":""} — ${o.t} → ${o.verb} → slides ${o.slides.join(",")||"-"} · weight ${o.w}`).join("\n")
+  +"\n\nUNITS (id | slide | section | unit | family | objectives | score | tier)\n"+D.units.map(akUnitLine).join("\n");
+// one card from Kimi → the shape the checks and the builder use, or null
+function akCard(x,D){if(!isObj(x))return null;const o=isObj(x.options)?x.options:{},w=isObj(x.why)?x.why:{},A=akT(x.answer,2).toUpperCase(),oid=new Set(D.obj.map(z=>z.id));
+  const c={type:AK_TY.includes(x.type)?x.type:"Definition",tier:x.tier==="T2"?"T2":"T1",obj:[...new Set((Array.isArray(x.obj)?x.obj:[]).map(akId).filter(i=>oid.has(i)))].slice(0,3),
+    section:akT(x.section,60)||"General",stem:akT(x.stem,1400),options:{},answer:A.length===1&&AKL.includes(A)?A:"",explain:akT(x.explain,800),why:{},warning:akT(x.warning,500),source:akT(x.source,40),
+    keys:[...new Set((Array.isArray(x.keys)?x.keys:[]).map(akId).filter(i=>/^U\d{1,4}$/.test(i)))].slice(0,3),
+    ids:[...new Set((Array.isArray(x.ids)?x.ids:[]).map(akId).filter(i=>/^U\d{1,4}$/.test(i)))].slice(0,16)};
   for(const k of AKL){c.options[k]=akT(o[k],400);c.why[k]=k===c.answer?"":akT(w[k],500)}
   if(/^\d{1,3}$/.test(c.source))c.source="Slide "+c.source;
   c.keys.slice().reverse().forEach(k=>{if(!c.ids.includes(k))c.ids.unshift(k)});
+  // the tier is the best tier among its keys (the site knows the scores)
+  const um=new Map(D.units.map(u=>[u.id,u])),ts=c.keys.map(k=>(um.get(k)||{}).tier).filter(Boolean);if(ts.length)c.tier=Math.min(...ts)===1?"T1":"T2";
   return c.stem||AKL.split("").some(k=>c.options[k])?c:null}
-// ---------- 🔍 the checks: build_apkg.py's validate() line for line, plus the prompt's item rules and coverage ----------
+// ---------- 🔍 step 8: the checks code can do (build_apkg.py's validate() line for line, plus the card-writing rules and the objectives) ----------
 const akPlain=s=>String(s||"").replace(/<[^>]+>/g,"").replace(/\*\*/g,"").trim();
 const AK_STOP=new Set("which what most following with that from this these those into than then they their there were have does doing because about after before under over between within cause causes caused patient patients presents present likely best following explains explain feature features finding findings".split(" "));
 const AK_BAN=/\b(all|none|both|neither) of (the )?(above|these|them)\b|\b[a-d] (and|&|or) [a-d]\b|^\s*(true|false)\s*$|\ball of the following\b/i;
 const AK_ABS=/\b(always|never|completely|absolutely|invariably|exclusively)\b/i;
-const AK_STMT=/\bwhich (one )?(of the following )?(statements?|is (a )?(true|correct|accurate))\b|\b(statement|statements) (is|are) (true|correct|accurate)\b/i;
 const AK_NEG=/\*\*\s*(NOT|EXCEPT)\s*\*\*|\b(NOT|EXCEPT)\b|\bexcept\b/;
+const AK_NEGLOW=/\b(not|except)\b/;
 const AK_LET=/\b([Oo]ption|[Cc]hoice|[Aa]nswer)s?[:\s]*\(?[A-D]\)?(?![A-Za-z])|\(\s*[A-D]\s*\)|(^|[\s(])[A-D]\)\s|\b[A-D] (is|was) (the )?(correct|right|wrong|incorrect|answer)\b/;
 const akCW=s=>new Set((akPlain(s).toLowerCase().match(/[a-z][a-z-]{5,}/g)||[]).filter(w=>!AK_STOP.has(w)));
 const akWS=s=>new Set((akPlain(s).toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(w=>!AK_STOP.has(w)&&!/^(the|and|for|are|was|its|his|her|not|but|all|any|can|has|had|who|how|why|when|does|best|describes?|following|true|correct|statement)$/.test(w)));
 const akJac=(a,b)=>{let n=0;a.forEach(x=>{if(b.has(x))n++});return n/Math.max(1,a.size+b.size-n)};
-// exactly what build_apkg.py's validate() says (so GitHub never refuses a deck the site let through)
+// exactly what build_apkg.py's validate() refuses (so GitHub never refuses a deck the site let through)
 function akValidate(cards){const errs=[],keys=[],sp=s=>String(s==null?"":s).replace(/<[^>]+>/g,"").trim();
   cards.forEach((c,ix)=>{const i=ix+1,o=isObj(c.options)?c.options:{};
     if(Object.keys(o).sort().join("")!=="ABCD"||[...AKL].some(k=>!sp(o[k]))){errs.push({i:ix,t:`card ${i}: needs 4 non-empty options A-D`});return}
-    const a=c.answer;if(typeof a!=="string"||a.length!==1||!AKL.includes(a)){errs.push({i:ix,t:`card ${i}: answer must be A-D`});return}
-    keys.push(a);
-    for(const k of AKL){if(k!==a&&!sp((c.why||{})[k]))errs.push({i:ix,t:`card ${i}: missing why[${k}]`});
-      if(sp(o[k]).split(/\s+/).filter(Boolean).length>15)errs.push({i:ix,t:`card ${i}: option ${k} > 15 words`})}
+    const a=c.answer;if(typeof a!=="string"||a.length!==1||!AKL.includes(a)){errs.push({i:ix,t:`card ${i}: Correct must be one of A-D`});return}
+    keys.push(a);if(!sp(c.stem))errs.push({i:ix,t:`card ${i}: empty question`});
+    for(const k of AKL)if(k!==a&&!sp((c.why||{})[k]))errs.push({i:ix,t:`card ${i}: missing why-not for ${k}`});
     const lens=[...AKL].map(k=>[...sp(o[k])].length),srt=[...lens].sort((x,y)=>x-y),mx=srt[3];
-    if(lens[AKL.indexOf(a)]===mx&&mx>1.5*srt[2])errs.push({i:ix,t:`card ${i}: key is clearly the longest option`});
-    if(!AK_TY.includes(c.type))errs.push({i:ix,t:`card ${i}: type must be Direct/Analytic/Hard`});
-    if(!sp(c.explain)||!sp(c.source))errs.push({i:ix,t:`card ${i}: explain and source required`})});
-  const st=cards.map(c=>sp(c.stem).toLowerCase());if(new Set(st).size!==st.length)errs.push({i:-1,t:"duplicate stems"});
-  let run=1;for(let i=1;i<keys.length;i++){run=keys[i]===keys[i-1]?run+1:1;if(run>2){errs.push({i:-1,t:"same key letter > 2 times in a row"});break}}
+    if(lens[AKL.indexOf(a)]===mx&&mx>1.5*srt[2])errs.push({i:ix,t:`card ${i}: the correct answer is clearly the longest option`});
+    if(!AK_TY.includes(c.type))errs.push({i:ix,t:`card ${i}: type must be one of ${AK_TY.join("/")}`});
+    if(!AK_TIER.includes(c.tier))errs.push({i:ix,t:`card ${i}: tier must be T1 or T2`});
+    if(!sp(c.explain)||!sp(c.source))errs.push({i:ix,t:`card ${i}: explanation and source required`})});
+  const st=cards.map(c=>sp(c.stem).toLowerCase());if(new Set(st).size!==st.length)errs.push({i:-1,t:"duplicate questions"});
+  let run=1;for(let i=1;i<keys.length;i++){run=keys[i]===keys[i-1]?run+1:1;if(run>2){errs.push({i:-1,t:"same correct letter > 2 times in a row"});break}}
   return errs}
-const AK_WHY={missing:"something is empty (stem, an option, the explanation or the source)",why:"a wrong option has no \"why\" line",words:"an option is over 15 words",
-  long:"the key is the longest option (make the four near-equal; the key is never the longest)",uneven:"the options' lengths are far apart (make them near-equal)",
-  combo:"a banned option (all/none of the above, \"A and B\", true/false)",abs:"an absolute-word cue (always/never…) in the distractors only",echo:"a stem word is echoed only in the key",
-  comp:"one option is compound and the others aren't (all or none)",letters:"the explanation names option letters (name the option text)",stem:"the stem isn't one focused question",
-  dup:"same or near-same item as another card",dupkey:"its key fact is already the key of another card (re-key it on an uncovered fact, or test the reverse direction only if it's a CORE confusable pair)",
-  stmt:"\"Which statement is correct?\" is over 20% of N or not on a Hard card (ask one focused question instead)",neg:"NOT/EXCEPT is over 10% of N (ask it positively)",
-  key:"\"keys\" must be 1–2 of the fact ids (a compound key carries ≤ 2 CORE facts)",nokey:"the stem can't be answered before reading the options"};
-// every problem of every card + what the deck still misses
-function akQA(D){const cards=D.cards,cnt=D.count,F=D.facts,W=D.extra||[],all=new Map([...F,...W].map(x=>[x.id,x])),weak=new Set(D.weak||[]);
-  const bad=cards.map(()=>new Set()),note=cards.map(()=>({}));
-  const ws=cards.map(c=>akWS(c.stem+" "+[...AKL].map(k=>c.options[k]).join(" ")));
+const AK_WHY={missing:"something is empty (stem, an option, the explanation or the source)",why:"a wrong option has no \"why not\" line",
+  long:"the correct answer is the longest option (make the four near-equal; the answer is never the longest or most qualified)",uneven:"the options' lengths are far apart (similar length, detail and grammatical form)",
+  combo:"a banned option (all/none of the above, \"A and C\", true/false)",abs:"an absolute-word cue (always/never…) in the distractors only",echo:"a stem key word is repeated only in the correct answer",
+  comp:"one option is compound and the others aren't (homogeneous options)",letters:"the explanation names option letters (name the option text)",stem:"the stem doesn't end with a clear, specific question",
+  dup:"same or near-same item as another card",dupkey:"its key unit is already the key of another card (one tested idea per card)",
+  neg:"a negative stem (avoid it; if unavoidable, write NOT / EXCEPT in capitals, and keep them rare)",key:"\"keys\" must be 1–2 of the unit ids",
+  verb:"its question type doesn't match its objective's verb (step 1)",obj:"\"obj\" is empty: the correct answer must serve an objective (only emphasised Tier 1 units may sit outside, ≤ 20%)"};
+// every problem of every card + what the deck still misses (objectives that aren't anyone's correct answer, the 80% rule, the count)
+function akQA(D){const cards=D.cards,um=new Map(D.units.map(u=>[u.id,u])),om=new Map(D.obj.map(o=>[o.id,o]));
+  const bad=cards.map(()=>new Set()),note=cards.map(()=>({})),ws=cards.map(c=>akWS(c.stem+" "+[...AKL].map(k=>c.options[k]).join(" ")));
   cards.forEach((c,i)=>{const o=c.options,keyT=o[c.answer]||"",ds=[...AKL].filter(k=>k!==c.answer).map(k=>o[k]);
     if(!c.stem||[...AKL].some(k=>!o[k])||!c.explain||!c.source||!c.answer)bad[i].add("missing");
     if([...AKL].some(k=>k!==c.answer&&!c.why[k]))bad[i].add("why");
-    if([...AKL].some(k=>akPlain(o[k]).split(/\s+/).filter(Boolean).length>15))bad[i].add("words");
     const L=[...AKL].map(k=>[...akPlain(o[k])].length),kl=L[AKL.indexOf(c.answer)]||0,ol=Math.max(...L.filter((v,j)=>AKL[j]!==c.answer));
     if(c.answer&&kl>ol*1.15&&kl-ol>=6)bad[i].add("long");
     const mn=Math.min(...L),mx=Math.max(...L);if(mn>0&&mx>2.5*mn&&mx-mn>=25)bad[i].add("uneven");
@@ -6551,27 +6589,21 @@ function akQA(D){const cards=D.cards,cnt=D.count,F=D.facts,W=D.extra||[],all=new
     if(c.answer){const sw=akCW(c.stem),kw=akCW(keyT),dw=ds.map(akCW),e=[...kw].filter(w=>sw.has(w)&&!dw.some(d=>d.has(w)));if(e.length){bad[i].add("echo");note[i].echo=e.slice(0,3).join(", ")}}
     const comp=[...AKL].map(k=>/;/.test(o[k]));if(comp.some(Boolean)&&!comp.every(Boolean))bad[i].add("comp");
     if(AK_LET.test(c.explain)||[...AKL].some(k=>AK_LET.test(c.why[k]||"")))bad[i].add("letters");
-    if(c.stem&&!/[?:]/.test(c.stem))bad[i].add("stem");
-    if(!c.keys.length||c.keys.some(k=>!all.has(k))||c.keys.filter(k=>(all.get(k)||{}).t==="C").length>2||c.keys.length>2)bad[i].add("key");
+    if(c.stem&&!/[?:]\s*$/.test(akPlain(c.stem)))bad[i].add("stem");
+    if(AK_NEGLOW.test(akPlain(c.stem).replace(/\b(NOT|EXCEPT)\b/g,"")))bad[i].add("neg");
+    if(!c.keys.length||c.keys.some(k=>!um.has(k))||c.keys.length>2)bad[i].add("key");
+    if(c.obj.length){const ok=c.obj.some(x=>akVerbTypes((om.get(x)||{}).verb).includes(c.type));if(!ok){bad[i].add("verb");note[i].verb=c.obj.map(x=>`${x}: ${(om.get(x)||{}).verb} → ${akVerbTypes((om.get(x)||{}).verb).join("/")}`).join("; ")}}
+    else if(D.obj.length&&!c.keys.some(k=>{const u=um.get(k);return u&&u.tier===1&&!u.o.length}))bad[i].add("obj");
     for(let j=0;j<i;j++){if(akPlain(cards[j].stem).toLowerCase()===akPlain(c.stem).toLowerCase()||akJac(ws[i],ws[j])>.8){bad[i].add("dup");note[i].dup=j;break}}});
-  // NOT/EXCEPT ≤ 10% of N, "Which statement…" ≤ 20% of N and Hard only
-  const capN=Math.floor(cnt.N*.1),capS=Math.floor(cnt.N*.2);let nN=0,nS=0;
-  cards.forEach((c,i)=>{if(AK_NEG.test(c.stem)){nN++;if(nN>capN)bad[i].add("neg")}
-    if(AK_STMT.test(akPlain(c.stem))){if(c.type!=="Hard")bad[i].add("stmt");else{nS++;if(nS>capS)bad[i].add("stmt")}}});
-  // coverage: every CORE a key once, every SUPPORT somewhere, every weak spot a key once
-  const keyed=new Map();cards.forEach((c,i)=>c.keys.forEach(k=>{if(!all.has(k))return;if(keyed.has(k)&&keyed.get(k)!==i){bad[i].add("dupkey");note[i].dupkey=keyed.get(k)}else keyed.set(k,i)}));
-  const used=new Set();cards.forEach(c=>c.ids.forEach(x=>used.add(x)));
-  const unC=F.filter(x=>x.t==="C"&&!keyed.has(x.id)).map(x=>x.id),unS=F.filter(x=>x.t==="S"&&!used.has(x.id)&&!keyed.has(x.id)).map(x=>x.id),unW=[...weak].filter(x=>!keyed.has(x));
-  // the main cards' types against Direct a · Analytic b · Hard c
-  const main=cards.map((c,i)=>({c,i})).filter(z=>!z.c.weak),have={Direct:0,Analytic:0,Hard:0};main.forEach(z=>have[z.c.type]++);
-  const want={Direct:cnt.a,Analytic:cnt.b,Hard:cnt.c},conv=[];
-  if(main.length===cnt.N){const over=AK_TY.filter(t=>have[t]>want[t]),under=AK_TY.filter(t=>have[t]<want[t]);const pool=[];
-    const core=z=>z.c.keys.some(k=>(all.get(k)||{}).t==="C")?1:0;
-    over.forEach(t=>{const L=main.filter(z=>z.c.type===t).sort((p,q)=>core(p)-core(q));pool.push(...L.slice(0,have[t]-want[t]))});
-    under.forEach(t=>{for(let k=have[t];k<want[t]&&pool.length;k++){const z=pool.shift();conv.push({i:z.i,to:t})}})}
-  const cC=cnt.C-unC.length,cS=cnt.S-unS.length;
-  return{bad:bad.map((s,i)=>({i,p:[...s],n:note[i]})).filter(z=>z.p.length),unC,unS,unW,conv,have,main:main.length,extras:cards.length-main.length,
-    cov:`Coverage CORE ${cC}/${cnt.C} · SUPPORT ${cS}/${cnt.S}`,ok:{c:cC,s:cS}}}
+  // negative stems: capitals only, and rare (≤ 10%)
+  const capN=Math.max(1,Math.floor(cards.length*.1));let nN=0;cards.forEach((c,i)=>{if(AK_NEG.test(c.stem)){nN++;if(nN>capN)bad[i].add("neg")}});
+  const keyed=new Map();cards.forEach((c,i)=>c.keys.forEach(k=>{if(!um.has(k))return;if(keyed.has(k)&&keyed.get(k)!==i){bad[i].add("dupkey");note[i].dupkey=keyed.get(k)}else keyed.set(k,i)}));
+  const ans={};D.obj.forEach(o=>ans[o.id]=[]);cards.forEach((c,i)=>c.obj.forEach(x=>{if(ans[x])ans[x].push(i)}));
+  const unO=D.obj.filter(o=>!ans[o.id].length).map(o=>o.id),mapped=cards.filter(c=>c.obj.length).length,share=cards.length?mapped/cards.length:1;
+  const T1=D.units.filter(u=>u.tier===1&&(!D.budget.half||true)),over=T1.filter(u=>!keyed.has(u.id)).sort((p,q)=>(q.o.length?1:0)-(p.o.length?1:0)||q.sc-p.sc);
+  const T3=D.units.filter(u=>u.tier===3&&!keyed.has(u.id));
+  return{bad:bad.map((s,i)=>({i,p:[...s],n:note[i]})).filter(z=>z.p.length),unO,ans,mapped,share,low80:D.obj.length>0&&share<.8,over,T3,keyed,
+    tooMany:cards.length>D.budget.F,cov:`Objectives ${D.obj.length-unO.length}/${D.obj.length} · mapped ${Math.round(share*100)}%`}}
 // A–D dealt evenly over the deck (±1), never the same letter 3× in a row; each option moves together with its "why"
 function akDeal(cards,seed){const n=cards.length;let h=(parseInt(hsh(seed).slice(0,7),36)||7)%2147483647;const R=k=>{h=(h*48271)%2147483647;return h%k};
   let L=Array.from({length:n},(_,i)=>i%4);for(let i=n-1;i>0;i--){const j=R(i+1);[L[i],L[j]]=[L[j],L[i]]}
@@ -6582,128 +6614,126 @@ function akDeal(cards,seed){const n=cards.length;let h=(parseInt(hsh(seed).slice
     [o[c.answer],o[t]]=[o[t],o[c.answer]];[w[c.answer],w[t]]=[w[t],w[c.answer]];return{...c,options:o,why:w,answer:t}})}
 // text → the HTML field Anki shows: escaped, **x** → bold, NOT / EXCEPT in a stem bold, line breaks kept
 function akHTML(s,stem){let t=esc(String(s||"")).replace(/\*\*([^*]{1,120})\*\*/g,"<b>$1</b>");
-  if(stem)t=t.replace(/(<b>[^<]*<\/b>)|\b(NOT|EXCEPT|except)\b/g,(m,b,w)=>b||`<b>${w.toUpperCase()}</b>`);
+  if(stem)t=t.replace(/(<b>[^<]*<\/b>)|\b(NOT|EXCEPT)\b/g,(m,b,w)=>b||`<b>${w}</b>`);
   return t.replace(/\n/g,"<br>")}
-const akOut=c=>({type:c.type,section:c.section,hy:c.hy,stem:akHTML(c.stem,1),image:"",image_back:"",options:Object.fromEntries([...AKL].map(k=>[k,akHTML(c.options[k])])),answer:c.answer,
-  explain:akHTML(c.explain),why:Object.fromEntries([...AKL].map(k=>[k,k===c.answer?"":akHTML(c.why[k])])),warning:akHTML(c.warning),source:c.source});
-// the weak spots the generator must test: knots, missed clip points, what flew by the next morning, morning-quiz mistakes
-function akWeakList(B){const L=[];B.mis.forEach(t=>L.push("[missed in his clip] "+t));B.kn.forEach(t=>L.push("[knot: didn't understand] "+t));
-  B.hl.forEach(t=>L.push("[forgot by the next morning] "+t));B.wrong.forEach(t=>L.push("[wrong in the morning quiz] "+t));
-  return[...new Set(L.map(x=>cleanCite(x).replace(/\s+/g," ").trim().slice(0,240)))].filter(Boolean).slice(0,30)}
-// parts: ≤ 40 cards a request; facts in slide order, N and the type mix shared out exactly
-function akParts(D){const cnt=D.count,F=D.facts,W=D.extra||[],weak=new Set(D.weak||[]);
-  const wx=W.length+F.filter(x=>weak.has(x.id)&&x.t==="S").length;let P=Math.max(1,Math.ceil((cnt.N+wx)/40));P=Math.min(P,Math.max(1,F.length));
-  const grp=[];let at=0;for(let p=0;p<P;p++){const n=Math.floor(F.length/P)+(p<F.length%P?1:0);grp.push(F.slice(at,at+n));at+=n}
-  const n=grp.map(g=>g.length/F.length*cnt.N),fl=n.map(Math.floor);let r=cnt.N-fl.reduce((a,b)=>a+b,0);
-  n.map((v,i)=>({i,f:v-fl[i]})).sort((p,q)=>q.f-p.f||p.i-q.i).forEach(z=>{if(r>0){fl[z.i]++;r--}});
-  // the type of each of the N slots, spread evenly (Bresenham), then sliced by part
-  const ty=[];const tot=[cnt.a,cnt.b,cnt.c],done=[0,0,0];for(let s=0;s<cnt.N;s++){let best=0,bv=-1;for(let t=0;t<3;t++){const v=tot[t]?(tot[t]*(s+1)/cnt.N-done[t]):-1;if(done[t]<tot[t]&&v>bv){bv=v;best=t}}done[best]++;ty.push(best)}
-  let off=0;return grp.map((g,p)=>{const sl=ty.slice(off,off+fl[p]);off+=fl[p];const ids=new Set(g.map(x=>x.id));
-    return{p,P,N:fl[p],a:sl.filter(x=>x===0).length,b:sl.filter(x=>x===1).length,c:sl.filter(x=>x===2).length,
-      core:g.filter(x=>x.t==="C").map(x=>x.id),sup:g.filter(x=>x.t==="S").map(x=>x.id),weak:[...weak].filter(i=>ids.has(i)||(p===P-1&&/^W/.test(i)))}})}
-function akT2(D,pt){const cnt=D.count,one=pt.P===1;
-  return`STAGE 2 of 2${one?"":` · PART ${pt.p+1} of ${pt.P}`}: write the cards (steps 4, 6 and 8) from the FACTS. JSON only.
-COUNT (the whole deck): ${D.line}
-${one?`Write exactly ${cnt.N} main cards: Direct ${cnt.a} · Analytic ${cnt.b} · Hard ${cnt.c}. Every CORE id is the KEY of exactly one card; every SUPPORT id appears at least once (key, corrected distractor, or back text).`
-  :`THIS PART writes exactly ${pt.N} main cards: Direct ${pt.a} · Analytic ${pt.b} · Hard ${pt.c}. KEY each of these CORE ids exactly once: ${pt.core.join(", ")||"none"}. Cover these SUPPORT ids: ${pt.sup.join(", ")||"none"}. The other parts write the rest; any fact may serve as a distractor.`}
-WEAK (each the KEY of exactly one card; one that isn't the key of one of your main cards gets ONE extra card with "weak": true, outside the count): ${pt.weak.join(", ")||"none"}
-${AK_CARD_HOW}
-"cov": the line \`Coverage CORE c/c · SUPPORT s/s\` for ${one?"the deck":"this part"}.`}
-const akFactsTxt=D=>"FACTS (id | slide | section | fact | family | tier)\n"+[...D.facts,...(D.extra||[])].map(akFactLine).join("\n");
-// one fix round: the cards with problems + what isn't covered, in one request
-function akFixData(D,q){const L=["FIX ROUND: change ONLY what is listed; everything else on a card stays as it is. \"i\" = the card's number as given; a NEW card has \"i\" = -1. Return only the changed or new cards. JSON only."];
-  const ex=new Set();q.bad.forEach(z=>z.p.forEach(p=>ex.add(p)));
-  if(q.bad.length){L.push("PROBLEM CARDS");q.bad.forEach(z=>{const c=D.cards[z.i],ps=z.p.map(p=>p==="echo"&&z.n.echo?`echo (${z.n.echo})`:p==="dup"&&z.n.dup!=null?`dup (card #${z.n.dup})`:p==="dupkey"&&z.n.dupkey!=null?`dupkey (card #${z.n.dupkey})`:p);
-    L.push(`#${z.i} problems: ${ps.join(", ")}\n${JSON.stringify(c)}`)})}
-  if(q.conv.length)L.push("TYPE MIX: "+q.conv.map(z=>`turn card #${z.i} into a ${z.to} card (same key)`).join("; "));
-  const room=!(D.flN>0)||q.main<D.count.N,unK=room?q.unC:[];
-  if(unK.length||q.unW.length)L.push("NOT YET A KEY (write ONE new card for each, keyed on it; weak ones with \"weak\": true): "+[...unK,...q.unW.filter(x=>!unK.includes(x))].join(", "));
-  if(!room&&q.unC.length)L.push(`/flcard ${D.flN} is exact, so no new main cards: work these CORE ids into the existing cards as compound keys (≤ 2 CORE a key) or as corrected distractors / back text, and list them in "keys" / "ids": ${q.unC.join(", ")}`);
-  if(q.unS.length)L.push("SUPPORT NOT YET USED (add each to an existing card as a corrected distractor or in its back text and list it in that card's \"ids\"; or a new card if it can't fit): "+q.unS.join(", "));
-  if(ex.size)L.push("PROBLEM CODES\n"+[...ex].map(p=>`${p} = ${AK_WHY[p]||p}`).join("\n"));
-  L.push(AK_CARD_HOW);return L.join("\n\n")}
-const akHasWork=q=>q.bad.length||q.unC.length||q.unW.length||q.unS.length||q.conv.length;
-// what the generator knows about this lecture: your clip checks (recalled vs missed), knots, what flew in the morning, quiz mistakes
+const akOut=c=>({type:c.type,tier:c.tier,section:c.section,stem:akHTML(c.stem,1),options:Object.fromEntries([...AKL].map(k=>[k,akHTML(c.options[k])])),answer:c.answer,
+  explain:akHTML(c.explain),why:Object.fromEntries([...AKL].map(k=>[k,k===c.answer?"":akHTML(c.why[k])])),warning:akHTML(c.warning),obj:c.obj,source:c.source});
+// what the generator knows about his recall of this lecture: clip checks (recalled vs missed), knots, what flew by the morning, quiz mistakes
 function ankiBlurt(id){const c=clipsOf(id),p=c?cprOf(id):null,rec=[],mis=[];
   if(c)c.c.forEach((x,i)=>{if(!p.r[i])return;const m=new Set(p.m[i]||[]);if(p.m[i]&&x.k.length){x.k.forEach((k,j)=>(m.has(j)?mis:rec).push(k))}else if(p.r[i]==="h")mis.push(...x.k);else if(p.r[i]==="e")rec.push(...x.k)});
   const kn=knotsOf(id).map(k=>k.t),hl=hintsOf(id).map(h=>h.f),g=rvqOf(mk(id)),aq=aiqOf(id),wrong=[];
   if(g&&aq)aq.q.forEach((q,i)=>{const a=g.a[i];if(!a)return;if(q.t==="m"&&!a.ok)wrong.push(q.s.slice(0,160));if(q.t==="s"&&(a.sc||0)<60)wrong.push(q.s.slice(0,160))});
   const U=a=>[...new Set(a)],M=new Set(mis);return{rec:U(rec).filter(k=>!M.has(k)),mis:U(mis),kn:U(kn),hl:U(hl),wrong:U(wrong),any:rec.length+mis.length+kn.length+hl.length+wrong.length>0}}
-// the content Kimi reads: the slides you opened here (all of them, or only the weak clips' slides), else the clip key points
-async function ankiContent(id,mode,onStep,signal){const c=clipsOf(id),B=ankiBlurt(id);let sl=await aiGet("slides",id);
+function akBlurtTxt(B){const c=s=>cleanCite(s).replace(/\s+/g," ").trim().slice(0,220),M=[...B.mis.map(t=>"[missed in his clip] "+t),...B.kn.map(t=>"[didn't understand] "+t),...B.hl.map(t=>"[forgot by the next morning] "+t),...B.wrong.map(t=>"[wrong in the morning quiz] "+t)].map(c).filter(Boolean).slice(0,40);
+  const R=B.rec.map(c).filter(Boolean).slice(0,40);
+  return R.length||M.length?`BLURT\nRECALLED:\n${R.map(t=>"- "+t).join("\n")||"- (none)"}\nMISSED:\n${M.map(t=>"- "+t).join("\n")||"- (none)"}`:"BLURT: none (score the blurt line 0)"}
+// the content Kimi reads: the lecture's slides (from this device, or Drive through the bridge), else the clip key points
+async function ankiContent(id,onStep,signal){const c=clipsOf(id),B=ankiBlurt(id);let sl=await aiGet("slides",id);
   if(!(sl&&sl.txt)&&gasSlidesOK(id)){try{sl=await slidesFromDrive(id,onStep,signal)}catch(e){if(signal&&signal.aborted)throw e;sl=null}}
-  if(sl&&sl.txt){let txt=sl.txt;if(mode==="weak"&&c){const p=cprOf(id),keep=new Set();c.c.forEach((x,i)=>{if(p.r[i]&&p.r[i]!=="e"||(p.m[i]||[]).length)for(let s=x.f;s<=x.t;s++)keep.add(s)});
-      if(keep.size)txt=txt.split("\n").filter(l=>{const m=l.match(/^S(\d+):/);return!m||keep.has(+m[1])}).join("\n")}
-    return{src:"slides",txt:"SLIDES\n"+txt,B}}
-  if(c)return{src:"keys",txt:"KEY POINTS (from his clips)\n"+sliceLec(id,{miss:mode==="weak"}).split("\n").slice(1).join("\n"),B};
-  return{src:"title",txt:"(only the title is known: use the standard 2nd-year content of this topic)",B}}
-// ---------- 🧠 the generator: stage 1 (facts) → the count → stage 2 (cards, in parts) → checks → ≤ 2 fix rounds → letters → ready for GitHub ----------
-async function akGenerate(id,flN,onStep,signal){
-  const b=BY_ID[id],P=akp();onStep&&onStep("📄 يجهّز المحاضرة…");
-  const ct=await ankiContent(id,"full",onStep,signal);if(ct.src==="title")throw aiErr("akslides");
-  const weakL=akWeakList(ct.B),days=daysToExamOf(b);
-  const base=`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h${P.subj?`\nCOURSE ${P.subj}`:""}\nLEVEL 2nd-year medical student · DAYS TO EXAM ${days??"unknown"}${flN>0?`\n/flcard ${flN}`:""}
-WEAK SPOTS (numbered; test every one)\n${weakL.length?weakL.map((t,i)=>`${i+1}. ${t}`).join("\n"):"none"}\n\n${ct.txt}`;
-  const call=(k,tail,schema,max,check,on)=>aiCall({k,rules:AK_RULES,data:base+"\n\n"+tail,schema,effort:"high",max,fg:true,over:true,signal,check,
-    onProg:p=>on&&on(p)});
-  onStep&&onStep("🧠 المرحلة 1 من 2: Kimi يطلّع كل معلومة تنسأل…");
-  const r1=await call("anki1",AK_T1,AK1_S,32000,j=>Array.isArray(j.facts)&&j.facts.length>0,p=>onStep&&onStep(p.c?`🧠 المرحلة 1: يكتب قائمة المعلومات… ${kfmt(p.c)}`:`🧠 المرحلة 1: يقرأ ويفكر… ${p.s} ثانية`));
-  const fx=akFacts(r1.json);if(!fx.F.length)throw aiErr("bad");
-  const count=akCount(fx.F,flN),course=P.subj||fx.course,title=label(b).replace(/::/g," - ").replace(/["\\]/g,"").trim().slice(0,100)||"Lecture";
-  const D={v:2,id,at:Date.now(),lec:label(b),course,deck:(course?`${course}::${title}`:title).slice(0,150),file:title.replace(/[\\/:*?"<>|]+/g," ").trim()+".apkg",
-    facts:fx.F,extra:fx.W,weak:fx.weak,X:fx.X,errs:fx.errs,count,flN:flN>0?flN:0,src:ct.src,nWeak:weakL.length,cards:[],fixes:0,job:null};
-  D.line=akLine(count,fx.X);onStep&&onStep("🧮 "+D.line);
-  const parts=akParts(D),ft=akFactsTxt(D),prog=parts.map(()=>0);let got=[];
-  for(let s=0;s<parts.length;s+=3)await Promise.all(parts.slice(s,s+3).map(async pt=>{if(!pt.N&&!pt.weak.length)return;
-    const r=await call("anki2",ft+"\n\n"+akT2(D,pt),AK2_S,48000,j=>Array.isArray(j.cards)&&(j.cards.length>0||!pt.N),p=>{prog[pt.p]=p.c||0;
-      onStep&&onStep(p.c?`✍️ المرحلة 2: Kimi يكتب ${cnt1(count.N,"بطاقة وحدة","بطاقتين","بطاقات")}… ${kfmt(prog.reduce((a,b)=>a+b,0))}`:`✍️ المرحلة 2: يخطط البطاقات… ${p.s} ثانية`)});
-    got.push(...r.json.cards.map(akCard).filter(Boolean).map(c=>({...c,_p:pt.p})))}));
-  // the parts in their own order (each part's cards keep Kimi's order)
-  D.cards=got.sort((x,y)=>x._p-y._p).map(({_p,...c})=>c);if(!D.cards.length)throw aiErr("bad");
-  akDropWeakRepeats(D);
+  if(sl&&sl.txt)return{src:"slides",raw:sl.txt,txt:"SLIDES\n"+slSep(sl.txt),B};
+  if(c)return{src:"keys",raw:"",txt:"KEY POINTS (from his clips; no slide text on this device)\n"+sliceLec(id,{}).split("\n").slice(1).join("\n"),B};
+  return{src:"title",raw:"",txt:"",B}}
+// his objectives for this lecture: what he typed/kept (synced), else the objectives slide found in the slides
+const akObjOf=id=>{const v=mk(id).akob;return typeof v==="string"?v.trim():""};
+function akObjBlock(id,raw){const typed=akObjOf(id),found=typed?"":akObjFind(raw);
+  if(typed)return{src:"typed",txt:`OBJECTIVES (his learning objectives for this lecture; use them verbatim, in this order)\n${typed}`};
+  if(found)return{src:"slide",txt:`OBJECTIVES (from the lecture's objectives slide; use them verbatim, in this order)\n${found}`};
+  return{src:"none",txt:"OBJECTIVES: none found on the slides → infer 3–6 (step 1), mark them inferred"}}
+function akBase(id,ct,extra){const b=BY_ID[id],P=akp(),days=daysToExamOf(b),ob=akObjBlock(id,ct.raw);
+  return{ob,days,txt:`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h${P.subj?`\nSUBJECT ${P.subj}`:""}
+MY PARAMETERS: Level 2nd-year medical student · review budget ${P.min} min/day · ${P.sec} s per review · ${P.lpd} lectures/day · days until exam ${days??"unknown"} · FSRS desired retention ${P.ret}
+${ob.txt}
+
+${akBlurtTxt(ct.B)}${extra?"\n\n"+extra:""}
+
+${ct.txt}`}}
+const akCallFor=(base,signal)=>(k,tail,schema,max,check,on)=>aiCall({k,rules:AK_RULES,data:base+"\n\n"+tail,schema,effort:"high",max,fg:true,over:true,signal,check,onProg:p=>on&&on(p)});
+function akT2(D){const B=D.budget;
+  return`STAGE 2 of 2: steps 5, 6, 7 and 8: write the cards from the UNITS. JSON only.
+BUDGET (step 2): ${B.math.join(" | ")}
+WRITE at most ${B.F} cards${B.F<B.cap?` (only ${B.pool} units are Tier 1${B.half?"":"/2"})`:""}: fewer only if fewer units truly deserve a card; never pad. Card ${B.half?"Tier 1 units only":"Tier 1 units first, then Tier 2"}; Tier 3 units may serve only as distractors or back text.
+ALLOCATION (step 5: cards whose CORRECT answer serves each objective): ${akAllocLine(B)}
+Every objective is the CORRECT answer of at least one card (a distractor doesn't count). ≥ 80% of cards map to an objective. Prefer cards that serve two objectives at once. Never two cards on the same tested idea.
+${AK_CARD_HOW}`}
+// one fix round: the cards with problems + what the deck still misses, in one request
+function akFixData(D,q){const L=["FIX ROUND (step 8): change ONLY what is listed; everything else on a card stays as it is. \"i\" = the card's number as given; a NEW card has \"i\" = -1. Return only the changed or new cards. JSON only."];
+  const ex=new Set();q.bad.forEach(z=>z.p.forEach(p=>ex.add(p)));
+  if(q.bad.length){L.push("PROBLEM CARDS");q.bad.forEach(z=>{const c=D.cards[z.i],ps=z.p.map(p=>p==="echo"&&z.n.echo?`echo (${z.n.echo})`:p==="dup"&&z.n.dup!=null?`dup (card #${z.n.dup})`:p==="dupkey"&&z.n.dupkey!=null?`dupkey (card #${z.n.dupkey})`:p==="verb"&&z.n.verb?`verb (${z.n.verb})`:p);
+    L.push(`#${z.i} problems: ${ps.join(", ")}\n${JSON.stringify(c)}`)})}
+  if(q.unO.length){const room=D.cards.length<D.budget.F;
+    L.push(`OBJECTIVES THAT AREN'T THE CORRECT ANSWER OF ANY CARD: ${q.unO.map(x=>`${x} — ${(D.obj.find(o=>o.id===x)||{}).t||""}`).join(" | ")}\n${room?"Write ONE new card for each (\"i\" -1), at the depth its verb demands.":`The deck is at its cap (${D.budget.F}): re-aim existing cards instead (return them with their "i"): serve two objectives in one card, or turn the card of an objective that already has several cards to this one. Never drop an objective.`}`)}
+  if(q.low80)L.push(`Only ${Math.round(q.share*100)}% of cards map to an objective (needs ≥ 80%): re-aim the cards without "obj" to an objective, or merge them.`);
+  if(ex.size)L.push("PROBLEM CODES\n"+[...ex].map(p=>`${p} = ${AK_WHY[p]||p}`).join("\n"));
+  L.push(AK_CARD_HOW);return L.join("\n\n")}
+const akHasWork=q=>q.bad.length||q.unO.length||q.low80;
+// the score of a card = its best key unit's score (objective-core first)
+const akCardSc=(D,c)=>{const um=new Map(D.units.map(u=>[u.id,u]));return Math.max(0,...c.keys.map(k=>{const u=um.get(k);return u?u.sc+(u.al===3?20:0):0}))+(c.obj.length?.5:0)};
+// "cut to N": the N highest-scoring cards, still ≥ 1 card per objective
+function akCutTo(D,N){const idx=D.cards.map((c,i)=>i).sort((a,b)=>akCardSc(D,D.cards[b])-akCardSc(D,D.cards[a])),keep=new Set();
+  D.obj.forEach(o=>{if([...keep].some(i=>D.cards[i].obj.includes(o.id)))return;const i=idx.find(i=>D.cards[i].obj.includes(o.id));if(i!=null)keep.add(i)});
+  for(const i of idx){if(keep.size>=Math.max(N,keep.size))break;keep.add(i)}
+  D.cards=D.cards.filter((c,i)=>keep.has(i))}
+// fix rounds (≤ 2) → anything build_apkg.py would refuse is left out (and listed) → order → letters
+async function akFixLoop(D,call,onStep){
   for(let round=0;round<2;round++){const q=akQA(D);if(!akHasWork(q))break;
-    onStep&&onStep(`🛠️ الفحص لقى ${[q.bad.length?cnt1(q.bad.length,"بطاقة وحدة تحتاج تعديل","بطاقتين يحتاجون تعديل","بطاقات تحتاج تعديل"):"",q.unC.length+q.unW.length?`${q.unC.length+q.unW.length} معلومة ما صارت مفتاح`:"",q.unS.length?`${q.unS.length} SUPPORT ما انذكرت`:""].filter(Boolean).join(" · ")} · Kimi يصلّح (${round+1}/2)…`);
-    try{const r=await call("ankifix",ft+"\n\n"+akFixData(D,q),AKFIX_S,24000,j=>Array.isArray(j.cards),p=>onStep&&onStep(p.c?`🛠️ Kimi يصلّح… ${kfmt(p.c)}`:`🛠️ Kimi يصلّح… ${p.s} ثانية`));
-      r.json.cards.forEach(y=>{const c=akCard(y);if(!c)return;const i=Math.round(+y.i);if(i>=0&&i<D.cards.length&&D.cards[i])D.cards[i]=c;else D.cards.push(c)});D.fixes++;akDropWeakRepeats(D)}
-    catch(e){if(e.code==="abort"||signal&&signal.aborted)throw e;break}}
-  akFinish(D);await aiPut("decks",id,D);return D}
-// an extra weak-spot card whose idea is already the key of another card goes (never two questions on one idea)
-function akDropWeakRepeats(D){const k=new Set();D.cards.forEach(c=>{if(!c.weak)c.keys.forEach(x=>k.add(x))});
-  D.cards=D.cards.filter(c=>!(c.weak&&c.keys.length&&c.keys.every(x=>k.has(x))))}
-// after the fixes: whatever would still make build_apkg.py refuse the deck is left out (and listed), the order is set, the letters dealt
-function akFinish(D){let q=akQA(D);const drop=new Set();
-  D.cards.forEach((c,i)=>{const e=akValidate([akOut(c)]);if(e.length)drop.add(i)});
+    onStep&&onStep(`🛠️ الفحص لقى ${[q.bad.length?cnt1(q.bad.length,"بطاقة وحدة تحتاج تعديل","بطاقتين يحتاجون تعديل","بطاقات تحتاج تعديل"):"",q.unO.length?`${cnt1(q.unO.length,"هدف واحد","هدفين","أهداف")} بدون سؤال`:"",q.low80?"أقل من 80% مربوطة بالأهداف":""].filter(Boolean).join(" · ")} · Kimi يصلّح (${round+1}/2)…`);
+    try{const r=await call("ankifix",akUnitsTxt(D)+"\n\n"+akFixData(D,q),AKFIX_S,24000,j=>Array.isArray(j.cards),p=>onStep&&onStep(p.c?`🛠️ Kimi يصلّح… ${kfmt(p.c)}`:`🛠️ Kimi يصلّح… ${p.s} ثانية`));
+      r.json.cards.forEach(y=>{const c=akCard(y,D);if(!c)return;const i=Math.round(+y.i);if(i>=0&&i<D.cards.length&&D.cards[i])D.cards[i]=c;else D.cards.push(c)});D.fixes++}
+    catch(e){if(e.code==="abort"||e.code==="halt")throw e;break}}}
+function akFinish(D){
+  if(D.cards.length>D.budget.F)akCutTo(D,D.budget.F);   // never silently over the cap
+  const drop=new Set();D.cards.forEach((c,i)=>{if(akValidate([akOut(c)]).length)drop.add(i)});
   const seen=new Set();D.cards.forEach((c,i)=>{const k=akPlain(c.stem).toLowerCase();if(seen.has(k))drop.add(i);seen.add(k)});
   D.dropped=[...drop].map(i=>akPlain(D.cards[i].stem).slice(0,160));D.cards=D.cards.filter((c,i)=>!drop.has(i));
-  const sl=c=>{const m=String(c.source).match(/\d+/);return m?+m[0]:999};
-  D.cards=[...D.cards.filter(c=>!c.weak).sort((x,y)=>sl(x)-sl(y)),...D.cards.filter(c=>c.weak)];
-  D.cards=akDeal(D.cards,D.deck+"|"+D.at);q=akQA(D);D.qa=q;D.cov=q.cov;
-  D.left=q.bad.map(z=>({i:z.i,p:z.p}));D.out=D.cards.map(akOut);
+  const sl=c=>{const m=String(c.source).match(/\d+/);return m?+m[0]:999};D.cards.sort((x,y)=>sl(x)-sl(y));
+  D.cards=akDeal(D.cards,D.deck+"|"+D.at);const q=akQA(D);D.qa=q;D.cov=q.cov;D.out=D.cards.map(akOut);
   D.slideErr=[...new Set([...D.errs,...D.cards.filter(c=>c.warning).map(c=>`${c.source}: ${c.warning}`)])].slice(0,20);
   const e=akValidate(D.out);if(e.length)throw Object.assign(aiErr("bad"),{text:e.map(x=>x.t).join("; ")});
   if(!D.cards.length)throw aiErr("bad")}
-// /flcard N on a deck already made: stage 2 again with the same facts (no stage 1), then the same checks
-async function akRedo(D,flN,onStep,signal){const b=BY_ID[D.id];if(!b)throw aiErr("bad");
-  const ct=await ankiContent(D.id,"full",onStep,signal);if(ct.src==="title")throw aiErr("akslides");
-  const weakL=akWeakList(ct.B),P=akp(),days=daysToExamOf(b);
-  const base=`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h${P.subj?`\nCOURSE ${P.subj}`:""}\nLEVEL 2nd-year medical student · DAYS TO EXAM ${days??"unknown"}\n/flcard ${flN}
-WEAK SPOTS (numbered; test every one)\n${weakL.length?weakL.map((t,i)=>`${i+1}. ${t}`).join("\n"):"none"}\n\n${ct.txt}`;
-  const N=Object.assign({},D,{at:Date.now(),flN,count:akCount(D.facts,flN),cards:[],fixes:0,job:null});N.line=akLine(N.count,N.X);onStep&&onStep("🧮 "+N.line);
-  const call=(k,tail,schema,max,check)=>aiCall({k,rules:AK_RULES,data:base+"\n\n"+tail,schema,effort:"high",max,fg:true,over:true,signal,check,
-    onProg:p=>onStep&&onStep(p.c?`✍️ Kimi يكتب… ${kfmt(p.c)}`:`✍️ يفكر… ${p.s} ثانية`)});
-  const parts=akParts(N),ft=akFactsTxt(N),got=[];
-  for(let s=0;s<parts.length;s+=3)await Promise.all(parts.slice(s,s+3).map(async pt=>{if(!pt.N&&!pt.weak.length)return;const r=await call("anki2",ft+"\n\n"+akT2(N,pt),AK2_S,48000,j=>Array.isArray(j.cards)&&(j.cards.length>0||!pt.N));
-    got.push(...r.json.cards.map(akCard).filter(Boolean).map(c=>({...c,_p:pt.p})))}));
-  N.cards=got.sort((x,y)=>x._p-y._p).map(({_p,...c})=>c);if(!N.cards.length)throw aiErr("bad");akDropWeakRepeats(N);
-  for(let round=0;round<2;round++){const q=akQA(N);if(!akHasWork(q))break;onStep&&onStep(`🛠️ Kimi يصلّح (${round+1}/2)…`);
-    try{const r=await call("ankifix",ft+"\n\n"+akFixData(N,q),AKFIX_S,24000,j=>Array.isArray(j.cards));
-      r.json.cards.forEach(y=>{const c=akCard(y);if(!c)return;const i=Math.round(+y.i);if(i>=0&&i<N.cards.length)N.cards[i]=c;else N.cards.push(c)});N.fixes++;akDropWeakRepeats(N)}
-    catch(e){if(e.code==="abort"||signal&&signal.aborted)throw e;break}}
-  akFinish(N);await aiPut("decks",N.id,N);return N}
-const akDeckOK=x=>isObj(x)&&x.v===2&&Array.isArray(x.cards)&&x.cards.length>0&&Array.isArray(x.out)&&isObj(x.count);
-// the plain-text copy (one card a line, "|" between fields, never inside one)
-const akPipe=D=>D.out.map(c=>[c.stem,...[...AKL].map(k=>c.options[k]),c.answer,c.explain,[...AKL].filter(k=>k!==c.answer).map(k=>`${k}: ${c.why[k]}`).join(" / "),c.source,`${c.section} ${c.type}${c.hy?" HY":""}`]
-  .map(v=>String(v).replace(/<br>/g," ").replace(/<[^>]+>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&amp;/g,"&").replace(/[|\n]+/g," / ")).join(" | ")).join("\n");
+// ---------- 🧠 the generator: stage 1 (objectives + scored units) → the cap and the allocation → stage 2 (the cards) → checks → ≤ 2 fix rounds → letters ----------
+async function akGenerate(id,_n,onStep,signal){
+  const b=BY_ID[id],P=akp();onStep&&onStep("📄 يجهّز المحاضرة…");
+  const ct=await ankiContent(id,onStep,signal);if(ct.src==="title")throw aiErr("akslides");
+  const base=akBase(id,ct),call=akCallFor(base.txt,signal);
+  onStep&&onStep(base.ob.src==="none"?"🧠 المرحلة 1 من 2: ما لقيت شريحة أهداف · Kimi يستنتجها ويطلّع المعلومات…":"🧠 المرحلة 1 من 2: Kimi يرتّب الأهداف ويطلّع كل معلومة تنسأل…");
+  const r1=await call("anki1",AK_T1,AK1_S,32000,j=>Array.isArray(j.units)&&j.units.length>0&&Array.isArray(j.objectives),p=>onStep&&onStep(p.c?`🧠 المرحلة 1: يكتب الأهداف والمعلومات… ${kfmt(p.c)}`:`🧠 المرحلة 1: يقرأ ويفكر… ${p.s} ثانية`));
+  const ux=akUnits(r1.json);if(!ux.U.length)throw aiErr("bad");
+  const course=P.subj||ux.course,title=label(b).replace(/::/g," - ").replace(/["\\]/g,"").trim().slice(0,100)||"Lecture",budget=akBudget(ux.O,ux.U,base.days);
+  const D={v:3,id,at:Date.now(),lec:label(b),title,course,deck:(course?`${course}::${title}`:title).slice(0,150),file:title.replace(/[\\/:*?"<>|]+/g," ").trim()+".apkg",
+    obj:ux.O,osrc:base.ob.src,units:ux.U,known:ux.known,amb:ux.amb,errs:ux.errs,budget,src:ct.src,cards:[],fixes:0,job:null,hist:[]};
+  onStep&&onStep(`🧮 Cap = ${budget.cap} · الأهداف ${ux.O.length} · ${cnt1(budget.F,"بطاقة وحدة","بطاقتين","بطاقات")} بالكثير`);
+  const r=await call("anki2",akUnitsTxt(D)+"\n\n"+akT2(D),AK2_S,48000,j=>Array.isArray(j.cards)&&j.cards.length>0,p=>onStep&&onStep(p.c?`✍️ المرحلة 2: Kimi يكتب البطاقات… ${kfmt(p.c)}`:`✍️ المرحلة 2: يخطط البطاقات… ${p.s} ثانية`));
+  D.cards=r.json.cards.map(c=>akCard(c,D)).filter(Boolean);if(!D.cards.length)throw aiErr("bad");
+  await akFixLoop(D,call,onStep);akFinish(D);await aiPut("decks",id,D);return D}
+// the follow-up commands on a deck already made: add N · cut to N · focus O# · harder (the same units; no stage 1 again)
+async function akFollowUp(D0,how,arg,onStep,signal){const id=D0.id;if(!BY_ID[id])throw aiErr("bad");
+  const D=JSON.parse(JSON.stringify(D0));Object.assign(D,{at:Date.now(),job:null,fixes:0,hist:[...(D0.hist||[]),how==="focus"?`focus ${arg}`:how==="harder"?"harder":`${how==="cut"?"cut to":"add"} ${arg}`].slice(-10)});
+  if(how==="cut"){const N=Math.max(1,Math.min(D.cards.length,Math.round(+arg||0)));D.budget={...D.budget,F:N};akCutTo(D,N);akFinish(D);await aiPut("decks",id,D);return D}
+  const ct=await ankiContent(id,onStep,signal);if(ct.src==="title")throw aiErr("akslides");
+  const call=akCallFor(akBase(id,ct).txt,signal),stems=D.cards.map((c,i)=>`#${i} ${akPlain(c.stem).slice(0,140)}`).join("\n"),q=akQA(D);let tail;
+  if(how==="add"){const N=Math.max(1,Math.min(60,Math.round(+arg||0))),cand=D.units.filter(u=>!q.keyed.has(u.id)&&u.tier<3).sort((a,b)=>(b.o.length?1:0)-(a.o.length?1:0)||b.sc-a.sc).slice(0,N*2);
+    D.budget={...D.budget,F:D.cards.length+N};
+    tail=`FOLLOW-UP "add ${N}": write ${N} NEW cards on the next highest-scoring units that aren't the key of any card yet (objective-linked first): ${cand.map(u=>u.id).join(", ")||"(any uncarded unit)"}. Never repeat an idea already carded.\nEXISTING CARDS\n${stems}`}
+  else if(how==="focus"){const o=D.obj.find(x=>x.id===arg);if(!o)throw aiErr("bad");const cand=D.units.filter(u=>u.o.includes(o.id)&&!q.keyed.has(u.id)).sort((a,b)=>b.sc-a.sc);
+    D.budget={...D.budget,F:D.cards.length+3};
+    tail=`FOLLOW-UP "focus ${o.id}": write 2–3 NEW cards whose CORRECT answer serves ${o.id} — ${o.t} (verb: ${o.verb} → ${akVerbTypes(o.verb).join(" / ")}), at the depth its verb demands, on its units not yet carded: ${cand.map(u=>u.id).join(", ")||"(re-test it from a new angle)"}. Never repeat an idea already carded.\nEXISTING CARDS\n${stems}`}
+  else{const el=D.cards.map((c,i)=>({c,i})).filter(z=>z.c.type==="Definition");if(!el.length)throw Object.assign(aiErr("bad"),{text:"ما فيه أسئلة حفظ تتحوّل"});
+    tail=`FOLLOW-UP "harder": convert these recall questions into mechanism, discrimination, or short-vignette questions (same key unit, same objective; "type" changes to Mechanism, Discrimination or Clinical). Return each with its "i".\n${el.map(z=>`#${z.i} ${JSON.stringify(z.c)}`).join("\n")}`}
+  onStep&&onStep("✍️ Kimi يكتب…");
+  const r=await call(how==="harder"?"ankifix":"anki2",akUnitsTxt(D)+"\n\n"+tail+"\n\n"+AK_CARD_HOW,how==="harder"?AKFIX_S:AK2_S,24000,j=>Array.isArray(j.cards)&&j.cards.length>0,p=>onStep&&onStep(p.c?`✍️ Kimi يكتب… ${kfmt(p.c)}`:`✍️ يفكر… ${p.s} ثانية`));
+  r.json.cards.forEach(y=>{const c=akCard(y,D);if(!c)return;const i=how==="harder"?Math.round(+y.i):-1;if(i>=0&&i<D.cards.length)D.cards[i]=c;else D.cards.push(c)});
+  await akFixLoop(D,call,onStep);akFinish(D);await aiPut("decks",id,D);return D}
+const akDeckOK=x=>isObj(x)&&x.v===3&&Array.isArray(x.cards)&&x.cards.length>0&&Array.isArray(x.out)&&Array.isArray(x.obj)&&Array.isArray(x.units)&&isObj(x.budget);
+// the plain-text fallback (one card a line, "|" between fields, never inside one)
+const akPipe=D=>{const lec=akPlain(D.title||D.lec).replace(/[^\w-]+/g,"_");return D.out.map(c=>[c.stem,...[...AKL].map(k=>c.options[k]),c.answer,c.explain,[...AKL].filter(k=>k!==c.answer).map(k=>`${k}: ${c.why[k]}`).join(" / "),
+  c.obj.map(x=>`${x} — ${(D.obj.find(o=>o.id===x)||{}).t||""}`).join(" / "),c.source,[`${lec}::${akPlain(c.section).replace(/[^\w-]+/g,"_")}`,c.tier,c.type,...c.obj.map(x=>`${lec}::Obj::${x}`)].join(" ")]
+  .map(v=>String(v).replace(/<br>/g," ").replace(/<[^>]+>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&").replace(/[|\n]+/g," / ")).join(" | ")).join("\n")};
+// the chat output A–E of the prompt, from the deck
+function akReport(D){const q=D.qa||akQA(D),dist=[0,0,0,0];D.out.forEach(x=>dist[AKL.indexOf(x.answer)]++);
+  const A=D.obj.map(o=>({o,cards:(q.ans[o.id]||[]).map(i=>i+1)})),sec={};D.cards.forEach(c=>sec[c.section]=(sec[c.section]||0)+1);
+  const um=new Map(D.units.map(u=>[u.id,u]));
+  return{A,B:`Cap = ${D.budget.cap} | Cards produced = ${D.cards.length}${q.over.length?` | Overflow = ${q.over.length}`:""}`,C:Object.entries(sec),D:dist,
+    over:q.over.slice(0,10).map(u=>u.f),T3:q.T3.slice(0,10).map(u=>u.f),q,um}}
 // ---------- ☁️ GitHub: the cards go to the anki-jobs branch, the workflow runs build_apkg.py, the .apkg comes back ----------
 const GH_API="https://api.github.com",GH_BR="anki-jobs";
 const ghRepoDef=()=>{const m=location.hostname.match(/^([a-z0-9-]+)\.github\.io$/i);return m?`${m[1].toLowerCase()}/${m[1].toLowerCase()}.github.io`:"almarhabi/almarhabi.github.io"};
@@ -6738,7 +6768,7 @@ const akJobId=()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return A
 // the whole trip: send → run → wait (every 4 s) → bring the .apkg back; the job is kept on the deck, so closing the sheet loses nothing
 async function ghBuild(D,onStep,signal){const repo=ghRepo();let jb=D.job;
   if(!(jb&&jb.st==="wait"&&jb.id&&Date.now()-jb.at<30*60e3)){
-    const id=akJobId(),rv=JSON.stringify(akRvw(D)),u8=new TextEncoder().encode(`{"v":1,"deck":${JSON.stringify(D.deck)},"cards":${JSON.stringify(D.out)}${rv.length<1.4e6?`,"review":${rv}`:""}}`);
+    const id=akJobId(),rv=JSON.stringify(akRvw(D)),u8=new TextEncoder().encode(`{"v":2,"deck":${JSON.stringify(D.deck)},"lecture":${JSON.stringify(D.title||D.lec)},"objectives":${JSON.stringify(D.obj.map(o=>({id:o.id,t:o.t,inf:o.inf})))},"cards":${JSON.stringify(D.out)}${rv.length<1.4e6?`,"review":${rv}`:""}}`);
     onStep&&onStep("☁️ يرسل البطاقات لـ GitHub…");
     await ghReq(`/repos/${repo}/contents/in/${id}.json`,{method:"PUT",signal,body:{message:`anki: ${D.lec.replace(/[\r\n]/g," ").slice(0,60)}`,content:b64u8(u8),branch:GH_BR}});
     jb=D.job={id,st:"wait",at:Date.now(),kick:0};await aiPut("decks",D.id,D);
@@ -6751,13 +6781,21 @@ async function ghBuild(D,onStep,signal){const repo=ghRepo();let jb=D.job;
       const u8=await ghReq(`/repos/${repo}/contents/out/${jb.id}.apkg?ref=${GH_BR}`,{raw:true,signal});
       if(!(u8&&u8.length>100&&u8[0]===0x50&&u8[1]===0x4b))throw ghErr("file");
       jb.st="ok";jb.size=u8.length;jb.done=Date.now();await aiPut("decks",D.id+"|apkg",{job:jb.id,u8});await aiPut("decks",D.id,D);
-      try{savePatch(D.id,{akj:JSON.stringify({j:jb.id,r:repo,at:jb.done,n:D.cards.length,N:D.count.N,deck:D.deck.slice(0,150),file:D.file.slice(0,120)})})}catch(e){}
+      try{savePatch(D.id,{akj:JSON.stringify({j:jb.id,r:repo,at:jb.done,n:D.cards.length,N:D.budget.cap,deck:D.deck.slice(0,150),file:D.file.slice(0,120)})})}catch(e){}
       return u8}
     if(Date.now()-jb.at>70e3&&!jb.kick){jb.kick=1;await aiPut("decks",D.id,D);try{await ghReq(`/repos/${repo}/dispatches`,{method:"POST",signal,body:{event_type:"anki",client_payload:{job:jb.id}}})}catch(e){if(e.code==="abort")throw e}}
     if(Date.now()-jb.at>6*60e3){jb.st="err";jb.err="slow";await aiPut("decks",D.id,D);throw ghErr("slow")}
     await new Promise((res,rej)=>{const t=setTimeout(res,4000);if(signal)signal.addEventListener("abort",()=>{clearTimeout(t);rej(aiErr("abort"))},{once:true})})}}
 // the last deck built on any of your devices (synced as marks[id].akj): with a token through the API, without one straight from the public branch
-const akjOf=id=>{const o=sjson(mk(id).akj,null);return isObj(o)&&typeof o.j==="string"&&/^[a-z0-9]{8,40}$/.test(o.j)?{...o,n:Math.max(0,Math.round(+o.n||0)),r:ghRepo()}:null};
+const akCutAt=id=>Math.max(+mk(id).akdel||0,+S.akdelAll||0);
+const akjOf=id=>{const o=sjson(mk(id).akj,null);return isObj(o)&&typeof o.j==="string"&&/^[a-z0-9]{8,40}$/.test(o.j)&&(+o.at||0)>=akCutAt(id)?{...o,n:Math.max(0,Math.round(+o.n||0)),r:ghRepo()}:null};
+// 🗑️ a lecture's decks go: here (this device's copies) and, unless only tidying, on every device (synced cut-off)
+async function akDelete(id,local){if(AKRUN[id])try{AKRUN[id].ctl.abort()}catch(e){}
+  for(const k of [id,id+"|apkg"])try{await idbAI("decks","readwrite",s=>s.delete(k))}catch(e){}
+  Object.keys(AKB).forEach(k=>{if(k.startsWith(id+"|"))delete AKB[k]});
+  if(!local)savePatch(id,{akdel:Date.now(),akj:false,akq:false})}
+async function akDeleteAll(){Object.keys(AKRUN).forEach(k=>{try{AKRUN[k].ctl.abort()}catch(e){}});
+  try{await idbAI("decks","readwrite",s=>s.clear())}catch(e){}Object.keys(AKB).forEach(k=>delete AKB[k]);setTop("akdelAll",Date.now());LV++}
 async function akjBytes(id,a,signal){const loc=await aiGet("decks",id+"|apkg");if(isObj(loc)&&loc.job===a.j&&loc.u8&&loc.u8.length)return loc.u8;
   let u8=null;
   if(ghOn())u8=await ghReq(`/repos/${a.r}/contents/out/${a.j}.apkg?ref=${GH_BR}`,{raw:true,ok404:true,signal});
@@ -6776,7 +6814,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.8";
+const RN_DEV="ghrunner",APPV="21.0";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
@@ -6786,9 +6824,10 @@ async function rnWake(why,force){if(RUNNER||!ghOn())return false;const now=Date.
   catch(e){rnWoke=0;console.warn("runner wake",e.text||e.code||e);return false}}
 // opening the site when the runner hasn't been seen for over an hour wakes it (its hourly round can be late)
 setInterval(()=>{if(document.hidden||!rnOn()||!ghOn())return;const r=rnInfo();if(Date.now()-r.at>70*60e3&&Date.now()-rnWokeOpen>30*60e3){rnWokeOpen=Date.now();rnWake("open")}},60e3);
-// ANKI asked of GitHub: {at, how: new|redo, flN, by, st: q|run|done|err|x, t (its step), j (the job), n, err}
+const AK_HOW=["new","add","cut","focus","harder"];
+// ANKI asked of GitHub: {at, how: new|add|cut|focus|harder, flN (N or O#), by, st: q|run|done|err|x, t (its step), j (the job), n, err}
 const akqOf=id=>{const o=sjson(mk(id).akq,null);if(!isObj(o)||!(+o.at>0)||!["q","run","done","err","x"].includes(o.st))return null;
-  return{at:+o.at,how:o.how==="redo"?"redo":"new",flN:Math.max(0,Math.min(300,Math.round(+o.flN||0))),by:typeof o.by==="string"?o.by.slice(0,16):"",st:o.st,
+  return{at:+o.at,how:AK_HOW.includes(o.how)?o.how:"new",flN:typeof o.flN==="string"&&/^O\d{1,2}$/.test(o.flN)?o.flN:Math.max(0,Math.min(300,Math.round(+o.flN||0))),by:typeof o.by==="string"?o.by.slice(0,16):"",st:o.st,
     t:typeof o.t==="string"?o.t.slice(0,160):"",hb:+o.hb||+o.at,j:typeof o.j==="string"&&/^[a-z0-9]{8,40}$/.test(o.j)?o.j:"",n:Math.max(0,Math.round(+o.n||0)),err:typeof o.err==="string"?o.err.slice(0,300):""}};
 function akAsk(id,how,flN){try{savePatch(id,{akq:JSON.stringify({at:Date.now(),how,flN:flN||0,by:SP_DEV,st:"q"})})}catch(e){console.warn(e)}rnWake("anki")}
 let AKQW=null;   // the open ANKI sheet that follows a GitHub run
@@ -6809,8 +6848,8 @@ async function rnAnki(id,q){
   const pub=o=>{const cur=akqOf(id);if(cur&&(cur.at!==q.at||cur.st==="x")&&o.st!=="x")return false;try{savePatch(id,{akq:JSON.stringify({...q,...o,hb:Date.now()})})}catch(e){}return true};
   RNS.ak[id]=q.at;pub({st:"run",t:"⏳ يبدأ…"});
   let D0=null;
-  if(q.how==="redo"){const x=await aiGet("decks",id);D0=akDeckOK(x)?x:null;const a=akjOf(id);if(a&&!(D0&&D0.job&&D0.job.id===a.j)){const r=await akReview(id,a).catch(()=>null);if(r)D0=r}
-    if(!D0){pub({st:"err",err:"ما لقيت النسخة السابقة عشان أعيدها بهالعدد. ولّدها من جديد."});return}}
+  if(q.how!=="new"){const x=await aiGet("decks",id);D0=akDeckOK(x)?x:null;const a=akjOf(id);if(a&&!(D0&&D0.job&&D0.job.id===a.j)){const r=await akReview(id,a).catch(()=>null);if(r)D0=r}
+    if(!D0){pub({st:"err",err:"ما لقيت النسخة السابقة عشان أعدّلها. ولّدها من جديد."});return}}
   const run=akStart(id,q.how,q.flN,D0);let last=0;
   run.subs.add(t=>{if(Date.now()-last<4e3)return;last=Date.now();if(!pub({st:"run",t}))run.ctl.abort()});
   try{const D=await run.p;
@@ -7055,7 +7094,8 @@ function aiSettingsRender(){
   const P=akp();ghRender();rnRender();
   if(!$("#aiAdv").dataset.filled||!document.activeElement||!$("#aiAdv").contains(document.activeElement)){$("#aiAdv").dataset.filled="1";
     $("#aiAuto").checked=c.auto;$("#aiBudget").value=c.budget;$("#aiProxy").value=c.proxy;$("#aiG").value=c.gkey;
-    $("#akSubj").value=P.subj}
+    $("#akSubj").value=P.subj;$("#akMin").value=P.min;$("#akSec").value=P.sec;$("#akLpd").value=P.lpd;$("#akRet").value=P.ret}
+  {const B=akBudget([],[],null);$("#akCapNote").textContent=`الحد لكل محاضرة: ${B.math.join(" · ")}`}
   $("#aiBudgetUsd").textContent=`≈ حد أقصى ${usd(c.budget*0.6*AI_PRICE.in/1e6+c.budget*0.4*AI_PRICE.out/1e6)} باليوم`;
 }
 function aiBindSettings(){
@@ -7075,7 +7115,7 @@ function aiBindSettings(){
   $("#aiSaveAdv").onclick=()=>{const num=(s,d)=>{const v=parseFloat($(s).value);return isFinite(v)?v:d},px=$("#aiProxy").value.trim().replace(/\/+$/,"");
     if(px&&!/^https:\/\/[^\s"'<>]+$/i.test(px)){msg("رابط البروكسي لازم يبدأ بـ https://");return}
     aiSet({auto:$("#aiAuto").checked,budget:Math.max(20000,Math.min(1e8,Math.round(num("#aiBudget",300000)))),proxy:px,gkey:$("#aiG").value.trim(),cors:0});
-    const P={...akp(),subj:$("#akSubj").value.trim().replace(/[:"\\|]/g,"").slice(0,40)};
+    const P={...akp(),subj:$("#akSubj").value.trim().replace(/[:"\\|]/g,"").slice(0,40),min:num("#akMin",60),sec:num("#akSec",20),lpd:num("#akLpd",2),ret:num("#akRet",.9)};
     setTop("akp",JSON.stringify(P));LV++;$("#aiAdv").dataset.filled="";aiSettingsRender();msg("✅ انحفظ");smT=0;smartTick(true)};
 }
 // ---------- 🃏 the ANKI sheet ----------
@@ -7087,7 +7127,7 @@ function akStart(id,how,flN,D0){if(AKRUN[id])return AKRUN[id];
   const run={how,t:"",ctl:new AbortController(),subs:new Set()};AKRUN[id]=run;
   const step=t=>{run.t=t;run.subs.forEach(f=>{try{f(t)}catch(e){}})};
   run.p=(async()=>{let D=how==="build"?D0:null;try{
-      if(!D)D=how==="redo"?await akRedo(D0,flN,step,run.ctl.signal):await akGenerate(id,flN,step,run.ctl.signal);
+      if(!D)D=how==="new"?await akGenerate(id,0,step,run.ctl.signal):await akFollowUp(D0,how,flN,step,run.ctl.signal);
       if(ghOn()){try{await ghBuild(D,step,run.ctl.signal)}catch(e){if(e.code==="abort")throw e;run.bErr=e}}
       run.D=D;return D}
     catch(e){if(e&&e.code==="abort"&&D&&D.job&&D.job.st==="wait"){D.job.st="stop";try{await aiPut("decks",D.id,D)}catch(x){}}throw e}
@@ -7121,7 +7161,7 @@ function sheetAnki(id){
       R.querySelector("#akStop").onclick=e=>{const x=e.currentTarget;if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="✕ وقّف"}},3000);return}
         run.ctl.abort();x.disabled=true};
       run.p.then(x=>{if(!R.isConnected)return;D=x;show(run.bErr)},e=>{if(!R.isConnected)return;if(e.code==="abort"){aiGet("decks",id).then(x=>{D=akDeckOK(x)?x:D;if(R.isConnected)(D?show():setup())});return}setup(e)})};
-    const flVal=()=>{const v=parseInt((R.querySelector("#akFl")||{}).value,10);return v>=1&&v<=300?v:0};
+    const numVal=()=>{const v=parseInt((R.querySelector("#akN")||{}).value,10);return v>=1&&v<=300?v:0};
     // ☁️ asked of GitHub: the step it's on (synced), and the deck when it lands; leaving the site loses nothing
     const watchR=()=>{const q=akqOf(id);AKQW={id,f:watchR,k:q?`${q.at}|${q.st}|${q.t}|${(akjOf(id)||{}).j||""}`:""};
       if(!q||q.st==="x"){AKQW=null;load();return}
@@ -7133,52 +7173,73 @@ function sheetAnki(id){
       R.querySelector("#akStop").onclick=e=>{const x=e.currentTarget;if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="✕ وقّف"}},3000);return}
         try{savePatch(id,{akq:JSON.stringify({...akqOf(id),st:"x",hb:Date.now()})})}catch(err){}AKQW=null;load()}};
     const askR=(how,n)=>{akAsk(id,how,n);watchR()};
-    // ✨ before the first deck (or «من جديد»)
-    const setup=async err=>{freshTap();AKQW=null;const sl=await aiGet("slides",id);if(!R.isConnected)return;const wl=akWeakList(ankiBlurt(id)),a=akjOf(id);
+    // ✨ before the first deck (or «من جديد»): the objectives (found on the slides, or yours), the cap, the source
+    const setup=async err=>{freshTap();AKQW=null;const sl=await aiGet("slides",id);if(!R.isConnected)return;const a=akjOf(id),days=daysToExamOf(b),B=akBudget([],[],days),bl=ankiBlurt(id);
+      const typed=akObjOf(id),found=typed?"":akObjFind(sl&&sl.txt);
       const src=sl&&sl.txt?`📄 يقرأ سلايداتها كاملة (${cnt1(sl.n,"شريحة وحدة","شريحتين","شرائح")})`:gasSlidesOK(id)?"☁️ يقرأ سلايداتها من Drive عن طريق الجسر":clipsOf(id)?"🎬 يبني من نقاط مقاطعها (للأدق: قسّمها من Drive عشان يقرأ السلايدات)":"";
       R.innerHTML=`${err?`<p class="ce bad">❌ ${esc(akErrMsg(err))}</p>`:""}
         ${src?`<p class="sh-note">${src}</p>`:`<p class="ce mid">⚠️ ${esc(akErrMsg({code:"akslides"}))}</p>`}
-        <div class="rcpt"><div class="rc-row"><span>العدد</span><b>البرومبت يحدده: <span class="en">N = max(⌈D/3⌉, ⌈C/2⌉)</span></b></div>
-          <div class="rc-row"><span>🎯 عُقدك وأخطاؤك</span><b>${wl.length?`${wl.length} · لها بطاقات زيادة خارج N، وبدون تكرار فكرة`:"ما فيه للحين"}</b></div>
-          <div class="rc-row"><span>ملف .apkg</span><b>${ghOn()||rnOn()?"GitHub يبنيه بـ build_apkg.py":"⚠️ يحتاج GitHub token (الإعدادات)"}</b></div></div>
-        <div class="frow"><label for="akFl" class="en">/flcard</label><input id="akFl" type="number" inputmode="numeric" min="1" max="300" placeholder="تلقائي" class="akn"><span class="note">اختياري: عدد محدد</span></div>
+        <label class="fl" for="akObj">🎯 أهداف المحاضرة: البطاقات تنبني عليها</label>
+        <textarea id="akObj" class="fin akobj" rows="5" dir="ltr" maxlength="3000" placeholder="By the end of this lecture, students should be able to:&#10;1. …">${esc(typed||found)}</textarea>
+        <p class="sh-note" style="margin:0">${typed?"✍️ أهدافك المحفوظة (تتزامن)":found?"📄 لقيتها في شريحة الأهداف · عدّلها لو ناقصة":"ما لقيت شريحة أهداف: الصقها هنا، أو اتركها فاضية و Kimi يستنتج 3–6 (Inferred)"}</p>
+        <div class="rcpt"><div class="rc-row"><span>الحد لكل محاضرة</span><b><span class="en">Cap = ${B.cap}</span>${B.half?" · الاختبار قريب: النص و Tier 1 بس":""}</b></div>
+          <div class="rc-row"><span>من وقت مراجعتك</span><b class="en" dir="ltr" style="font-size:12px">${esc(B.math.join(" · "))}</b></div>
+          <div class="rc-row"><span>🧠 ذاكرتك</span><b>${bl.any?"مقاطعك وعُقدك وأخطاؤك ترفع أو تنزّل الأولوية (±2)":"ما فيه للحين"}</b></div>
+          <div class="rc-row"><span>ملف .apkg</span><b>${ghOn()||rnOn()?"GitHub يبنيه (MCQ 4-Option)":"⚠️ يحتاج GitHub token (الإعدادات)"}</b></div></div>
         <div class="sh-act"><button class="btn primary big" id="akGo"${(aiOn()||rnOn())&&(src||rnOn())?"":" disabled"}>✨ ولّد البطاقات</button>${D?`<button class="btn" id="akLast">آخر نسخة (${D.cards.length})</button>`:""}</div>
-        ${!aiOn()?`<p class="sh-note">التوليد يحتاج مفتاح Kimi على هالجهاز.</p>`:""}${a&&!(D&&D.job&&D.job.id===a.j)?akjHTML(a):""}`;
-      const g=R.querySelector("#akGo");g.onclick=()=>{g.disabled=true;if(rnOn())askR("new",flVal());else watch(akStart(id,"new",flVal()))};
-      const l=R.querySelector("#akLast");if(l)l.onclick=()=>show();bindAkj(a)};
-    // ✅ the deck, in the prompt's output order: the count line → the file → the coverage line + slide errors
-    const show=bErr=>{freshTap();const q=D.qa||akQA(D),j=D.job,dist=[0,0,0,0];D.out.forEach(x=>dist[AKL.indexOf(x.answer)]++);
-      const m=mk(id),wk=D.cards.filter(x=>x.weak).length,main=D.cards.length-wk,done=!!m.anki&&+m.cards===D.cards.length,ok=j&&j.st==="ok";
+        ${!aiOn()?`<p class="sh-note">التوليد يحتاج مفتاح Kimi على هالجهاز.</p>`:""}${a&&!(D&&D.job&&D.job.id===a.j)?akjHTML(a):""}
+        ${a||D?`<div class="sh-act"><button class="btn sm dangerbtn" id="akDel">🗑️ احذف بطاقات هالمحاضرة</button></div>`:""}`;
+      const ta=R.querySelector("#akObj");
+      const saveObj=()=>{const v=ta.value.trim().slice(0,3000);if(v===(typed||found))return;savePatch(id,{akob:v&&v!==found?v:false})};
+      const g=R.querySelector("#akGo");g.onclick=()=>{saveObj();g.disabled=true;if(rnOn())askR("new",0);else watch(akStart(id,"new",0))};
+      const l=R.querySelector("#akLast");if(l)l.onclick=()=>show();bindAkj(a);bindDel()};
+    const bindDel=()=>{const x=R.querySelector("#akDel");if(!x)return;x.onclick=async()=>{if(x.dataset.sure!=="1"){x.dataset.sure="1";x.textContent="متأكد؟ اضغط مرة ثانية";setTimeout(()=>{if(x.isConnected){x.dataset.sure="";x.textContent="🗑️ احذف بطاقات هالمحاضرة"}},3000);return}
+      x.disabled=true;await akDelete(id);D=null;toast("🗑️ انحذفت بطاقات المحاضرة");setup()}};
+    // ✅ the deck, with the prompt's chat output: A objectives map · B budget · C coverage · D answer distribution · E overflow / not carded
+    const show=bErr=>{freshTap();const rp=akReport(D),q=rp.q,j=D.job,d=rp.D;
+      const m=mk(id),done=!!m.anki&&+m.cards===D.cards.length,ok=j&&j.st==="ok";
       const jerr=bErr?akErrMsg(bErr):j&&j.st==="err"?(j.err==="slow"?ghErrMsg({text:"slow"}):ghErrMsg({text:"build",msg:j.err})):"",stopped=j&&j.st==="stop";
       const file=ok?`<div class="sh-act">${navigator.canShare?`<button class="btn primary big" id="akShare">📤 افتحه في ANKI</button>`:""}<button class="btn${navigator.canShare?"":" primary big"}" id="akDl">⬇️ نزّل <span class="en">${esc(D.file)}</span></button></div>`
         :`<p class="ce ${jerr?"bad":"mid"}">${jerr?"❌ "+esc(jerr):stopped?"⏸️ وقّفت متابعة GitHub. يمكن الملف انبنى هناك: اضغط تحت عشان أجيبه.":ghOn()?"الملف ما انبنى للحين.":"⚠️ عشان ينبني ملف .apkg على GitHub، حط الـ token من الإعدادات ← 🤖 ← 🃏 بناء ANKI على GitHub."}</p>
           <div class="frow">${ghOn()?`<button class="btn primary" id="akBuild">${stopped?"☁️ كمّل وجيب الملف":"☁️ ابنِ الملف على GitHub"}</button>`:`<button class="btn sm" id="akSet">⚙️ الإعدادات</button>`}</div>`;
-      const facts=[...D.facts,...(D.extra||[])];
-      R.innerHTML=`<div class="akout"><p class="akline en" dir="ltr">${esc(D.line)}</p>${file}<p class="akline en" dir="ltr">${esc(q.cov)}</p>
+      const osrc=D.osrc==="typed"?"✍️ أهدافك":D.osrc==="slide"?"📄 من شريحة الأهداف":"🔎 استنتجها Kimi (Inferred)";
+      R.innerHTML=`<div class="akout"><p class="akline en" dir="ltr">B. ${esc(rp.B)}</p>${file}
+          <p class="akline en" dir="ltr">${esc(D.budget.math.join(" | "))}</p>
           ${(D.slideErr||[]).map(e=>`<p class="akline akerr en" dir="ltr">⚠️ Slide error: ${esc(e)}</p>`).join("")}</div>
-        <div class="rcpt"><div class="rc-row"><span>البطاقات</span><b><span class="en">${main}</span>${wk?` + 🎯 <span class="en">${wk}</span> لعُقدك`:""}</b></div>
-          <div class="rc-row"><span>توزيع الإجابات</span><b class="en">A ${dist[0]} · B ${dist[1]} · C ${dist[2]} · D ${dist[3]}</b></div>
-          <div class="rc-row"><span>الأنواع</span><b class="en">Direct ${q.have.Direct} · Analytic ${q.have.Analytic} · Hard ${q.have.Hard}</b></div>
+        <div class="akrep en" dir="ltr"><b>A. Objectives map</b>${rp.A.map(z=>`<div class="${z.cards.length?"":"akmiss"}">${z.o.id}${z.o.inf?" (Inferred)":""} — ${esc(z.o.t)} → ${esc(z.o.verb)} → ${z.cards.length?"#"+z.cards.join(", #"):"⚠️ no card"}</div>`).join("")}
+          <b>C. Coverage map</b>${rp.C.map(([s,n])=>`<div>${esc(s)} → ${n}</div>`).join("")}
+          <b>D. Answer distribution</b><div>A = ${d[0]}, B = ${d[1]}, C = ${d[2]}, D = ${d[3]}</div></div>
+        <div class="rcpt"><div class="rc-row"><span>الأهداف</span><b>${osrc} · <span class="en">${q.cov}</span></b></div>
           <div class="rc-row"><span>🔍 الفحص</span><b>${q.bad.length?cnt1(q.bad.length,"بطاقة وحدة فيها ملاحظة","بطاقتين فيهم ملاحظة","بطاقات فيها ملاحظة"):"كلها سليمة ✓"}${D.fixes?` · ${cnt1(D.fixes,"جولة إصلاح وحدة","جولتين إصلاح","جولات إصلاح")}`:""}</b></div>
-          ${D.dropped&&D.dropped.length?`<div class="rc-row"><span>انشالت</span><b>${cnt1(D.dropped.length,"بطاقة وحدة","بطاقتين","بطاقات")} ما ضبطت بعد الإصلاح</b></div>`:""}</div>
+          ${D.dropped&&D.dropped.length?`<div class="rc-row"><span>انشالت</span><b>${cnt1(D.dropped.length,"بطاقة وحدة","بطاقتين","بطاقات")} ما ضبطت بعد الإصلاح</b></div>`:""}
+          ${j&&j.warn&&j.warn.length?`<div class="rc-row"><span>⚠️ GitHub</span><b class="en">${esc(j.warn.join(" · "))}</b></div>`:""}</div>
         ${q.bad.length?`<details class="how"><summary>📝 الملاحظات</summary><p class="en" dir="ltr">${q.bad.map(z=>`#${z.i+1}: ${z.p.map(p=>AK_WHY[p]||p).join("; ")}`).map(esc).join("<br>")}</p></details>`:""}
-        <details class="how"><summary>👀 شوف البطاقات</summary><div class="akprev" dir="ltr">${D.cards.map((x,i)=>`<div class="akc"><b>${i+1}. ${x.weak?"🎯 ":""}${esc(akPlain(x.stem))}</b>${[...AKL].map(k=>`<div class="${k===x.answer?"ok":""}">${k}) ${esc(akPlain(x.options[k]))}</div>`).join("")}<small>${x.type} · ${esc(x.section)}${x.hy?" · HY":""} · ${esc(x.source)} · ${esc(akPlain(x.explain))}</small></div>`).join("")}</div></details>
-        <details class="how"><summary>🧩 المعلومات (${facts.length})</summary><p class="en" dir="ltr">${facts.map(x=>esc(akFactLine(x))).join("<br>")}</p></details>
+        <details class="how"><summary>E. Overflow (${q.over.length}) · Not carded (${q.T3.length})</summary><div class="en akrep" dir="ltr"><b>Overflow (deferred Tier 1)</b>${rp.over.map(t=>`<div>• ${esc(t)}</div>`).join("")||"<div>—</div>"}<b>Not carded (Tier 3)</b>${rp.T3.map(t=>`<div>• ${esc(t)}</div>`).join("")||"<div>—</div>"}</div></details>
+        ${D.amb&&D.amb.length?`<details class="how"><summary>❓ نقاط غامضة ما انسأل عنها (${D.amb.length})</summary><div class="en akrep" dir="ltr">${D.amb.map(t=>`<div>• ${esc(t)}</div>`).join("")}</div></details>`:""}
+        <details class="how"><summary>👀 شوف البطاقات</summary><div class="akprev" dir="ltr">${D.cards.map((x,i)=>`<div class="akc"><b>${i+1}. ${esc(akPlain(x.stem))}</b>${[...AKL].map(k=>`<div class="${k===x.answer?"ok":""}">${k}) ${esc(akPlain(x.options[k]))}</div>`).join("")}<small>${x.type} · ${x.tier} · ${x.obj.join(", ")||"—"} · ${esc(x.section)} · ${esc(x.source)} · ${esc(akPlain(x.explain))}</small></div>`).join("")}</div></details>
+        <details class="how"><summary>🧩 المعلومات (${D.units.length})</summary><p class="en" dir="ltr">${D.units.map(x=>esc(akUnitLine(x))).join("<br>")}</p></details>
         <div class="sh-act">${done?`<p class="ce good">✓ مسجّلة «سويت ANKI» (${D.cards.length})</p>`:`<button class="btn" id="akMark">✓ سجّلها «سويت ANKI» (${cnt1(D.cards.length,"بطاقة وحدة","بطاقتين","بطاقات")})</button>`}<button class="btn" id="akTxt">📋 انسخ كنص</button></div>
-        <div class="frow akfu"><label class="en" for="akFl">/flcard</label><input id="akFl" type="number" inputmode="numeric" min="1" max="300" class="akn" placeholder="N" value="${D.flN||""}">
-          <button class="btn sm" id="akRedo"${aiOn()||rnOn()?"":" disabled"}>↺ بهالعدد (نفس المعلومات)</button><button class="btn sm" id="akNew"${aiOn()||rnOn()?"":" disabled"}>↺ من جديد</button></div>`;
+        <div class="akfu"><div class="frow"><input id="akN" type="number" inputmode="numeric" min="1" max="300" class="akn" placeholder="N" aria-label="N">
+            <button class="btn sm" id="akAdd"${aiOn()||rnOn()?"":" disabled"}>➕ add N</button><button class="btn sm" id="akCut">✂️ cut to N</button></div>
+          <div class="frow">${D.obj.length?`<select id="akO" class="akn" aria-label="objective">${D.obj.map(o=>`<option value="${o.id}">${o.id}</option>`).join("")}</select><button class="btn sm" id="akFocus"${aiOn()||rnOn()?"":" disabled"}>🎯 focus</button>`:""}
+            <button class="btn sm" id="akHard"${(aiOn()||rnOn())&&D.cards.some(c=>c.type==="Definition")?"":" disabled"}>💪 harder</button></div>
+          <div class="frow"><button class="btn sm" id="akNew"${aiOn()||rnOn()?"":" disabled"}>↺ من جديد</button><button class="btn sm dangerbtn" id="akDel">🗑️ احذف بطاقات هالمحاضرة</button></div></div>`;
       const q$=s=>R.querySelector(s);
       if(ok){const ref=akRef(D);akPreload(id,ref);if(q$("#akShare"))q$("#akShare").onclick=()=>akSend(id,ref,true);q$("#akDl").onclick=()=>akSend(id,ref,false)}
       if(q$("#akBuild"))q$("#akBuild").onclick=()=>{const jb=D.job;if(jb&&jb.st==="stop"&&Date.now()-jb.at<30*60e3)jb.st="wait";else if(jb&&jb.st!=="wait")D.job=null;watch(akStart(id,"build",0,D))};
       if(q$("#akSet"))q$("#akSet").onclick=()=>{closeSheet();setPage("settings")};
-      q$("#akTxt").onclick=async()=>{const ok=await copyText(akPipe(D));toast(ok?"انسخت البطاقات (Stem | A | B | C | D | Answer | Explain | Why | Source | Tags)":"ما قدرت أنسخ")};
-      if(q$("#akMark"))q$("#akMark").onclick=()=>{const m0=mk(id),n=D.cards.length;savePatch(id,{anki:m0.anki||todayISO,...(m0.anki?{}:{ankiAt:Date.now()}),cards:n,akc:n,ak:JSON.stringify({n,at:Date.now(),N:D.count.N,w:wk})});toast("انسجلت 🃏");show()};
-      q$("#akRedo").onclick=()=>{const v=flVal();if(!v){toast("اكتب العدد N (1–300)");return}if(rnOn())askR("redo",v);else watch(akStart(id,"redo",v,D))};
-      q$("#akNew").onclick=()=>setup();
+      q$("#akTxt").onclick=async()=>{const ok=await copyText(akPipe(D));toast(ok?"انسخت البطاقات (Question | A | B | C | D | Correct | Why | WhyNot | Objective | Source | Tags)":"ما قدرت أنسخ")};
+      if(q$("#akMark"))q$("#akMark").onclick=()=>{const m0=mk(id),n=D.cards.length;savePatch(id,{anki:m0.anki||todayISO,...(m0.anki?{}:{ankiAt:Date.now()}),cards:n,akc:n,ak:JSON.stringify({n,at:Date.now(),N:D.budget.cap,w:0})});toast("انسجلت 🃏");show()};
+      const fu=(how,arg)=>{if(how==="cut"?!ghOn()&&rnOn():rnOn())askR(how,arg);else watch(akStart(id,how,arg,D))};
+      q$("#akAdd").onclick=()=>{const v=numVal();if(!v){toast("اكتب N");return}fu("add",v)};
+      q$("#akCut").onclick=()=>{const v=numVal();if(!v){toast("اكتب N");return}if(v>=D.cards.length){toast(`عندك ${D.cards.length} بس`);return}fu("cut",v)};
+      if(q$("#akFocus"))q$("#akFocus").onclick=()=>fu("focus",q$("#akO").value);
+      q$("#akHard").onclick=()=>fu("harder",0);
+      q$("#akNew").onclick=()=>setup();bindDel();
       // a build that was still running when the sheet closed picks up where it was
       if(j&&j.st==="wait"&&!bErr&&ghOn()&&Date.now()-j.at<30*60e3)watch(akStart(id,"build",0,D))};
     // the newest deck: this device's, else the one GitHub (or your other device) built, with its review
-    async function load(){let x=await aiGet("decks",id);const a=akjOf(id);
+    async function load(){let x=await aiGet("decks",id);const a=akjOf(id);if(isObj(x)&&+x.at<akCutAt(id)){x=null;akDelete(id,1)}
       if(a&&!(akDeckOK(x)&&x.job&&x.job.id===a.j)){const r=await akReview(id,a).catch(()=>null);if(r)x=r}
       if(!R.isConnected)return;D=akDeckOK(x)?x:null;D?show():setup()}
     if(AKRUN[id]){watch(AKRUN[id]);return}

@@ -1,171 +1,148 @@
 #!/usr/bin/env python3
-"""Build an Anki .apkg of shuffled MCQ cards from cards.json. Standard library only.
+"""Build an Anki .apkg of 4-option MCQ cards from cards.json (step 9 of PROMPT.md). Standard library only.
 Usage: python3 build_apkg.py cards.json
-cards.json = {"deck": "Course::Lecture", "file": "Lecture.apkg", "media_dir": "media",
-  "cards": [{"type": "Direct|Analytic|Hard", "section": "...", "hy": true,
-             "stem": "...", "image": "", "image_back": "",
-             "options": {"A": "", "B": "", "C": "", "D": ""}, "answer": "A",
-             "explain": "...", "why": {"B": "", "C": "", "D": ""},
-             "warning": "", "source": "Slide 12"}]}
+cards.json = {"deck": "Course::Lecture", "file": "Lecture.apkg", "lecture": "Lecture",
+  "objectives": [{"id": "O1", "t": "objective text", "inf": false}],
+  "cards": [{"type": "Mechanism|Clinical|Discrimination|Definition", "tier": "T1|T2",
+             "section": "...", "stem": "...", "options": {"A": "", "B": "", "C": "", "D": ""},
+             "answer": "A", "explain": "...", "why": {"B": "", "C": "", "D": ""},
+             "warning": "", "obj": ["O1"], "source": "Slide 12"}]}
+Note model "MCQ 4-Option": Question, OptionA, OptionB, OptionC, OptionD, Correct, Review, Objective, Source.
 """
 import hashlib, json, os, re, sqlite3, sys, tempfile, time, zipfile
 
-MODEL_ID = 1730000000001          # fixed: one shared note type across all decks
-MODEL_NAME = "MCQ Shuffle v1"
-FIELDS = ["Stem", "Image", "ImageBack", "A", "B", "C", "D", "Answer", "Explain",
-          "WhyA", "WhyB", "WhyC", "WhyD", "Warning", "Source", "Type"]
+MODEL_ID = 1761000000003          # fixed: one shared note type across all decks
+MODEL_NAME = "MCQ 4-Option"
+FIELDS = ["Question", "OptionA", "OptionB", "OptionC", "OptionD", "Correct", "Review", "Objective", "Source"]
+TYPES = ("Mechanism", "Clinical", "Discrimination", "Definition")
+TIERS = ("T1", "T2")
 
 FRONT = r"""<div class="mcq">
-<div class="meta">{{Type}}</div>
-<div class="stem">{{Stem}}</div>
-{{#Image}}<div class="img">{{Image}}</div>{{/Image}}
-<div id="raw" class="opts">
-<div class="opt" data-l="A"><b>A.</b> <span>{{A}}</span></div>
-<div class="opt" data-l="B"><b>B.</b> <span>{{B}}</span></div>
-<div class="opt" data-l="C"><b>C.</b> <span>{{C}}</span></div>
-<div class="opt" data-l="D"><b>D.</b> <span>{{D}}</span></div>
+<div class="q">{{Question}}</div>
+<div class="opts">
+<div class="opt oA"><b>A)</b> {{OptionA}}</div>
+<div class="opt oB"><b>B)</b> {{OptionB}}</div>
+<div class="opt oC"><b>C)</b> {{OptionC}}</div>
+<div class="opt oD"><b>D)</b> {{OptionD}}</div>
 </div>
-<div id="opts" class="opts"></div>
-</div>
-<script>
-(function(){
-  var raw=document.getElementById('raw'), box=document.getElementById('opts');
-  if(!raw||!box) return;
-  var back=!!document.getElementById('mcq-back');
-  var t=document.querySelector('.stem').textContent, key='k'+t.length+':'+t.slice(0,120);
-  function load(){var s=window.__mcq; if(s&&s.key===key) return s;
-    try{s=JSON.parse(sessionStorage.getItem('mcq')||'null'); if(s&&s.key===key) return s;}catch(e){} return null;}
-  var st=back?load():null, perm=st?st.perm:['A','B','C','D'], pick=st?st.pick:null;
-  if(!back){for(var i=3;i>0;i--){var j=Math.floor(Math.random()*(i+1)),x=perm[i];perm[i]=perm[j];perm[j]=x;}}
-  function save(){var s={key:key,perm:perm,pick:pick}; window.__mcq=s;
-    try{sessionStorage.setItem('mcq',JSON.stringify(s));}catch(e){}}
-  if(!back) save();
-  perm.forEach(function(o,i){
-    var d=document.createElement('div'); d.className='opt'; d.setAttribute('data-o',o);
-    d.innerHTML='<b>'+'ABCD'[i]+'.</b> '+raw.querySelector('[data-l="'+o+'"] span').innerHTML;
-    if(!back){d.onclick=function(){pick=o; save();
-      var a=box.children; for(var k=0;k<a.length;k++) a[k].classList.remove('picked');
-      d.classList.add('picked');};}
-    box.appendChild(d);});
-  raw.style.display='none';
-  window.__mcqView={perm:perm,pick:pick};
-})();
-</script>"""
+</div>"""
 
-BACK = r"""<div id="mcq-back"></div>
+BACK = r"""<div class="back" data-c="{{Correct}}">
 {{FrontSide}}
 <hr id="answer">
-{{#ImageBack}}<div class="img">{{ImageBack}}</div>{{/ImageBack}}
-<div id="fb" class="fb"></div>
-<div id="fbraw" class="fb">
-<div class="ok"><b>Answer: {{Answer}}</b> — {{Explain}}</div>
-<div class="why" data-l="A">A: {{WhyA}}</div><div class="why" data-l="B">B: {{WhyB}}</div>
-<div class="why" data-l="C">C: {{WhyC}}</div><div class="why" data-l="D">D: {{WhyD}}</div>
-</div>
-<span id="ans" style="display:none">{{Answer}}</span>
-<div id="xp" style="display:none">{{Explain}}</div>
-<div id="wA" style="display:none">{{WhyA}}</div><div id="wB" style="display:none">{{WhyB}}</div>
-<div id="wC" style="display:none">{{WhyC}}</div><div id="wD" style="display:none">{{WhyD}}</div>
-{{#Warning}}<div class="warn">⚠️ Slide error: {{Warning}}</div>{{/Warning}}
-<div class="src">{{Source}}</div>
-<script>
-(function(){
-  var v=window.__mcqView, fb=document.getElementById('fb'); if(!v||!fb) return;
-  var ans=document.getElementById('ans').textContent.trim(), h='';
-  function g(id){var e=document.getElementById(id); return e?e.innerHTML:'';}
-  v.perm.forEach(function(o,i){
-    var txt=document.querySelector('#opts [data-o="'+o+'"]');
-    txt=txt?txt.innerHTML.replace(/^<b>[A-D]\.<\/b>\s*/,''):'';
-    var ok=(o===ans), me=(v.pick===o)?' <i>(your choice)</i>':'';
-    h+='<div class="'+(ok?'ok':'bad')+'"><b>'+(ok?'✓ ':'✗ ')+'ABCD'[i]+'. '+txt+'</b>'+me+
-       '<div class="note">'+(ok?g('xp'):g('w'+o))+'</div></div>';
-    var el=document.querySelector('#opts [data-o="'+o+'"]');
-    if(el) el.classList.add(ok?'is-ok':'is-bad');});
-  fb.innerHTML=h; document.getElementById('fbraw').style.display='none';
-})();
-</script>"""
+<div class="rv">{{Review}}</div>
+{{#Objective}}<div class="obj">🎯 Objective: {{Objective}}</div>{{/Objective}}
+<div class="src">Source: {{Source}}</div>
+</div>"""
 
 CSS = """.card{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:18px;line-height:1.45;
  color:#1f2328;background:#fff;text-align:left;padding:4px}
-.mcq{max-width:720px;margin:0 auto}
-.meta{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6e7781;margin-bottom:6px}
-.stem{font-weight:600;margin-bottom:10px}
-.img{text-align:center;margin:8px 0}.img img{max-width:100%;height:auto;border-radius:8px}
-.opts .opt{border:1px solid #d0d7de;border-radius:10px;padding:9px 12px;margin:7px 0;cursor:pointer}
-.opts .opt.picked{border-color:#0969da;box-shadow:0 0 0 2px #0969da33}
-.opts .opt.is-ok{border-color:#1a7f37;background:#dafbe1}
-.opts .opt.is-bad{opacity:.75}
-.fb{max-width:720px;margin:10px auto}
-.fb .ok,.fb .bad{border-radius:10px;padding:9px 12px;margin:7px 0}
-.fb .ok{background:#dafbe1;border-left:5px solid #1a7f37;color:#0f3d1f}
-.fb .bad{background:#ffebe9;border-left:5px solid #cf222e;color:#5c0f14}
-.fb .note{font-size:15px;margin-top:3px}
-.warn{max-width:720px;margin:8px auto;background:#fff8c5;border-left:5px solid #bf8700;padding:8px 12px;border-radius:10px;font-size:15px}
-.src{max-width:720px;margin:8px auto;font-size:13px;color:#6e7781}
-hr#answer{border:0;border-top:1px solid #d0d7de;margin:14px 0}
+.mcq,.rv,.obj,.src{max-width:720px;margin-left:auto;margin-right:auto}
+.q{font-weight:600;margin-bottom:10px}
+.opt{border:1px solid #d0d7de;border-radius:10px;padding:9px 12px;margin:7px 0}
+.back[data-c="A"] .oA,.back[data-c="B"] .oB,.back[data-c="C"] .oC,.back[data-c="D"] .oD{border-color:#1a7f37;background:#dafbe1}
+hr#answer{border:0;border-top:1px solid #d0d7de;margin:14px auto;max-width:720px}
+.rv .ok,.rv .bad,.rv .warn{border-radius:10px;padding:9px 12px;margin:7px 0}
+.rv .ok{background:#dafbe1;border-left:5px solid #1a7f37;color:#0f3d1f}
+.rv .bad{background:#ffebe9;border-left:5px solid #cf222e;color:#5c0f14;font-size:15px}
+.rv .warn{background:#fff8c5;border-left:5px solid #bf8700;color:#3b2e00;font-size:15px}
+.rv .hd{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#6e7781;margin:12px 0 2px}
+.rv .ex{font-size:15px;margin-top:3px}
+.obj{margin-top:10px;background:#ddf4ff;border-left:5px solid #0969da;color:#0a3069;padding:8px 12px;border-radius:10px;font-size:15px}
+.src{margin-top:8px;font-size:13px;color:#6e7781}
 .nightMode .card,.night_mode .card,.card.nightMode{color:#e6edf3;background:#0d1117}
-.nightMode .opts .opt,.night_mode .opts .opt{border-color:#30363d}
-.nightMode .opts .opt.is-ok,.night_mode .opts .opt.is-ok,.nightMode .fb .ok,.night_mode .fb .ok{background:#12361f;color:#aff5b4}
-.nightMode .fb .bad,.night_mode .fb .bad{background:#3d1214;color:#ffdcd7}
-.nightMode .warn,.night_mode .warn{background:#3b2e00;color:#f8e3a1}
+.nightMode .opt,.night_mode .opt{border-color:#30363d}
+.nightMode .back[data-c="A"] .oA,.nightMode .back[data-c="B"] .oB,.nightMode .back[data-c="C"] .oC,.nightMode .back[data-c="D"] .oD,
+.night_mode .back[data-c="A"] .oA,.night_mode .back[data-c="B"] .oB,.night_mode .back[data-c="C"] .oC,.night_mode .back[data-c="D"] .oD,
+.nightMode .rv .ok,.night_mode .rv .ok{background:#12361f;color:#aff5b4;border-color:#2ea043}
+.nightMode .rv .bad,.night_mode .rv .bad{background:#3d1214;color:#ffdcd7}
+.nightMode .rv .warn,.night_mode .rv .warn{background:#3b2e00;color:#f8e3a1}
+.nightMode .obj,.night_mode .obj{background:#0c2d6b;color:#cae8ff}
 """
+
 
 def die(msg):
     print("ERROR:", msg); sys.exit(1)
 
+
 def h(s, n=8):
     return int(hashlib.sha1(s.encode()).hexdigest()[:n], 16)
+
 
 def strip(s):
     return re.sub(r"<[^>]+>", "", s or "").strip()
 
-def validate(cards, media_dir):
-    errs, keys = [], []
+
+def tag(s):
+    return re.sub(r"[^\w-]+", "_", strip(s)).strip("_") or "General"
+
+
+def validate(cards, objectives):
+    """Errors stop the build; warnings are printed (an objective nobody answers is reported, the deck still builds)."""
+    errs, warns, keys = [], [], []
+    if not cards:
+        errs.append("no cards")
     for i, c in enumerate(cards, 1):
         o = c.get("options", {})
         if sorted(o) != list("ABCD") or any(not strip(o[k]) for k in "ABCD"):
-            errs.append(f"card {i}: needs 4 non-empty options A-D")
-            continue
+            errs.append(f"card {i}: needs 4 non-empty options A-D"); continue
         a = c.get("answer")
-        if a not in "ABCD" or len(a or "") != 1:
-            errs.append(f"card {i}: answer must be A-D"); continue
+        if a not in ("A", "B", "C", "D"):
+            errs.append(f"card {i}: Correct must be one of A-D"); continue
         keys.append(a)
+        if not strip(c.get("stem")):
+            errs.append(f"card {i}: empty question")
         for k in "ABCD":
             if k != a and not strip(c.get("why", {}).get(k)):
-                errs.append(f"card {i}: missing why[{k}]")
-            if len(strip(o[k]).split()) > 15:
-                errs.append(f"card {i}: option {k} > 15 words")
+                errs.append(f"card {i}: missing why-not for {k}")
         lens = [len(strip(o[k])) for k in "ABCD"]
-        if lens[ "ABCD".index(a)] == max(lens) and max(lens) > 1.5 * sorted(lens)[-2]:
-            errs.append(f"card {i}: key is clearly the longest option")
-        if c.get("type") not in ("Direct", "Analytic", "Hard"):
-            errs.append(f"card {i}: type must be Direct/Analytic/Hard")
-        for f in ("image", "image_back"):
-            if c.get(f) and not os.path.exists(os.path.join(media_dir, c[f])):
-                errs.append(f"card {i}: missing media {c[f]}")
+        if lens["ABCD".index(a)] == max(lens) and max(lens) > 1.5 * sorted(lens)[-2]:
+            errs.append(f"card {i}: the correct answer is clearly the longest option")
+        if c.get("type") not in TYPES:
+            errs.append(f"card {i}: type must be one of {'/'.join(TYPES)}")
+        if c.get("tier") not in TIERS:
+            errs.append(f"card {i}: tier must be T1 or T2")
         if not strip(c.get("explain")) or not strip(c.get("source")):
-            errs.append(f"card {i}: explain and source required")
-    stems = [strip(c["stem"]).lower() for c in cards]
+            errs.append(f"card {i}: explanation and source required")
+    stems = [strip(c.get("stem")).lower() for c in cards]
     if len(set(stems)) != len(stems):
-        errs.append("duplicate stems")
+        errs.append("duplicate questions")
     run = 1
     for x, y in zip(keys, keys[1:]):
         run = run + 1 if x == y else 1
         if run > 2:
-            errs.append("same key letter > 2 times in a row"); break
-    return errs, {k: keys.count(k) for k in "ABCD"}
+            errs.append("same correct letter > 2 times in a row"); break
+    answered = {x for c in cards for x in (c.get("obj") or [])}
+    miss = [ob["id"] for ob in objectives if ob["id"] not in answered]
+    if miss:
+        warns.append("objectives not the correct answer of any card: " + ", ".join(miss))
+    return errs, warns, {k: keys.count(k) for k in "ABCD"}
+
+
+def review_html(c):
+    a, o, w = c["answer"], c["options"], c.get("why", {})
+    out = [f'<div class="ok"><b>Correct: {a}) {o[a]}</b><div class="ex">{c["explain"]}</div></div>',
+           '<div class="hd">Why not the others</div>']
+    for k in "ABCD":
+        if k != a:
+            out.append(f'<div class="bad"><b>{k}) {o[k]}</b> — {w.get(k, "")}</div>')
+    if strip(c.get("warning")):
+        out.append(f'<div class="warn">⚠️ {c["warning"]}</div>')
+    return "".join(out)
+
 
 def main(path):
     spec = json.load(open(path, encoding="utf-8"))
     deck, cards = spec["deck"], spec["cards"]
-    media_dir = spec.get("media_dir", "media")
-    errs, dist = validate(cards, media_dir)
+    lec = tag(spec.get("lecture") or deck.split("::")[-1])
+    objectives = [x for x in spec.get("objectives", []) if isinstance(x, dict) and re.match(r"^O\d{1,2}$", str(x.get("id", "")))]
+    otext = {x["id"]: strip(x.get("t")) for x in objectives}
+    errs, warns, dist = validate(cards, objectives)
     if errs:
         die("\n".join(errs))
     now, ms = int(time.time()), int(time.time() * 1000)
     did = h("deck:" + deck, 12)
-    tmpl = {"name": "MCQ", "ord": 0, "qfmt": FRONT, "afmt": BACK, "did": None,
-            "bqfmt": "", "bafmt": ""}
+    tmpl = {"name": "MCQ", "ord": 0, "qfmt": FRONT, "afmt": BACK, "did": None, "bqfmt": "", "bafmt": ""}
     model = {"id": MODEL_ID, "name": MODEL_NAME, "type": 0, "mod": now, "usn": -1,
              "sortf": 0, "did": did, "tmpls": [tmpl],
              "flds": [{"name": f, "ord": i, "sticky": False, "rtl": False,
@@ -180,6 +157,7 @@ def main(path):
                        "minInt": 1, "mult": 0},
              "rev": {"bury": True, "ease4": 1.3, "fuzz": 0.05, "ivlFct": 1,
                      "maxIvl": 36500, "minSpace": 1, "perDay": 200}}}
+
     def deckobj(i, name):
         return {"id": i, "name": name, "mod": now, "usn": -1, "collapsed": False,
                 "browserCollapsed": False, "conf": 1, "desc": "", "dyn": 0,
@@ -220,23 +198,16 @@ def main(path):
                 (now // 86400 * 86400, ms, ms, json.dumps(conf),
                  json.dumps({str(MODEL_ID): model}), json.dumps(decks),
                  json.dumps(dconf), "{}"))
-    media = []
-    def img(f):
-        if not f: return ""
-        if f not in media: media.append(f)
-        return f'<img src="{f}">'
     for i, c in enumerate(cards):
-        o, w = c["options"], c.get("why", {})
-        vals = [c["stem"], img(c.get("image")), img(c.get("image_back")),
-                o["A"], o["B"], o["C"], o["D"], c["answer"], c["explain"],
-                w.get("A", ""), w.get("B", ""), w.get("C", ""), w.get("D", ""),
-                c.get("warning", ""), c["source"], c["type"]]
-        tags = {re.sub(r"\s+", "_", c.get("section", "General")), c["type"]}
-        if c.get("hy"): tags.add("HY")
-        if c.get("image"): tags.add("Image")
-        if c.get("warning"): tags.add("SlideError")
+        o, ob = c["options"], [x for x in (c.get("obj") or []) if x in otext]
+        objective = "<br>".join(f"{x} — {otext[x]}" for x in ob)
+        vals = [c["stem"], o["A"], o["B"], o["C"], o["D"], c["answer"], review_html(c), objective, c["source"]]
+        tags = {f"{lec}::{tag(c.get('section', 'General'))}", c["tier"], c["type"]}
+        tags.update(f"{lec}::Obj::{x}" for x in ob)
+        if strip(c.get("warning")):
+            tags.add("SlideError")
         guid = hashlib.sha1((deck + "|" + strip(c["stem"])).encode()).hexdigest()[:16]
-        nid, cid = ms + i, ms + i
+        nid = cid = ms + i
         sfld = strip(c["stem"])
         con.execute("INSERT INTO notes VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                     (nid, guid, MODEL_ID, now, -1, " " + " ".join(sorted(tags)) + " ",
@@ -247,11 +218,13 @@ def main(path):
     out = spec.get("file") or (deck.split("::")[-1] + ".apkg")
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         z.write(db, "collection.anki2")
-        z.writestr("media", json.dumps({str(i): f for i, f in enumerate(media)}))
-        for i, f in enumerate(media):
-            z.write(os.path.join(media_dir, f), str(i))
-    types = {t: sum(c["type"] == t for c in cards) for t in ("Direct", "Analytic", "Hard")}
-    print(f"OK {out}: {len(cards)} cards | {types} | keys {dist} | media {len(media)}")
+        z.writestr("media", "{}")
+    for w in warns:
+        print("WARN", w)
+    types = {t: sum(c["type"] == t for c in cards) for t in TYPES}
+    cov = sum(1 for ob in objectives if any(ob["id"] in (c.get("obj") or []) for c in cards))
+    print(f"OK {out}: {len(cards)} cards | {types} | A={dist['A']} B={dist['B']} C={dist['C']} D={dist['D']} | objectives {cov}/{len(objectives)}")
+
 
 if __name__ == "__main__":
     main(sys.argv[1] if len(sys.argv) > 1 else "cards.json")

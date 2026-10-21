@@ -16,7 +16,7 @@ ID_RE = re.compile(r"^[a-z0-9]{8,40}$")
 MAX_CARDS, MAX_TEXT, MAX_INPUT = 400, 20000, 3 * 1024 * 1024   # caps are a safety net only: never below what the site sends (HTML-escaped)
 KEEP_DAYS = 14
 MAX_REVIEW = 1_500_000
-TYPES = ("Direct", "Analytic", "Hard")
+OBJ_RE = re.compile(r"^O\d{1,2}$")
 CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
@@ -38,17 +38,25 @@ def clean_card(c):
     a = text(c.get("answer"), 2).strip().upper()
     return {
         "type": text(c.get("type"), 20).strip(),
+        "tier": text(c.get("tier"), 4).strip().upper(),
         "section": text(c.get("section"), 80).strip() or "General",
-        "hy": c.get("hy") is True,
         "stem": text(c.get("stem")),
-        "image": "", "image_back": "",          # picture cards are off for now: nothing from a job becomes a file path
         "options": {k: text(o.get(k)) for k in "ABCD" if k in o},
         "answer": a,
         "explain": text(c.get("explain")),
         "why": {k: text(w.get(k)) for k in "ABCD" if k in w},
         "warning": text(c.get("warning")),
+        "obj": [x for x in (c.get("obj") if isinstance(c.get("obj"), list) else []) if isinstance(x, str) and OBJ_RE.match(x)][:6],
         "source": text(c.get("source"), 120),
     }
+
+
+def clean_objectives(v):
+    out = []
+    for x in v if isinstance(v, list) else []:
+        if isinstance(x, dict) and isinstance(x.get("id"), str) and OBJ_RE.match(x["id"]):
+            out.append({"id": x["id"], "t": text(x.get("t"), 600), "inf": x.get("inf") is True})
+    return out[:30]
 
 
 def build(job_id, spec, out_dir):
@@ -64,7 +72,8 @@ def build(job_id, spec, out_dir):
     try:
         os.makedirs(os.path.join(work, "media"))
         with open(os.path.join(work, "cards.json"), "w", encoding="utf-8") as f:
-            json.dump({"deck": deck, "file": "deck.apkg", "media_dir": "media", "cards": cards}, f, ensure_ascii=False)
+            json.dump({"deck": deck, "file": "deck.apkg", "lecture": text(spec.get("lecture"), 150),
+                       "objectives": clean_objectives(spec.get("objectives")), "cards": cards}, f, ensure_ascii=False)
         try:
             p = subprocess.run([sys.executable, BUILDER, "cards.json"], cwd=work, capture_output=True,
                                text=True, timeout=120)
@@ -74,7 +83,8 @@ def build(job_id, spec, out_dir):
         apkg = os.path.join(work, "deck.apkg")
         if rc == 0 and os.path.isfile(apkg):
             shutil.copyfile(apkg, os.path.join(out_dir, job_id + ".apkg"))
-            st.update(ok=True, size=os.path.getsize(apkg), msg=log.splitlines()[-1][:300] if log else "OK")
+            st.update(ok=True, size=os.path.getsize(apkg), msg=log.splitlines()[-1][:300] if log else "OK",
+                      warn=[l[5:300] for l in log.splitlines() if l.startswith("WARN ")][:10])
             # the site's review of the deck (facts, cards, checks) rides along, so any device can show it; data only, never run
             rv = spec.get("review")
             if isinstance(rv, dict) and len(json.dumps(rv, ensure_ascii=False)) <= MAX_REVIEW:

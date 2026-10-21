@@ -10,7 +10,8 @@ LET = "ABCD"
 
 def card(i, ans="A", **kw):
     opts = {k: f"option {k} number {i}" for k in LET}
-    c = {"type": ["Direct", "Analytic", "Hard"][i % 3], "section": "Viral structure", "hy": i % 2 == 0,
+    c = {"type": ["Mechanism", "Clinical", "Discrimination", "Definition"][i % 4], "tier": "T1" if i % 2 == 0 else "T2",
+         "section": "Viral structure", "obj": ["O%d" % (i % 3 + 1)],
          "stem": f"Which feature best explains finding number {i}?", "options": opts, "answer": ans,
          "explain": f"Because of mechanism {i}.", "why": {k: f"belongs to item {k}{i}" for k in LET if k != ans},
          "warning": "", "source": f"Slide {i + 1}"}
@@ -40,7 +41,8 @@ class JobTests(unittest.TestCase):
             return json.load(f)
 
     def test_good_deck(self):
-        self.put("abcdefgh1", {"deck": "Micro::Viruses 1", "cards": deck_cards(12)})
+        objs = [{"id": "O%d" % k, "t": "objective %d" % k} for k in (1, 2, 3)]
+        self.put("abcdefgh1", {"deck": "Micro::Viruses 1", "lecture": "Viruses 1", "objectives": objs, "cards": deck_cards(12)})
         job.main(self.root)
         st = self.status("abcdefgh1")
         self.assertTrue(st["ok"], st)
@@ -57,20 +59,38 @@ class JobTests(unittest.TestCase):
         self.assertEqual(con.execute("select count(*) from cards").fetchone()[0], 12)
         decks = json.loads(con.execute("select decks from col").fetchone()[0])
         self.assertIn("Micro::Viruses 1", [d["name"] for d in decks.values()])
-        flds = con.execute("select flds from notes limit 1").fetchone()[0].split("\x1f")
-        self.assertEqual(len(flds), 16)
+        flds, tags = con.execute("select flds, tags from notes order by id limit 1").fetchone()
+        flds = flds.split("\x1f")
+        self.assertEqual(len(flds), 9)                       # Question, OptionA-D, Correct, Review, Objective, Source
+        self.assertEqual(flds[5], "A")
+        self.assertIn("Correct: A)", flds[6])
+        self.assertIn("Why not the others", flds[6])
+        self.assertEqual(flds[7], "O1 — objective 1")
+        self.assertEqual(flds[8], "Slide 1")
+        self.assertEqual(set(tags.split()), {"Viruses_1::Viral_structure", "T1", "Mechanism", "Viruses_1::Obj::O1"})
+        model = json.loads(con.execute("select models from col").fetchone()[0])
+        self.assertEqual([m["name"] for m in model.values()], ["MCQ 4-Option"])
         con.close()
+        self.assertIn("objectives 3/3", st["msg"])
+
+    def test_uncovered_objective_is_a_warning(self):
+        objs = [{"id": "O1", "t": "a"}, {"id": "O9", "t": "never answered"}]
+        self.put("abcdefgh6", {"deck": "D", "objectives": objs, "cards": deck_cards(3)})
+        job.main(self.root)
+        st = self.status("abcdefgh6")
+        self.assertTrue(st["ok"], st)
+        self.assertTrue(any("O9" in w for w in st["warn"]), st)
 
     def test_builder_errors_come_back(self):
         bad = deck_cards(4)
-        bad[1]["options"]["C"] = "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen"
+        bad[1]["tier"] = "T3"
         del bad[2]["why"]["D" if bad[2]["answer"] != "D" else "A"]
         self.put("abcdefgh2", {"deck": "X", "cards": bad})
         job.main(self.root)
         st = self.status("abcdefgh2")
         self.assertFalse(st["ok"])
-        self.assertTrue(any("> 15 words" in e for e in st["errors"]), st)
-        self.assertTrue(any("missing why" in e for e in st["errors"]), st)
+        self.assertTrue(any("tier must be" in e for e in st["errors"]), st)
+        self.assertTrue(any("missing why-not" in e for e in st["errors"]), st)
         self.assertFalse(os.path.exists(os.path.join(self.root, "out", "abcdefgh2.apkg")))
 
     def test_null_and_wrong_types_never_crash(self):
