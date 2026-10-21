@@ -6501,7 +6501,7 @@ const slSep=txt=>String(txt||"").split("\n").map(l=>{const m=l.match(/^S(\d+):\s
 const AK_OBJ_RE=/\b(learning\s+)?objectives?\b|\blearning\s+outcomes?\b|\bILOs?\b|\bby the end of (this|the) (lecture|session|class|lesson)\b|\bintended learning\b|\baims?\s*(and|&)\s*objectives\b/i;
 function akObjFind(txt){const L=String(txt||"").split("\n").map(l=>l.match(/^S(\d+):\s?(.*)$/)).filter(Boolean),hit=L.filter(m=>AK_OBJ_RE.test(m[2])&&m[2].length>25);
   if(!hit.length)return"";const first=+hit[0][1],keep=hit.filter(m=>+m[1]-first<=2).slice(0,3);
-  return keep.map(m=>`S${m[1]}: ${m[2]}`).join("\n").slice(0,3000)}
+  return keep.map(m=>m[2].split(" / ").map(x=>x.trim()).filter(Boolean).join("\n")).join("\n").slice(0,3000)}
 // stage 1 → clean lists (whatever Kimi sends, nothing broken gets through), scores and tiers worked out here
 function akUnits(j){const O=[],U=[],oid=new Set();
   (Array.isArray(j.objectives)?j.objectives:[]).forEach(x=>{if(!isObj(x))return;const id=akId(x.id),t=akT(x.t,500);if(!/^O\d{1,2}$/.test(id)||oid.has(id)||!t)return;oid.add(id);
