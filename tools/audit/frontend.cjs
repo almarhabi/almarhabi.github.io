@@ -6,9 +6,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 let playwright;
-try { playwright = require('playwright-core'); } catch { playwright = require('../runner/node_modules/playwright-core'); }
+try { playwright = require('../runner/node_modules/playwright-core'); } catch { playwright = require('playwright-core'); }
 const ROOT = path.resolve(__dirname, '../..');
-const HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const HTML = fs.readFileSync(process.env.AUDIT_SOURCE || path.join(ROOT, 'index.html'), 'utf8');
 const ENGINE = process.env.AUDIT_BROWSER || 'chromium';
 const WIDTHS = [320, 375, 390, 430, 768, 1024, 1280, 1440, 1920];
 const result = { engine: ENGINE, checks: [], limitations: ['Integrations are isolated/local mocks; no real user records are read or changed.'] };
@@ -16,6 +16,32 @@ let browser;
 async function check(name, fn) {
   try { await fn(); result.checks.push({ name, ok: true }); console.log('PASS ' + name); }
   catch (e) { result.checks.push({ name, ok: false, error: String(e.message).slice(0, 1000) }); console.error('FAIL ' + name + ': ' + String(e.message).slice(0, 500)); }
+}
+// Let the real startup timer finish and acknowledge only identified, expected notices.
+// A hidden overlay before its 450ms timer fired is not a ready application.
+async function acknowledgeStartup(page) {
+  await page.waitForFunction(() => achReady === true);
+  const acknowledged = [];
+  let quiet = 0;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    await page.waitForTimeout(550);
+    if (await page.locator('#ov').isHidden()) {
+      if (++quiet === 2) return acknowledged;
+      continue;
+    }
+    quiet = 0;
+    const known = [
+      ['offer', '#ofLater'], ['week', '#wkGo'], ['reward phase', '#thOk'], ['achievement', '#celOk'],
+    ];
+    const notice = await page.evaluate(known => known.find(([, selector]) => document.querySelector(selector))?.[0], known);
+    assert(notice, 'Unexpected startup modal: ' + (await page.locator('#ov').innerText()).slice(0, 250));
+    const selector = known.find(([name]) => name === notice)[1];
+    await settleModal(page);
+    await page.locator(selector).click();
+    await page.waitForFunction(() => document.querySelector('#ov').hidden);
+    acknowledged.push(notice);
+  }
+  throw Error('Startup notices did not settle after acknowledgement');
 }
 async function isolated(options = {}) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', ...options });
@@ -37,12 +63,17 @@ async function isolated(options = {}) {
   page.on('pageerror', e => faults.push('exception: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') faults.push('console: ' + m.text()); });
   await page.addInitScript(() => {
+    // Normal saved user preferences keep non-media UI tests independent of host audio/haptics.
+    localStorage.setItem('uqu-sfx', '0');
+    localStorage.setItem('uqu-hap', '0');
+    localStorage.setItem('uqu-motion', 'low');
     window.__auditRejections = [];
     addEventListener('unhandledrejection', e => window.__auditRejections.push(String(e.reason?.message || e.reason)));
   });
   await page.goto('http://audit.test/');
   await page.waitForFunction(() => typeof st === 'object' && typeof setPage === 'function');
-  return { ctx, page, faults };
+  const startupNotices = await acknowledgeStartup(page);
+  return { ctx, page, faults, startupNotices };
 }
 async function settleModal(page) { await page.waitForTimeout(360); }
 (async () => {
@@ -51,6 +82,17 @@ async function settleModal(page) { await page.waitForTimeout(360); }
   result.version = browser.version();
   const app = await isolated();
   const p = app.page;
+  await check('fresh startup offer is acknowledged once and its state survives refresh', async () => {
+    assert(app.startupNotices.includes('offer'), 'fresh startup did not show the expected day offer');
+    const first = await p.evaluate(() => offersList().filter(o => o.first && o.day === curDay()).map(o => o.id));
+    assert.equal(first.length, 1);
+    assert(await p.locator('#ov').isHidden());
+    await p.reload();
+    const repeated = await acknowledgeStartup(p);
+    assert(!repeated.includes('offer'), 'acknowledged day offer reopened on refresh');
+    assert.deepEqual(await p.evaluate(() => offersList().filter(o => o.first && o.day === curDay()).map(o => o.id)), first);
+    result.startupNotices = app.startupNotices;
+  });
   const pages = await p.evaluate(() => PAGES.map(([key]) => key));
   await check('all pages at nine widths, portrait/landscape, without page or control overflow', async () => {
     const overflow = [];
@@ -105,6 +147,7 @@ async function settleModal(page) { await page.waitForTimeout(360); }
     assert.equal(await p.locator('[data-ix]').count(), 1);
     assert.equal(await p.locator('#pg-ideas .idea img').count(), 0);
     await p.reload();
+    await acknowledgeStartup(p);
     await p.waitForFunction(() => typeof st === 'object');
     assert((await p.locator('#pg-ideas').innerText()).includes(text));
     await p.locator('[data-ix]').click();
@@ -125,6 +168,7 @@ async function settleModal(page) { await page.waitForTimeout(360); }
     await p.locator('#edN').fill(title + ' edited');
     await p.locator('#edSave').click();
     await p.reload();
+    await acknowledgeStartup(p);
     await p.waitForFunction(() => typeof ALL !== 'undefined');
     const value = await p.evaluate(id => ({ b: BY_ID[id], m: mk(id) }), id);
     assert.equal(value.b.topic, title + ' edited');
@@ -148,6 +192,7 @@ async function settleModal(page) { await page.waitForTimeout(360); }
     await p.evaluate(id => pauseSession(id), id);
     const acc = await p.evaluate(id => sessMs(id), id);
     await p.reload();
+    await acknowledgeStartup(p);
     await p.waitForFunction(() => typeof mk === 'function');
     assert(await p.evaluate(id => !!mk(id).pz, id));
     assert((await p.evaluate(id => sessMs(id), id)) >= acc);
@@ -205,6 +250,7 @@ async function settleModal(page) { await page.waitForTimeout(360); }
       assert(await p.evaluate(() => ideasList().some(x => x.t === 'فكرة محفوظة بدون شبكة — offline')));
     } finally { await app.ctx.setOffline(false); }
     await p.reload();
+    await acknowledgeStartup(p);
     await p.waitForFunction(() => typeof ideasList === 'function');
     assert((await p.locator('#pg-ideas').innerText()).includes('فكرة محفوظة بدون شبكة — offline'));
   });
@@ -218,9 +264,11 @@ async function settleModal(page) { await page.waitForTimeout(360); }
   await check('valid deep links render directly and survive refresh', async () => {
     for (const pg of ['month', 'radar', 'settings', 'sleep', 'ideas']) {
       await p.goto('http://audit.test/#' + pg);
+      await acknowledgeStartup(p);
       await p.waitForFunction(pg => st.page === pg, pg);
       assert(await p.locator('#pg-' + pg).isVisible());
       await p.reload();
+      await acknowledgeStartup(p);
       await p.waitForFunction(pg => st.page === pg, pg);
     }
   });

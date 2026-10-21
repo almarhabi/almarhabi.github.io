@@ -2,7 +2,7 @@
 // No live backend, real credentials, paid API or uncached CDN requests.
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto');
-let pw;try{pw=require('playwright-core')}catch{pw=require('../runner/node_modules/playwright-core')}
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch{pw=require('playwright-core')}
 const address=process.env.FIREBASE_DATABASE_EMULATOR_HOST||'';
 if(!/^(?:127\.0\.0\.1|localhost):\d+$/.test(address)||!(Number(address.split(':')[1])>0&&Number(address.split(':')[1])<65536))throw Error('A loopback Firebase emulator address is required.');
 const namespace=process.env.GCLOUD_PROJECT||process.env.GOOGLE_CLOUD_PROJECT||'demo-uqu-state-epochs';

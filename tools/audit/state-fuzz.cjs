@@ -1,6 +1,6 @@
 // Bounded adversarial persisted-state coverage. Blocks all external requests and uses synthetic data only.
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
-let pw;try{pw=require('playwright-core')}catch(e){pw=require('../runner/node_modules/playwright-core')}
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch(e){pw=require('playwright-core')}
 const html=fs.readFileSync(path.join(__dirname,'../../index.html'),'utf8'),id='8-0-1',validDate='2026-10-20';
 const grab=name=>JSON.parse(html.match(new RegExp(name+'=('+String.raw`\[[^\]]+\]`+')'))[1]);
 const nums=grab('MK_NUM'),strs=grab('MK_STR'),objs=grab('MK_OBJ'),tops=grab('TOP_JSON'),topnums=grab('TOP_NUM');

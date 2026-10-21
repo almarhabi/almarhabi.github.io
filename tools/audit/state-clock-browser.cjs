@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 let pw;
-try { pw = require('playwright-core'); } catch (e) { pw = require('../runner/node_modules/playwright-core'); }
+try { pw = require('../runner/node_modules/playwright-core'); } catch (e) { pw = require('playwright-core'); }
 const html = fs.readFileSync(path.join(__dirname, '../../index.html'), 'utf8');
 const lecture = '8-0-1';
 const farFuture = Date.parse('2500-01-01T00:00:00Z');

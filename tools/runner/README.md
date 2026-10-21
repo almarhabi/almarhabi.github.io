@@ -19,3 +19,5 @@ Every exit path closes the browser, local server and transport and removes the t
 The cache is an atomic, bounded whitelist of meter values, attempt counts, validated `am`/`rq`/`wk` job identifiers and learned limits. Private bookmark questions, lecture text, credentials, arbitrary localStorage keys and extra job arguments are never retained. The v2 cache namespace prevents restoring older unsanitized snapshots. Previously generated Actions caches are outside this checkout and should be removed or allowed to expire separately.
 
 The regression suite uses fabricated credentials, isolated browsers, mocked upstream responses and temporary local Git repositories. It makes no paid AI request and performs no writes to live user data. `RUNNER_HOOK` remains an environment-only test hook; it is not accepted from synchronized state or from a job payload.
+
+Playwright is pinned to 1.62.1 and audit browser scripts prefer this repository's installed copy. This tested minor update retains the runner APIs and moves the Linux WebKit checks to 26.5; the older 26.0 port encountered native reload crashes. WebKit engine checks do not replace testing Safari on a real Apple device.

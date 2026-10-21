@@ -1,7 +1,7 @@
 // Full-app Firebase configuration trust-boundary regressions. No external service I/O.
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-let pw;try{pw=require('playwright-core')}catch{pw=require('../runner/node_modules/playwright-core')}
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch{pw=require('playwright-core')}
 const html=fs.readFileSync(process.env.AI_AUDIT_SOURCE||path.join(__dirname,'../../index.html'),'utf8'),app='https://config.test/',key='audit-config-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 const valid=[{apiKey:'fixture-public',databaseURL:'https://demo-uqu.firebaseio.com'},{apiKey:'fixture-public',databaseURL:'https://demo-uqu-default-rtdb.firebaseio.com/'},{apiKey:'fixture-public',projectId:'demo-uqu',databaseURL:'https://demo-uqu-default-rtdb.europe-west1.firebasedatabase.app/'},{apiKey:'fixture-public',projectId:'demo-uqu'}];
 const urls=['https://attacker.invalid','http://demo-uqu.firebaseio.com','https://demo-uqu.firebaseio.com.attacker.invalid','https://attacker.invalid/demo-uqu.firebaseio.com','https://fixture@demo-uqu.firebaseio.com','https://fixture:password@demo-uqu.firebaseio.com','https://demo-uqu.firebaseio.com:444','https://demo-uqu.firebaseio.com/child','https://demo-uqu.firebaseio.com/?auth=fixture','https://demo-uqu.firebaseio.com/#fragment','javascript:window.__fixture=1','data:text/javascript,window.__fixture=1','http://127.0.0.1:9005'];

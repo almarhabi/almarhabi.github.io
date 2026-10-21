@@ -1,8 +1,8 @@
 {
-  "verified_at_utc": "2026-10-21T20:41:20.576398+00:00",
+  "verified_at_utc": "2026-10-21T21:03:15.471131+00:00",
   "baseline_commit": "e8b0dd6204819245e65e4d8820283250dcbe650c",
   "application_version": "20.10",
-  "index_sha256": "21da22ef247da619a821aff84403558e45e3d0fe9cc777950f96e28d8e939da8",
+  "index_sha256": "505267f450298f87f5ba0eae5db7330c3eb4187ff69e94547d6f6a48c46caccc",
   "scope": "Synthetic isolated fixtures; no live user data, paid AI requests or production database writes.",
   "fresh_dependency_install": {
     "npm_ci_runner": "passed",
@@ -35,7 +35,7 @@
     {
       "name": "test_browser.js",
       "exit": 0,
-      "seconds": 2.58
+      "seconds": 2.64
     },
     {
       "name": "ai-regressions.js",
@@ -85,7 +85,7 @@
     {
       "name": "state-fuzz.cjs",
       "exit": 0,
-      "seconds": 19.84
+      "seconds": 21.07
     },
     {
       "name": "security-worker.test.cjs",
@@ -105,12 +105,12 @@
     {
       "name": "security-firebase-config.cjs",
       "exit": 0,
-      "seconds": 25.16
+      "seconds": 24.81
     },
     {
       "name": "runner",
       "exit": 0,
-      "seconds": 6.21
+      "seconds": 6.2
     },
     {
       "name": "secret-scan",
@@ -120,12 +120,12 @@
     {
       "name": "security-probes",
       "exit": 0,
-      "seconds": 3.39
+      "seconds": 3.13
     },
     {
       "name": "state-browser.cjs",
       "exit": 0,
-      "seconds": 5.0
+      "seconds": 4.94
     },
     {
       "name": "state-wipe.cjs",
@@ -135,7 +135,7 @@
     {
       "name": "state-clock-browser.cjs",
       "exit": 0,
-      "seconds": 3.34
+      "seconds": 3.29
     },
     {
       "name": "ai-tabs.cjs",
@@ -145,47 +145,67 @@
     {
       "name": "frontend_media.cjs",
       "exit": 0,
-      "seconds": 20.66
+      "seconds": 24.83
     },
     {
       "name": "frontend_accessibility.cjs",
       "exit": 0,
-      "seconds": 10.19
+      "seconds": 10.3
     },
     {
       "name": "frontend-chromium",
       "exit": 0,
-      "seconds": 12.32
+      "seconds": 34.96
     },
     {
       "name": "frontend-firefox",
       "exit": 0,
-      "seconds": 14.42
+      "seconds": 35.95
     },
     {
       "name": "frontend-webkit",
       "exit": 0,
-      "seconds": 14.54
+      "seconds": 36.7
     },
     {
       "name": "libraries-chromium",
       "exit": 0,
-      "seconds": 3.76
+      "seconds": 3.81
     },
     {
       "name": "libraries-webkit",
       "exit": 0,
-      "seconds": 4.9
+      "seconds": 5.04
     },
     {
       "name": "firebase",
       "exit": 0,
-      "seconds": 14.69
+      "seconds": 14.84
     }
   ],
   "environment_corrections": [
-    "Fresh npm ci restored declared Playwright1.56.1; installed local Firefox and WebKit binaries selected explicitly.",
-    "Long-poll fixture serves actual owned loopback HTTP responses to avoid artificial IP address-space classification through interception; CSP and browser web security stay enabled."
+    "Browser harnesses prefer repository-local exact Playwright1.62.1; npm install/audit and all14 runner tests passed.",
+    "Frontend fixture acknowledges normal startup offers through real UI and verifies fresh offer persistence across reload.",
+    "First remote CI WebKit26.0/Linux process crashed natively; that engine is not counted as validated. Matched Chromium154, Firefox153 and WebKit26.5 all pass14 cases. The independent SFX repair is not claimed as fixing the old native crash.",
+    "Long-poll fixture serves actual owned loopback HTTP responses; CSP and browser web security stay enabled."
   ],
-  "remote_ci_and_pages": "Not yet recorded; see release evidence in PRODUCTION_READINESS.md after publication."
+  "remote_ci_and_pages": "See current main workflow and source-specific release evidence in PRODUCTION_READINESS.md. Earlier public21da evidence is explicitly historical until this source is published and checked.",
+  "playwright": "1.62.1",
+  "frontend_cases_per_engine": 14,
+  "additional_matched_media_checks": {
+    "chromium": 24,
+    "webkit": 24,
+    "accessibility": 21
+  },
+  "historical_first_remote_ci": {
+    "source_commit": "4efaaa13f2e19144f1fd9c8d2c7a2d963362e261",
+    "run": "https://github.com/almarhabi/almarhabi.github.io/actions/runs/39672531587",
+    "conclusion": "failure",
+    "jobs": {
+      "verify": "success",
+      "firebase-rules": "success",
+      "firefox": "success",
+      "webkit_26_0_linux": "failure"
+    }
+  }
 }

@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-opnoIUbMNlLooMGy/G/OATv0K+gl5BG2tLneTI3yrOY=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-W8vNGJ5Ndrg19RvJb64q9/sEiHFU5GQzddKJyeQiVZ0=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="جدول مذاكرة الطب، تنظيم المحاضرات والمراجعات، ومقاطع الدراسة وبطاقات Anki.">
 <link rel="canonical" href="https://almarhabi.github.io/">
@@ -3401,7 +3401,18 @@ function renderSfx(ev){
 const SURL={},SPOOL=[];let spI=0,sUnlocked=false;
 function spool(){if(!SPOOL.length)for(let i=0;i<6;i++){const a=new Audio();a.preload="auto";a.setAttribute("playsinline","");SPOOL.push(a)}return SPOOL}
 // the first touch "unlocks" each player so later effects (after a delay) are allowed to play
-function unlockSfx(){if(sUnlocked)return;sUnlocked=true;try{const u=URL.createObjectURL(encodeWav(new Float32Array(400),8000));spool().forEach(a=>{a.src=u;a.muted=true;const p=a.play();const done=()=>{a.pause();a.muted=false};if(p&&p.then)p.then(done,done);else done()})}catch(e){}}
+function unlockSfx(){
+  if(sUnlocked||!sfxOn()||!sfxMedia()||typeof Audio!=="function")return;
+  let u="",players=[],timer=0,closed=false;
+  const release=a=>{try{if(a.getAttribute("src")===u){a.pause();a.muted=false;a.removeAttribute("src");a.load()}}catch(e){}};
+  const finish=()=>{if(closed)return;closed=true;clearTimeout(timer);players.forEach(release);if(u)try{URL.revokeObjectURL(u)}catch(e){}};
+  try{
+    u=URL.createObjectURL(encodeWav(new Float32Array(400),8000));players=spool();sUnlocked=true;
+    let left=players.length;timer=setTimeout(finish,2000);
+    players.forEach(a=>{let settled=false;const done=()=>{if(settled)return;settled=true;release(a);if(--left===0)finish()};
+      a.src=u;a.muted=true;try{const p=a.play();if(p&&p.then)p.then(done,done);else done()}catch(e){done()}});
+  }catch(e){sUnlocked=false;finish()}
+}
 ["pointerdown","touchend","keydown"].forEach(ev=>document.addEventListener(ev,unlockSfx,{capture:true}));
 function sfx(k,a){
   if(!sfxOn()||!SFX[k])return;

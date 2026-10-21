@@ -2,26 +2,25 @@
 
 **المشروع:** `almarhabi/almarhabi.github.io` — **التاريخ:** 2026-10-21.
 
-**نطاق الدليل:** نتائج محلية فعلية بعد دمج الإصلاحات، بتاريخ المراجعة. لا يُستنتج منها نجاح GitHub-hosted CI أو نشر Pages أو صحة إعدادات الخدمات الحية. تتبع نتائج الاختبارات أسماء ملفاتها ووحدة عد كل مجموعة؛ لا تُجمع fixtures الداخلية كأنها اختبارات مستقلة.
+**نطاق الدليل:** اختبارات محلية فعلية ببيانات مصطنعة، مع أدلة نشر وCI حقيقية محددة بهوية المصدر. لا تُنسب نتيجة نسخة أقدم إلى تعديل لاحق، ولا تثبت اختبارات emulator إعدادات الخدمات الإنتاجية. نتائج التحقق القابلة للقراءة آليًا وهوية المصدر لكل جولة في [verification-results.json](verification-results.json).
 
-**اعتماد الإصدار النهائي قيد الاستكمال:** المجموعات أدناه لها تشغيلات محلية ناجحة موثقة، لكن إعادة التحقق الموحدة بعد تجميد آخر مصدر، ثم commit وremote CI وPages deployment، تُسجّل بواسطة مسؤول الإصدار. لا تمثل هذه الوثيقة موافقة على نشر لم يحدث بعد.
-
-أُعيد التحقق المحلي بعد تثبيت الاعتماديات من lockfiles؛ نجحت **31 مجموعة تنفيذ نهائية** إلى جانب Python40 وفحوص المصدر والتبعيات. التفاصيل القابلة للقراءة آليًا في [verification-results.json](verification-results.json).
+**متابعة الإصدار:** تعرض [Production checks على main](https://github.com/almarhabi/almarhabi.github.io/actions/workflows/validate.yml?query=branch%3Amain) آخر حالة CI. التشغيلة الأولى والسلوك غير المتحقق للمحرك القديم محفوظان أدناه؛ لا تمثل نتيجة Pages ناجحة وحدها نجاح كل متصفح أو خدمة خارجية.
 
 | دليل التحقق | النتيجة |
 |---|---|
-| مصدر الواجهة المحلي المفحوص | `index.html` SHA256: `21da22ef247da619a821aff84403558e45e3d0fe9cc777950f96e28d8e939da8`؛ ليس commit نهائيًا أو دليل نشر. |
-| إعادة التحقق المحلية الموحدة بعد تجميد المصدر | قيد تسجيل مسؤول الإصدار؛ النتائج التفصيلية هي أدلة تشغيلات المجموعات وليست ادعاء نجاح remote CI. |
-| Commit / remote CI / Pages deployment | الفحوص المحلية النهائية نجحت على بصمة المصدر أعلاه؛ متابعة النشر عن بعد لم تُسجل بعد في هذا السجل. |
+| مصدر الواجهة المحلي المفحوص | `index.html` SHA256: `505267f450298f87f5ba0eae5db7330c3eb4187ff69e94547d6f6a48c46caccc`؛ بصمة النسخة المحلية بعد إصلاح SFX، مستقلة عن المصدر الأقدم المنشور أدناه. |
+| هوية نتائج الاختبارات | يُرجع إلى `index_sha256` والجولات المسجلة في artifact المرفق؛ لكل مجموعة/محرك دليلها، ولا تُستنتج النتيجة من وجود workflow. |
+| أول نشر عام متحقق | commit `4efaaa1`، [Pages39672530535](https://github.com/almarhabi/almarhabi.github.io/actions/runs/39672530535) نجح، و6 فحوص HTTPS عامة نجحت للمصدر القديمSHA256 `21da22ef…939da8`. لا يُنسب هذا إلى إصلاحSFX اللاحق. |
+| أول CI حقيقي | [39672531587](https://github.com/almarhabi/almarhabi.github.io/actions/runs/39672531587): verify وFirebase وFirefox نجحت؛ WebKit26.0/Linux انهار native. هذه التشغيلة لم تنجح ككل. الحالة الأحدث عبر رابط workflow أعلاه. |
 | Install / dependencies | `npm ci` نظيف في `tools/runner` و`tools/audit`؛ `npm audit` بلا findings في كليهما وقت الفحص. pip26.2.2 و13 dependency اختبار مثبتة بإصدارات محددة و`pip check` نجحت؛ bootstrap بلا Firebase CLI. |
 | Syntax / lint / shell / workflows | parsing لكل JavaScript وPython، correctness lint، CSP hash check، `bash -n` وactionlint نجحت. لا TypeScript أو build compiler في هذا المشروع. |
 | Python + محرك Anki فعلي | **40/40**، بلا skip عند تثبيت dependency الاختبار وبلا ResourceWarning. |
 | AI والمنطق والتزامن | regressions **14/14**، concurrency **16/16**، boundaries **9/9**، loader **6/6**، tabs **3/3**، integration **6/6**. |
 | الحالة والتخزين والوقت | regressions **7/7**، queue **4/4**، browser **7/7**، wipe **8/8**، errors **8/8**، fuzz **101/101**، clock **7/7** وclock-browser **4/4**. |
-| المتصفحات والموارد | frontend: Chromium/Firefox/WebKit **13/13 لكل محرك**؛ axe **21/21**؛ media **20/20**؛ المكتبات الفعلية وPDF workers **12/12 Chromium و12/12 WebKit**. |
+| المتصفحات والموارد | frontend: Chromium154/Firefox153/WebKit26.5 **14/14 لكل محرك**؛ axe **21/21**؛ media **24/24 Chromium و24/24 WebKit26.5**؛ المكتبات الفعلية وPDF workers **12/12 Chromium و12/12 WebKit**. |
 | الأمن / Firebase emulator | XSS/state probes **8/8**، Worker **21/21**، bridge **8/8**، GAS client **4/4**؛ config **4/4**؛ harness JAR حقيقي **27/27** = قواعد16 + SDK epochs9 + long-poll2، دون Firebase CLI. |
 | العامل وطابور Git | **14/14** بما فيها عملية Chromium حقيقية وGit remote مؤقت وسباق وصول مهمة أثناء الحفظ. |
-| القياس المحلي للأداء | موثق مع كل العينات وSHA256 في [PERFORMANCE.md](PERFORMANCE.md)؛ يخص بصمة المصدر المجمد أعلاه؛ الفروق والنطاقات المتداخلة لا تثبت تحسن سرعة أو تراجعًا ماديًا. |
+| القياس المحلي للأداء | موثق مع كل العينات وSHA256 في [PERFORMANCE.md](PERFORMANCE.md)؛ قياس المصدر505267f4…6caccc بعد إصلاحSFX؛ النطاقات المتداخلة لا تثبت تحسن سرعة أو تراجعًا ماديًا. |
 
 ## 1. Executive Summary
 
@@ -31,7 +30,7 @@
 
 ظهرت أخطاء حقيقية تتجاوز المظهر: XSS من بيانات مستوردة، prototype pollution، استبدال وجهة المزامنة دون تأكيد، فقد تعديلات أثناء reset، تعطل عند قيم تاريخ/بيانات مشوهة، مهام عالقة بعد موت العامل، بطاقات MCQ بخيارات مكررة، تعطل إعداد Worker المولّد، وتسرب موارد وcredentials من بيئة العامل. تسرد الأقسام التالية السبب والسيناريو والإصلاح والدليل بدل افتراض سلامة التنفيذ الموجود.
 
-**تصنيف الإطلاق العام الحالي: NOT READY.** الفحوص المحلية المذكورة نجحت، لكن إعدادات Firebase الحية وصلاحيات التكاملات والنشر الفعلي واشتراطات خصوصية فرع المهام العام لم تُتحقق تشغيليًا. نموذج bearer capability مقصود للاستخدام الشخصي والمشاركة بالمفتاح؛ غياب الحسابات ليس ثغرة مستقلة في هذا النطاق. إذا كان الإطلاق يحتاج عضويات وأدوارًا أو إبطال جهاز مستقلًا، فذلك نطاق تفويض إضافي غير منفذ. لا تثبت نتائج emulator وحدها جاهزية قاعدة الإنتاج.
+**تصنيف الإطلاق العام الحالي: NOT READY.** الفحوص المحلية المذكورة نجحت، لكن إعدادات Firebase الحية وصلاحيات التكاملات واشتراطات خصوصية فرع المهام العام لم تُتحقق تشغيليًا. نشر أول نسخة وفحوص HTTPS موثقان، مع فشل WebKit26.0 في أول CI وحدود التحقق التالية؛ تلك أدلة مختلفة عن صلاحيات قاعدة الإنتاج. نموذج bearer capability مقصود للاستخدام الشخصي والمشاركة بالمفتاح؛ غياب الحسابات ليس ثغرة مستقلة في هذا النطاق. إذا كان الإطلاق يحتاج عضويات وأدوارًا أو إبطال جهاز مستقلًا، فذلك نطاق تفويض إضافي غير منفذ. لا تثبت نتائج emulator وحدها جاهزية قاعدة الإنتاج.
 
 **درجة الثقة:** عالية في التراجعات المحلية المحددة التي أعيد إنتاجها ثم اختُبرت؛ جيدة في الرحلات المعزولة على المحركات الثلاثة؛ غير كافية للحكم على صلاحيات production Firebase أو موثوقية الخدمات الحية أو التجربة على جهاز iOS فعلي. لا يوجد ادعاء بأن المشروع خالٍ من جميع الأخطاء.
 
@@ -105,7 +104,8 @@
 | RUN-07 / Medium | غياب sync أو crash صفحة قد ينتهي بنجاح شكلي. | العامل ينتظر دون بيانات حتى انتهاء الوقت. | فشل واضح عند crash أو تجاوز انتظار sync، مع استمرار cleanup. اختبار timeout معزول. |
 | JOB-02 / Medium | shell word splitting لأسماء ملفات fetched من فرع المهام. | اسم خبيث/مسافات/symlink أو وصول مهمة أثناء force-with-lease retry. | save script NUL-safe ويتحقق من IDs/modes ويحتفظ بالأعمال المتأخرة. temporary bare Git remote وpre-push race يثبتان ذلك. |
 | DEV-02 / Medium test tooling | Firebase CLI يضيف dependency tree ذا advisories غير لازمة لاختبار JAR؛ bootstrap pip قديم غير مقفل. | تشغيل CI يضيف مخاطر لتبعيات أدوات التدقيق دون حاجة إنتاجية. | استبدال CLI بـPython harness يتحقق من SHA256/size لـJAR4.11.2 ويملك lifecycle/deadlines؛ pip26.2.2 و13 حزمة Anki مثبتة. OSV بلا advisories معادة لـpip والنسخ المختبرة؛ emulator27 وPython40 نجحا. |
-| DEV-01 / Medium | لا lockfiles، installs غير مقفلة، Actions tags متحركة، ولا validation CI. | تغيير transitive dependency أو وصول regression دون حارس. | lockfiles وnpm ci، إبقاء Playwright الحالي، pin Actions SHAs، CI read-only. npm audit/actionlint واختبارات العامل. تفعيل branch protection الفعلي يظل تحقق مشغّل. |
+| DEV-03 / Medium test reliability | اختبار الواجهة اعتبر overlay المخفي جاهزية قبل مؤقت startup، وأخفى offer عرضية أثناء الاختبار؛ bundle WebKit26.0 القديم انهار native في CI. | النتائج تعتمد على توقيت modal والبيئة. | انتظار `achReady` ومؤقتات startup ثم ضغط الأزرار المحددة للعروض/الإنجازات؛ حفظ تفضيلات الصوت العادية وfixture reload للعرض. Playwright1.62.1 بlockfile يحدد المحركات الحديثة؛ لا يُدّعى إصلاح native crash للمحرك26.0 أو نسبته إلى التطبيق. |
+| DEV-01 / Medium | لا lockfiles، installs غير مقفلة، Actions tags متحركة، ولا validation CI. | تغيير transitive dependency أو وصول regression دون حارس. | lockfiles وnpm ci، ترقية minor مدروسة إلى Playwright1.62.1 بlockfile وفحوص تبعيات/تشغيل؛ pin Actions SHAs وCI read-only. npm audit/actionlint واختبارات العامل. تفعيل branch protection الفعلي يظل تحقق مشغّل. |
 
 ### الواجهة والتوافق
 
@@ -119,10 +119,11 @@
 | FE-06 / Medium | opacity على محتوى صغير يهبط بالتباين. | نص أبيض/رمادي فعلي 2.28:1 بدل 4.5:1. | إزالة تعتيم النص؛ اختبار light/dark. |
 | FE-07 / Medium | الأحمر وخفض opacity لوسوم الشهر لا يبلغان التباين. | النص الصغير 3.72:1. | لون مناسب مع opacity كاملة للوسوم. axe للشهر في الوضعين. |
 | FE-08 / Medium | OS reduced motion يعطل JS فقط دون transitions CSS عامة. | إعداد الجهاز reduce مع استمرار تحريك الأزرار. | suppression عام للتأثيرات بما فيها pseudo-elements مع بقاء الوظيفة. قياس computed durations تحت reduced-motion. |
-| FE-09 / Medium | Blob object URLs لا تملك cleanup موحدًا عند إغلاق/استبدال أو تخطي الصوت. | تكرار فتح التسجيلات وMP3 يبقي بيانات مرتبطة بعناوين لا تُحرر. | ownership صريح وإلغاء URL عند الإغلاق والاستبدال والتخطي، مع إبقاء URL النشط صالحًا. `frontend_media.cjs` ضمن 20/20. |
-| FE-10 / Medium | `getUserMedia` أو تحويل MP3 يعود بعد تغيير النافذة. | الموافقة المتأخرة تترك microphone tracks حية، أو تحويل مكتمل يعيد نافذة أغلقها المستخدم. | generation/owner checks؛ إيقاف tracks المتأخرة وعدم إعادة النافذة. 20/20 بfixtures MediaRecorder/getUserMedia؛ دون استخدام ميكروفون فعلي. |
-| FE-11 / High reliability | حفظ التسجيل ينتظر IndexedDB ثم يغلق أي sheet مفتوح، وقد ينشر بعد wipe/reset. | المستخدم يفتح نافذة أخرى أو يمسح البيانات أثناء الحفظ. | ربط إغلاق النافذة بمالك العملية، وفحص إبطال wipe/reset قبل النشر والتنظيف. الإغلاق العادي لا يلغي save مصرحًا به؛ اختبارات save/close/wipe/reset ضمن 20/20. |
-| FE-12 / Medium | نجاح منح microphone لا يضمن دعم MIME أو إنشاء/بدء MediaRecorder. | `isTypeSupported` أو constructor أو start يرمي بعد منح stream، فتظل tracks دون تحرير. | try/catch يغطي مراحل الإنشاء والبدء، يوقف recorder/tracks ويعرض text fallback قابلًا للحفظ؛20/20 تشمل حالتين جديدتين وغياب console/page errors. |
+| FE-09 / Medium | Blob object URLs لا تملك cleanup موحدًا عند إغلاق/استبدال أو تخطي الصوت. | تكرار فتح التسجيلات وMP3 يبقي بيانات مرتبطة بعناوين لا تُحرر. | ownership صريح وإلغاء URL عند الإغلاق والاستبدال والتخطي، مع إبقاء URL النشط صالحًا. `frontend_media.cjs` ضمن24/24 Chromium. |
+| FE-10 / Medium | `getUserMedia` أو تحويل MP3 يعود بعد تغيير النافذة. | الموافقة المتأخرة تترك microphone tracks حية، أو تحويل مكتمل يعيد نافذة أغلقها المستخدم. | generation/owner checks؛ إيقاف tracks المتأخرة وعدم إعادة النافذة. ضمن24/24 Chromium بfixtures MediaRecorder/getUserMedia؛ دون استخدام ميكروفون فعلي. |
+| FE-11 / High reliability | حفظ التسجيل ينتظر IndexedDB ثم يغلق أي sheet مفتوح، وقد ينشر بعد wipe/reset. | المستخدم يفتح نافذة أخرى أو يمسح البيانات أثناء الحفظ. | ربط إغلاق النافذة بمالك العملية، وفحص إبطال wipe/reset قبل النشر والتنظيف. الإغلاق العادي لا يلغي save مصرحًا به؛ اختبارات save/close/wipe/reset ضمن24/24 Chromium. |
+| FE-12 / High resource lifecycle | نجاح منح microphone لا يضمن دعم MIME أو إنشاء/بدء MediaRecorder. | `isTypeSupported` أو constructor أو start يرمي بعد منح stream، فتظل tracks دون تحرير. | try/catch يغطي مراحل الإنشاء والبدء، يوقف recorder/tracks ويعرض text fallback قابلًا للحفظ؛24/24 تشمل حالتين جديدتين وغياب console/page errors. |
+| FE-13 / Medium | `unlockSfx` يهيئ6 عناصرHTMLAudio وBlob عند أي gesture حتى مع كتم الصوت أو اختيار WebAudio؛ cleanup متأخر يوقف صوتًا حل محل unlock. | ضغط عادي يولد موارد غير لازمة أو يتدخل في effect أحدث، وplay Promise معلقة تحتفظ بunlock Blob. | احترام الإعدادات قبل إنشاء pool، cleanup يفحص ملكية src، وإلغاء URL بحد2s حتى لو لم يستقر play.4 حالاتSFX نجحت ضمن24/24 Chromium وتفحص الإعدادات/التفعيل اللاحق/المهلة/استبدال الصوت؛ لا يُدّعى أن هذا يصلح crash WebKit26.0 الأصلي. |
 
 كل حالات الفشل المحلية المؤكدة المذكورة أعلاه أُصلحت وأُعيدت اختبارات regression لها. هذا لا يثبت خلو التطبيق من أعطال غير مكتشفة؛ الحدود التشغيلية والمعمارية المتبقية مفصولة أدناه.
 
@@ -149,7 +150,7 @@
 
 **Secrets:** الفاحص الحالي يعرض موضع ونوع candidate فقط، دون قيم. لم يجد المسح المحلي candidates حقيقية في الشجرة المفحوصة؛ لم يُطبع أي secret. عدم العثور على candidate ليس إثباتًا لغياب كل سر، وليس مراجعة كاملة لتاريخ Git أو clones أو Actions caches قديمة. Firebase web config العامة لا تُصنّف تلقائيًا private secret.
 
-**Dependencies:** نجح `npm audit` للمشروعين دون findings وقت الفحص، لكنه لا يغطي وحده مكتبات CDN. استعلام OSV عام للنسخ المحددة لم يجد direct advisories لـPDF4.10.38 وJSZip3.10.1 وlamejs1.2.1 وFirebase10.12.2 وundici6.29.1 وplaywright-core1.56.1 وAnki25.9.5، ووجد advisory العالي المذكور لـPDF3.11.174. التخفيف الموجود يخص exploit path المعروف ولا يساوي إزالة advisory أو إثبات غياب كل ثغرة. اختُبر أيضًا pip26.2.2 و13 حزمة Python مقفلة بإصداراتها الحالية دون advisories معادة؛ لا يستبدل هذا مراجعة مستمرة. أُزيل Firebase CLI من bootstrap بدل إضافة شجرة تبعياته للاختبار. لم تُنفّذ major upgrade عشوائية لإخفاء advisory fallback.
+**Dependencies:** نجح `npm audit` للمشروعين دون findings وقت الفحص، لكنه لا يغطي وحده مكتبات CDN. استعلام OSV عام للنسخ المحددة لم يجد direct advisories لـPDF4.10.38 وJSZip3.10.1 وlamejs1.2.1 وFirebase10.12.2 وundici6.29.1 وplaywright-core1.62.1 وAnki25.9.5، ووجد advisory العالي المذكور لـPDF3.11.174. التخفيف الموجود يخص exploit path المعروف ولا يساوي إزالة advisory أو إثبات غياب كل ثغرة. اختُبر أيضًا pip26.2.2 و13 حزمة Python مقفلة بإصداراتها الحالية دون advisories معادة؛ لا يستبدل هذا مراجعة مستمرة. أُزيل Firebase CLI من bootstrap بدل إضافة شجرة تبعياته للاختبار. لم تُنفّذ major upgrade عشوائية لإخفاء advisory fallback.
 
 **HTTP policies:** baseline العام كان بلا CSP أو referrer policy موثقة. النسخة المحلية تُرسل CSP عبر meta مع SHA256 للـinline script، دون `unsafe-inline` أو `unsafe-eval`، ومع `strict-dynamic` للـFirebase fallback، وتمنع object/base/form destinations غير المقصودة؛ `no-referrer` مضاف. hash checker وCI يمنعان بصمة قديمة، واختبارات المكتبات الفعلية تعمل مع السياسة مفعّلة. SHA384 SRI يغطي classic URLs المعروفة؛ modern PDF module محمّل بـmodule tag مع SHA384 SRI متحقق؛ worker URLs الخارجية تبقى بإصدار ثابت دون browser SRI. سياسات HTTP-only مثل `frame-ancestors` لا يمكن فرضها بوسم meta؛ تحتاج ضبط الاستضافة/edge. صلاحيات GitHub token وإعدادات حماية الفروع ليست مضمونة من ملفات المشروع وحدها.
 
@@ -161,7 +162,7 @@
 - طابور ANKI يُعالج على دفعات تترك زمنًا للحفظ؛ هذا تحسين للتقدم تحت backlog والفشل البطيء، لا ادعاء بقياس throughput لخدمة production.
 - الواجهة تبقى ملفًا كبيرًا يقارب megabyte مع assets صوتية وCDN loaders. لم تُنفذ إعادة كتابة أو ترقية major اعتباطية. يبقى قياس Core Web Vitals وCPU/ذاكرة جهاز بطيء وشبكة إنتاجية فعلية ضمن المتابعة المطلوبة.
 - اختبارات الأحجام تمنع document overflow غير المقصود عبر 320–1920px وlandscape، لكنها لا تُحوّل تلقائيًا إلى نتيجة Lighthouse أو ضمان سرعة ثابتة.
-- قياس فعلي محلي بـChromium وCPU4× وعشر عينات لكل طرف: cold load الوسيط960.85→991.95ms(+3.2%)، full render19.40→20.25ms(+4.4%)، فتح المحاضرة55.55→56.90ms(+2.4%)، وحفظ bookmark المحلي72.90→73.35ms(+0.6%). النطاقات متداخلة ولا تثبت تحسن سرعة أو تراجعًا ماديًا؛ القياس يخص SHA256 المصدر المجمد المذكور أعلى الوثيقة. التفاصيل والبايتات وSHA256 وكل العينات في [PERFORMANCE.md](PERFORMANCE.md) و[performance-results.json](performance-results.json).
+- قياس فعلي محلي بـChromium وCPU4× وعشر عينات لكل طرف: cold load الوسيط948.30→997.35ms(+5.2%)، full render20.00→18.60ms(−7.0%)، فتح المحاضرة58.35→60.85ms(+4.3%)، وحفظ bookmark المحلي76.00→79.65ms(+4.8%). النطاقات متداخلة ولا تثبت تحسن سرعة أو تراجعًا ماديًا؛ القياس يخص SHA256 المصدر المجمد المذكور أعلى الوثيقة. التفاصيل والبايتات وSHA256 وكل العينات في [PERFORMANCE.md](PERFORMANCE.md) و[performance-results.json](performance-results.json).
 - transaction Firebase عند جذر المستخدم تحقق عزل epoch بصورة ذرية مقابل نقل snapshot أكبر من field update؛ لم يُقَس throughput أو تكلفة النقل لحساب ضخم على خدمة حية. لا يُقدّم هذا التغيير كتحسين أداء.
 
 ## 5. Tests
@@ -177,9 +178,9 @@
 | Python `test_*.py` | malformed inputs، caps، duplicate options، HTML، paths/symlinks، atomic output/status، timeout/cleanup/batch، review byte limits؛ fuzz10,000 shapes داخل التغطية. | **40/40** مع Anki25.9.5/Python3.12.14، دون ResourceWarning. بيئة stdlib وحدها تتخطى2 تكامل اختياريين؛ CI يثبت المحرك ويستدعي `Collection` صراحة لمنع silent skips. |
 | Anki backend فعلي | import/render وإعادة استيراد **الملف نفسه** للنموذجين16 و9 fields، counts/tags/objective/WeakSpot واستقرار IDs للمدخل نفسه. | مشمول ضمن40؛ لا يثبت حذف بطاقات قديمة من collection عند cut/rebuild. اختبار backend إضافي:3 بطاقات ثم ملف2 يبقي3 ملاحظات في collection. ليس Anki GUI/AnkiMobile/AnkiDroid. |
 | Runner/Git `test_runner.mjs`, `test_anki_save.mjs` | عملية Chromium/SSE معزولة، nonce bridge، cache poisoning، masks، bad config، hung evaluate، failure cleanup، bare Git/pre-push race. | **14/14** على Node22؛ لا dispatch حي أو رفع cache إنتاجي. |
-| Frontend `frontend.cjs` | عشر صفحات ×320/375/390/430/768/1024/1280/1440/1920px وlandscape844×390، history/deep links/refresh، ideas، gate، pause/resume، invalid counts، offline/storage، console/rejections. | **13/13 Chromium154،13/13 Firefox153،13/13 WebKit26.5**. fixture state/network معزولان. |
-| Accessibility | axe4.11 WCAG2A/AA/2.1AA، كل الصفحات light/dark وdialog. | **21/21**؛ منع zoom استثناء منتج معلن؛ ليس اختبار screen reader فعليًا. |
-| Media `frontend_media.cjs` | Blob URL ownership، late permissions، stream stop، conversion، async save/close/wipe/reset. | **20/20**، APIs الصوت mocked؛ لا hardware microphone أو encoding/latency على iPhone. |
+| Frontend `frontend.cjs` | عشر صفحات ×320/375/390/430/768/1024/1280/1440/1920px وlandscape844×390، history/deep links/refresh، ideas، gate، pause/resume، invalid counts، offline/storage، fresh-day offer/acknowledgment/reload، console/rejections. | **14/14 Chromium154،14/14 Firefox153،14/14 WebKit26.5**. fixture state/network معزولان. |
+| Accessibility | axe4.11 WCAG2A/AA/2.1AA، كل الصفحات light/dark وdialog. | **21/21**؛ حقن axe في test context فقط يسمحbypassCSP، أما functional/CDN contexts فتُبقي سياسة الإنتاج. منع zoom استثناء منتج معلن؛ ليس اختبار screen reader فعليًا. |
+| Media `frontend_media.cjs` | Blob URL ownership، late permissions، stream stop، conversion، async save/close/wipe/reset، وSFX preferences/ownership/deadline. | **24/24 Chromium و24/24 WebKit26.5**، APIs الميكروفون/MediaRecorder mocked، وSFX لها4 حالات مستقلة؛ لا hardware microphone أو encoding/latency على iPhone. |
 | Firebase `security-firebase.test.cjs` | REST إلى emulator4.11.2/Java21، anonymous/auth fixtures، deny enumeration، key bounds/state/audio/lock/atomic rollback/tombstones. | **16/16**؛ سياسة checkout فقط، لا قاعدة production. |
 | Epoch `state-epochs.cjs` | adapter الفعلي وSDK10.12.2 وثلاثة Chromium clients؛ initialization/concurrent edits، cold-cache null، old offline writes، old/same reset replay، recovery و`applyLocally:false`. | **9/9** على emulator حقيقي جديد؛ عميل قديم أو bearer writer مباشر قد يتجاوز بروتوكول CAS. |
 | Firebase long-poll `state-longpoll.cjs` | تطبيق كامل مع hash-authorized script وSRI loader، SDK حقيقي، WebSocket معطل، cross-origin JSONP إلى emulator. | **2/2**؛ control policy يُمنع وstrict-dynamic يعمل بلا console errors؛ صلاحية local-network للfixture فقط. |
@@ -203,10 +204,10 @@
 
 | الأمر | النتيجة |
 |---|---|
-| `npm ci --prefix tools/runner --ignore-scripts` و`npm ci --prefix tools/audit --ignore-scripts` | تثبيت نظيف من lockfiles؛ بلا dependency conflicts مؤثرة. |
+| `npm ci --prefix tools/runner --ignore-scripts` و`npm ci --prefix tools/audit --ignore-scripts` | تثبيت نظيف من lockfiles؛ Playwright1.62.1 وundici6.29.1 بلا dependency conflicts مؤثرة. |
 | `npm audit --prefix tools/runner --audit-level=moderate` ونسخته لـ`tools/audit` | **0 findings** في الاثنين وقت الفحص. |
 | `node tools/audit/validate.cjs` و`node tools/audit/csp.cjs` | parsing للتطبيق وWorker/Apps Script المولدين، correctness lint وبصمة CSP نجحت؛ لا يُسمى ذلك TypeScript typecheck. |
-| `node --check` لكل `.js/.cjs/.mjs` و`python -m py_compile` لكل Python source | جميع المصادر نجحت؛ تشمل أدوات الاختبارات. |
+| `node --check` لكل `.js/.cjs/.mjs` و`python -m py_compile` لكل Python source | جميع المصادر نجحت في الجولات المسجلة؛ تشمل أدوات الاختبارات. |
 | `bash -n .github/scripts/save-anki.sh` و`actionlint .github/workflows/*.yml` | نجحا؛ actionlint1.7.7 متحقق release checksum. |
 | `python -m pip install -r tools/anki/requirements-test.txt` و`python -m pip check` | pip26.2.2 وAnki25.9.5 و12 تبعية Python أخرى مثبتة بإصدارات محددة في virtualenv معزول؛ no broken requirements. |
 | `/tmp/anki-import-audit-venv/bin/python -W error::ResourceWarning -m unittest discover -s tools/anki -p 'test_*.py' -q` | **40/40**، بلا skipped؛ محرك Anki الحقيقي داخل المجموعة. |
@@ -217,8 +218,8 @@
 | `node tools/audit/state-regressions.cjs`، `state-browser.cjs`، `state-wipe.cjs`، `state-errors.cjs`، `state-fuzz.cjs` | **7/7،7/7،8/8،8/8،101/101**. |
 | `node tools/audit/state-clock.cjs` و`node tools/audit/state-clock-browser.cjs` | **7/7 و4/4**. |
 | `node tools/audit/state-queue.cjs` | **4/4** actual main synchronization orchestration. |
-| `node tools/audit/frontend.cjs` و`AUDIT_BROWSER=firefox ...` و`AUDIT_BROWSER=webkit ...` | **13/13 لكل محرك**؛ binaries/system libraries ثُبتت في بيئة الاختبار. |
-| `node tools/audit/frontend_accessibility.cjs` و`node tools/audit/frontend_media.cjs` | **21/21 و20/20**. |
+| `node tools/audit/frontend.cjs` و`AUDIT_BROWSER=firefox ...` و`AUDIT_BROWSER=webkit ...` | **14/14 لكل محرك**؛ binaries/system libraries ثُبتت في بيئة الاختبار. |
+| `node tools/audit/frontend_accessibility.cjs` و`node tools/audit/frontend_media.cjs` | **21/21**؛ media **24/24 Chromium و24/24 WebKit26.5**. |
 | `python3 tools/audit/cache-cdn.py` ثم `node tools/audit/ai-libraries.cjs` ونسخة `AUDIT_BROWSER=webkit` | تحققت10 URLs عامة، ثم **12/12 لكل محرك** مع CSP الإنتاجية؛ لم تبدأ جلسة Firebase حية. |
 | `python3 tools/audit/security-scan.py` و`node tools/audit/security-repros.js --assert-secure` | لا candidates فعلية في الشجرة؛ **8/8** markers خاملة دون تسريب قيم. |
 | `node tools/audit/security-worker.test.cjs`، `security-bridge.test.cjs`، `security-gas-client.test.cjs` | **21/21،8/8،4/4**. |
@@ -227,7 +228,7 @@
 | `python3 tools/audit/run-firebase.py` | **27/27**: rules16 + epochs9 + long-poll2؛JAR مثبت الحجم/SHA256، port loopback مؤقت وowned-process cleanup. لا Firebase CLI. |
 | `python3 -m http.server 8000 --bind 127.0.0.1` وخوادم الاختبارات loopback | frontend runtime حقيقي بملفات ساكنة، دون backend build خفي أو hydration. |
 
-لا يوجد build compiler في البنية الحالية. تحقق production runtime محليًا هو تقديم الملفات نفسها واختبارات browser/generated-script؛ أما هوية commit النهائي ونجاح CI/Pages عن بعد فيضيفهما مسؤول الإصدار إلى سجل أعلى الوثيقة. إعادة الإنتاج والقائمة الكاملة للأوامر في [README](../README.md).
+لا يوجد build compiler في البنية الحالية. تحقق production runtime محليًا هو تقديم الملفات نفسها واختبارات browser/generated-script؛ التشغيلات العامة المحددة أعلى الوثيقة تخص هوياتها فقط؛ أحدث CI مرجعه رابط workflow وartifact التحقق، ولا يُستنتج نجاح المصدر الحالي من النشر السابق. إعادة الإنتاج والقائمة الكاملة للأوامر في [README](../README.md).
 
 ## 7. Remaining Risks
 
@@ -236,7 +237,7 @@
 3. **Kimi/Drive/Worker الحية:** لم تُختبر مفاتيح مدفوعة أو response headers حقيقية أو صلاحيات حسابات Google أو deployment قديم للجسر/proxy. نشر كود الموقع لا يحدّث الخدمات المنسوخة خارجه تلقائيًا.
 4. **Privacy لفرع ANKI العام:** cards/review artifacts علنية وقابلة للنسخ. الاحتفاظ 14 يومًا لا يضمن محو clones أو downloads. المحتوى السري يحتاج قناة تخزين بصلاحيات مناسبة.
 5. **Caches تاريخية:** قد تحتوي نسخة العامل القديمة أسئلة bookmark خاصة في Actions caches؛ namespace v2 يمنع restore القديم، لكنه لا يمحو artifacts تاريخية خارج checkout. تحتاج إزالة/انتهاء وفق سياسة المشغّل.
-6. **Native Safari/iOS/Edge والأجهزة:** WebKit ليس جهاز iPhone فعليًا، وChromium ليس اختبار Edge native. الميكروفون، Safari WebView storage eviction، Share Sheet، Apple haptics/Shortcuts، وتعدد المناطق/الساعة بين أجهزة حقيقية لم تُختبر بالكامل.
+6. **Native Safari/iOS/Edge والأجهزة والمحركات القديمة:** WebKit26.5 ليس جهاز iPhone فعليًا، وChromium ليس اختبار Edge native. WebKit26.0/Linux انهار native في أول CI؛ لم يُثبت أن تعديلات التطبيق أصلحته، ولا يُدرج ضمن المحركات المتحققة النظيفة. جرى تحديث harness إلى1.62.1 لاستعمال المحركات المدعومة الحديثة. الميكروفون، Safari WebView storage eviction، Share Sheet، Apple haptics/Shortcuts، وتعدد المناطق/الساعة بين أجهزة حقيقية لم تُختبر بالكامل.
 7. **التزامن والتوافق:** Firebase adapter الحالي يفرض epoch CAS واختُبر بSDK حقيقي؛ Web Locks لتوليد AI يظل محليًا للـorigin ولا يوفّر distributed generation lock عالميًا. القواعد المتوافقة لا تجبر جهازًا قديمًا مفتوحًا أو حامل capability يكتب مباشرة على المعاملة؛ يلزم تحديث الأجهزة. Claude adapter merge/create semantics لم تُختبر على منصته. زيادة حمولة root transactions لم تخضع لحمل حي.
 8. **Availability والأداء:** يوجد benchmark محلي موثق للمصدر المجمد، ولا يوجد اختبار حمل حي أو SLO/alerting/backup-restore drill أو Core Web Vitals إنتاجي لهذه النسخة. CDN والخدمات الخارجية قد تفشل؛ فحوص الفشل المحلية تقلل الخطر ولا تثبت uptime.
 9. **Medical content:** coverage وأعداد/types/key IDs يمكن فحصها؛ صحة المعلومة الطبية، دقة نسبتها إلى الشريحة، وجود إجابة واحدة صحيحة علميًا، ومستوى difficulty تحتاج مراجعة مصدر/مختص.

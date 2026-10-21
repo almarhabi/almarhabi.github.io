@@ -1,5 +1,5 @@
 // Corrupt persisted state/backup regression checks in a real browser, with every external request blocked.
-const {chromium}=require('playwright-core'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {chromium}=require('../runner/node_modules/playwright-core'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const html=fs.readFileSync(path.join(__dirname,'../../index.html'),'utf8');
 const fixtures=[
  ['valid empty state',{marks:{}}],

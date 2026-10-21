@@ -2,7 +2,7 @@
 // No API/credentials/live-data calls: generation is deliberately held using an in-page mock.
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-let pw;try{pw=require('playwright-core')}catch(e){pw=require('../runner/node_modules/playwright-core')}
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch(e){pw=require('playwright-core')}
 const html=fs.readFileSync(process.env.AI_AUDIT_SOURCE||path.join(__dirname,'../../index.html'),'utf8');
 (async()=>{const browser=await pw.chromium.launch({executablePath:process.env.CHROMIUM_PATH||process.env.CHROME_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});try{
   const context=await browser.newContext({reducedMotion:'reduce'});await context.route('**/*',r=>r.request().url()==='https://uqu.test/'?r.fulfill({contentType:'text/html',body:html}):r.abort());

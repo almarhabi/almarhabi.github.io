@@ -4,7 +4,7 @@ const path = require('node:path');
 const http = require('node:http');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-let pw;try{pw=require('playwright-core')}catch{pw=require('../runner/node_modules/playwright-core')}const {chromium}=pw;
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch{pw=require('playwright-core')}const {chromium}=pw;
 const ROOT=path.resolve(__dirname,'../..'), OUT=process.env.AUDIT_PERF_OUTPUT||path.join(require('node:os').tmpdir(),'uqu-performance-audit');
 const BASE_REF=process.env.AUDIT_BASE_REF||'e8b0dd6204819245e65e4d8820283250dcbe650c';
 fs.mkdirSync(OUT,{recursive:true});

@@ -1,0 +1,61 @@
+{
+  "started": "2026-10-21T20:43:05.567Z",
+  "url": "https://almarhabi.github.io/",
+  "expectedSHA256": "21da22ef247da619a821aff84403558e45e3d0fe9cc777950f96e28d8e939da8",
+  "checks": [
+    {
+      "name": "public HTTPS GET with TLS validation and exact approved SHA256",
+      "ok": true,
+      "bytes": 1024836
+    },
+    {
+      "name": "fresh startup and navigation without horizontal overflow",
+      "widths": [
+        {
+          "width": 320,
+          "pages": 9,
+          "ok": true
+        },
+        {
+          "width": 390,
+          "pages": 9,
+          "ok": true
+        },
+        {
+          "width": 1440,
+          "pages": 9,
+          "ok": true
+        }
+      ],
+      "ok": true
+    },
+    {
+      "name": "visible settings version 20.10",
+      "ok": true
+    },
+    {
+      "name": "drawer and browser back/forward navigation",
+      "ok": true
+    },
+    {
+      "name": "real lecture modal name/focus/Escape/focus restoration",
+      "ok": true
+    },
+    {
+      "name": "no console errors, exceptions, rejected promises or backend attempts",
+      "ok": true
+    }
+  ],
+  "blockedServiceRequests": [],
+  "limitations": [
+    "Public smoke test used a fresh credential-free profile; authenticated Firebase, Drive, GitHub and paid AI operations were intentionally outside this public check.",
+    "Unnecessary third-party fonts were locally fulfilled without external font downloads; this does not verify their live availability.",
+    "Public-origin browser verification used Chromium on Linux; earlier isolated browser suites covered Firefox/WebKit, but this public smoke did not test physical devices."
+  ],
+  "actualSHA256": "21da22ef247da619a821aff84403558e45e3d0fe9cc777950f96e28d8e939da8",
+  "browser": "Chromium 154.0.8037.57",
+  "mode": "live-public-origin",
+  "browserTLS": "TLS 1.3",
+  "ok": true,
+  "finished": "2026-10-21T20:43:10.565Z"
+}

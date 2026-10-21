@@ -3,7 +3,7 @@
 // AI_CDN_CACHE overrides the external temp cache; no paid API or live-user calls.
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict'),crypto=require('node:crypto'),cp=require('node:child_process');
-let pw;try{pw=require('playwright-core')}catch(e){pw=require('../runner/node_modules/playwright-core')}
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch(e){pw=require('playwright-core')}
 const html=fs.readFileSync(process.env.AI_AUDIT_SOURCE||path.join(__dirname,'../../index.html'),'utf8'),manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'cdn-fixtures.json'),'utf8'));
 assert(/<meta[^>]+http-equiv="Content-Security-Policy"/i.test(html),'production CSP must be present for this integration check');
 const ENGINE=process.env.AUDIT_BROWSER||'chromium';assert(pw[ENGINE],'unknown browser engine');

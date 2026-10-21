@@ -1,5 +1,5 @@
 // Run: node tools/anki/test_browser.js. Uses the runner's playwright-core and a locally installed Chromium.
-let playwright;try{playwright=require('playwright-core')}catch(e){playwright=require('../runner/node_modules/playwright-core')}
+let playwright;try{playwright=require('../runner/node_modules/playwright-core')}catch(e){playwright=require('playwright-core')}
 const {chromium}=playwright,fs=require('fs'),path=require('path'),assert=require('assert/strict');
 const html=fs.readFileSync(path.join(__dirname,'../../index.html'),'utf8');
 (async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});let passed=0;

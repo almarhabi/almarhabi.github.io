@@ -21,7 +21,7 @@ The Shortcut uses an unauthenticated read of `users/<syncKey>/lock.json`. It rem
 
 ## Reproducible isolated verification
 
-Run from the repository root with Python 3.11+, Node 20+, Java 21, and a supported system Chromium. Install only the repository's locked test dependencies and cache the pinned public SDK bytes:
+Run from the repository root with Python 3.11+, Node 22+, Java 21, and a supported system Chromium. Install only the repository's locked test dependencies and cache the pinned public SDK bytes:
 
 ```sh
 npm ci --prefix tools/runner --ignore-scripts --no-audit --no-fund

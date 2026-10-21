@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 let pw;
-try { pw = require('playwright-core'); } catch { pw = require('../runner/node_modules/playwright-core'); }
+try { pw = require('../runner/node_modules/playwright-core'); } catch { pw = require('playwright-core'); }
 const html = fs.readFileSync(process.env.AUDIT_MEDIA_SOURCE || path.join(__dirname, '../../index.html'), 'utf8');
 const engine = process.env.AUDIT_BROWSER || 'chromium';
 const results = { engine, checks: [] };
@@ -57,6 +57,26 @@ async function check(name, fn) {
   catch (e) { const live = await app.page.evaluate(() => [...auditURLs.values()].filter(v => !v.revoked).length).catch(() => null); results.checks.push({ name, ok: false, error: e.message.slice(0, 2500), liveURLs: live, faults: app.faults, body: (await app.page.locator('#ov').innerText().catch(() => '')).slice(-600) }); console.error('FAIL ' + name + ': ' + e.message.slice(0, 300)); }
   finally { await app.context.close(); }
 }
+async function controlledEffects(page) {
+  await page.evaluate(() => {
+    sUnlocked = false; SPOOL.splice(0); spI = 0;
+    window.auditEffectAudio = []; window.auditEffectPending = [];
+    window.AudioContext = class { constructor() { this.state = 'running'; } resume() { return Promise.resolve(); } };
+    window.Audio = class {
+      constructor() { this.attrs = new Map(); this.paused = true; this.muted = false; this.pauseCount = 0; auditEffectAudio.push(this); }
+      get src() { return this.attrs.get('src') || ''; }
+      set src(value) { this.attrs.set('src', String(value)); }
+      getAttribute(name) { return this.attrs.get(name) ?? null; }
+      setAttribute(name, value) { this.attrs.set(name, String(value)); }
+      removeAttribute(name) { this.attrs.delete(name); }
+      load() {}
+      play() { this.paused = false; return new Promise((resolve, reject) => auditEffectPending.push({ audio: this, src: this.src, resolve, reject })); }
+      pause() { this.paused = true; this.pauseCount++; }
+    };
+    localStorage.setItem('uqu-sfx', '1'); localStorage.setItem('uqu-sfxmedia', '1');
+    window.auditEffectGesture = () => document.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+  });
+}
 async function preview(page) {
   await page.evaluate(() => sheetSummary(ALL.find(b => needsStudy(b)).id, 'x'));
   await page.waitForTimeout(350);
@@ -82,6 +102,43 @@ async function podcast(page) {
   browser = await pw[engine].launch({ headless: true, ...(process.env.AUDIT_BROWSER_PATH ? { executablePath: process.env.AUDIT_BROWSER_PATH } : {}), ...(engine === 'chromium' ? { executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] } : {}) });
   results.version = browser.version();
   try {
+    await check('SFX mute and Web Audio preferences allocate no HTML audio or unlock URLs', async page => {
+      await controlledEffects(page);
+      const value = await page.evaluate(() => {
+        localStorage.setItem('uqu-sfx', '0'); auditEffectGesture();
+        const muted = { count: auditEffectAudio.length, urls: auditURLs.size, unlocked: sUnlocked };
+        localStorage.setItem('uqu-sfx', '1'); localStorage.setItem('uqu-sfxmedia', '0'); auditEffectGesture();
+        const webAudio = { count: auditEffectAudio.length, urls: auditURLs.size, unlocked: sUnlocked };
+        return { muted, webAudio };
+      });
+      assert.deepEqual(value, { muted: { count: 0, urls: 0, unlocked: false }, webAudio: { count: 0, urls: 0, unlocked: false } });
+    });
+    await check('SFX enabling later allows the next gesture to unlock one pool', async page => {
+      await controlledEffects(page);
+      const value = await page.evaluate(() => {
+        localStorage.setItem('uqu-sfx', '0'); auditEffectGesture();
+        localStorage.setItem('uqu-sfx', '1'); auditEffectGesture(); auditEffectGesture();
+        return { count: auditEffectAudio.length, pool: SPOOL.length, urls: auditURLs.size, pending: auditEffectPending.length, unlocked: sUnlocked };
+      });
+      assert.deepEqual(value, { count: 6, pool: 6, urls: 1, pending: 6, unlocked: true });
+      await page.evaluate(() => auditEffectPending.forEach(pending => pending.resolve()));
+    });
+    await check('SFX unlock URL releases after every play promise settles, including rejection', async page => {
+      await controlledEffects(page);
+      await page.evaluate(() => { auditEffectGesture(); window.auditUnlockURL = [...auditURLs.keys()][0]; auditEffectPending[0].reject(new Error('Controlled playback rejection')); auditEffectPending.slice(1, 5).forEach(pending => pending.resolve()); });
+      assert.equal(await page.evaluate(() => auditURLs.get(auditUnlockURL).revoked), false);
+      await page.evaluate(() => auditEffectPending[5].resolve());
+      await page.waitForFunction(() => auditURLs.get(auditUnlockURL).revoked);
+      assert(await page.evaluate(() => auditEffectAudio.every(audio => audio.paused && !audio.muted && !audio.getAttribute('src'))));
+    });
+    await check('SFX bounded cleanup and late unlock settlements cannot pause a replacement effect', async page => {
+      await controlledEffects(page);
+      await page.evaluate(() => { auditEffectGesture(); window.auditUnlockURL = [...auditURLs.keys()][0]; sfx('g'); window.auditReplacementURL = SPOOL[0].src; });
+      await page.waitForFunction(() => auditURLs.get(auditUnlockURL).revoked, null, { timeout: 4000 });
+      await page.evaluate(() => auditEffectPending.slice(0, 6).forEach(pending => pending.resolve()));
+      assert(await page.evaluate(() => { const audio = SPOOL[0]; return !audio.paused && !audio.muted && audio.pauseCount === 0 && audio.src === auditReplacementURL && !auditURLs.get(auditReplacementURL).revoked; }));
+      await page.evaluate(() => auditEffectPending[6].resolve());
+    });
     await check('mini player survives page/sheet changes and ended replay while still mounted', async page => {
       await page.evaluate(() => { playNow(encodeWav(new Float32Array(160000), 8000), 'Lifecycle test'); window.auditMini = document.querySelector('#nowPlay audio'); });
       await page.waitForFunction(() => !auditMini.paused);

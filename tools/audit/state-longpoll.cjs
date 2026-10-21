@@ -2,7 +2,7 @@
 // Uses cached public SDK bytes and a loopback demo emulator only; no live backend.
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto'),assert=require('node:assert/strict'),http=require('node:http');
-let pw;try{pw=require('playwright-core')}catch{pw=require('../runner/node_modules/playwright-core')}
+let pw;try{pw=require('../runner/node_modules/playwright-core')}catch{pw=require('playwright-core')}
 const address=process.env.FIREBASE_DATABASE_EMULATOR_HOST||'';
 if(!/^(?:127\.0\.0\.1|localhost):\d+$/.test(address))throw Error('A loopback Firebase emulator is required.');
 const namespace=process.env.GCLOUD_PROJECT||process.env.GOOGLE_CLOUD_PROJECT||'demo-uqu-longpoll';if(!/^demo-[a-z0-9-]+$/.test(namespace))throw Error('A synthetic demo- namespace is required.');

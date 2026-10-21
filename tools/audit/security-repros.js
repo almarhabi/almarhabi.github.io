@@ -1,5 +1,5 @@
 // Offline production-audit reproductions. No live services, user data or real credentials.
-const fs=require('node:fs'),path=require('node:path'),{chromium}=require('playwright-core');
+const fs=require('node:fs'),path=require('node:path'),{chromium}=require('../runner/node_modules/playwright-core');
 (async()=>{
  const html=fs.readFileSync(path.join(__dirname,'../../index.html'),'utf8');
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});

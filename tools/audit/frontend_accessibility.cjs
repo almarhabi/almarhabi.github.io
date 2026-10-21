@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 let playwright;
-try { playwright = require('playwright-core'); } catch { playwright = require('../runner/node_modules/playwright-core'); }
+try { playwright = require('../runner/node_modules/playwright-core'); } catch { playwright = require('playwright-core'); }
 const axePath = require.resolve(process.env.AXE_MODULE || 'axe-core');
 const html = fs.readFileSync(path.join(__dirname, '../../index.html'), 'utf8');
 (async () => {
