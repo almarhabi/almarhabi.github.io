@@ -1497,6 +1497,21 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <p class="note" style="margin:0">يشتغل تلقائيًا مع بداية جلسة المذاكرة (ومع مؤقت 5 دقايق)، ويوقف مع نهايتها أو الإيقاف المؤقت. تكتمه وترجّعه من زر 🔊 في شريط الجلسة تحت، أو من شاشة القفل. لأنه ما ينسمع إلا وقت المذاكرة، مع التكرار يصير دماغك يدخل جو التركيز أول ما يسمعه.</p>
       <div class="seg sm" role="group" aria-label="صوت التركيز" id="fsndSeg"><button data-fsnd="brown">🟤 Brown noise</button><button data-fsnd="rain">🌧️ مطر</button><button data-fsnd="off">🔇 بدون</button></div>
       <button class="btn sm" id="fsndTest" style="align-self:flex-start">▶ اسمعه 3 ثواني</button></section>
+    <section class="rpage" id="lockSec"><div class="rp-h"><b>🔒 قفل التطبيقات المشتتة</b><span class="note" id="lockSt"></span></div>
+      <p class="note" style="margin:0">أول ما تبدأ جلسة مذاكرة، أي تطبيق تختاره (سناب، تيك توك، انستقرام…) يرجّعك على طول للشاشة الرئيسية. ينفتح لحاله لما توقف الجلسة أو تاخذ استراحة. يشتغل على الآيفون والآيباد مع بعض.</p>
+      <p class="note" id="lockNo" style="margin:0">يحتاج المزامنة شغّالة (فوق ← 🔄 المزامنة بين أجهزتك).</p>
+      <div id="lockYes" class="aiadv" hidden>
+        <div class="frow"><button class="btn sm primary" id="lockCopy">📋 انسخ الرابط</button><button class="btn sm" id="lockTest">🧪 جرّب الرابط</button></div>
+        <input id="lockUrl" dir="ltr" readonly aria-label="رابط القفل">
+        <p class="note" id="lockMsg" style="margin:0" aria-live="polite"></p>
+        <div class="kh">١) الاختصار: مرة وحدة (ينتقل للآيباد لحاله عن طريق iCloud)</div>
+        <ol class="note aisteps"><li>افتح تطبيق <b>الاختصارات</b> (<span class="en">Shortcuts</span>) ← <b>+</b> ← سمّه <b>قفل المذاكرة</b>.</li><li>أضف <b>الحصول على محتويات URL</b> (<span class="en">Get Contents of URL</span>، ابحث عن «محتويات») والصق الرابط مكان <span class="en">URL</span>.</li><li>أضف <b>إذا</b> (<span class="en">If</span>): <b>محتويات URL</b> ← <b>يحتوي على</b> (<span class="en">contains</span>) ← اكتب <b class="en">LOCK</b>. (ما طلع لك «يحتوي على»؟ اضغط «محتويات URL» واختر النوع <b>نص</b>.)</li><li>داخل «إذا»: أضف <b>إظهار إشعار</b> (<span class="en">Show Notification</span>) واكتب «🔒 أنت في جلسة مذاكرة»، وبعده <b>الانتقال إلى الشاشة الرئيسية</b> (<span class="en">Go to Home Screen</span>، ابحث عن «الشاشة الرئيسية»).</li></ol>
+        <div class="kh">٢) الأتمتة: على كل جهاز (الآيفون والآيباد)</div>
+        <ol class="note aisteps"><li>في الاختصارات ← <b>الأتمتة</b> (<span class="en">Automation</span>) ← <b>+</b> ← <b>التطبيق</b> (<span class="en">App</span>).</li><li>اختر التطبيقات اللي تشتتك (لا تختار <span class="en">Safari</span>: الموقع يشتغل منه) ← <b>تم فتحه</b> (<span class="en">Is Opened</span>) ← <b>تشغيل فورًا</b> (<span class="en">Run Immediately</span>) ← التالي.</li><li>اختر الاختصار <b>قفل المذاكرة</b>. خلاص.</li></ol>
+        <p class="note" style="margin:0">جرّبه: ابدأ جلسة وافتح واحد من التطبيقات. ⏸ الإيقاف المؤقت يفتحها، والرجوع للجلسة يقفلها.</p>
+        <p class="note" style="margin:0">💡 قفل أقوى للآيباد وقت المذاكرة: الإعدادات ← تسهيلات الاستخدام ← <b>الوصول الموجّه</b> (<span class="en">Guided Access</span>). شغّله، وبعدها اضغط الزر الجانبي 3 مرات وأنت في الموقع: الآيباد ما يطلع منه إلا برمز.</p>
+        <p class="note" style="margin:0">الرابط فيه رمز المزامنة حقك: لا ترسله لأحد.</p>
+      </div></section>
     <section class="rpage"><div class="rp-h"><b>🔊 الأصوات والاهتزاز</b></div>
       <p class="note" style="margin:0">أصوات خفيفة لما تخلّص مهمة وتفتح صندوق. الإعداد هذا لهذا الجهاز بس.</p>
       <label class="chk"><input type="checkbox" id="sfxOn"> أصوات الإنجاز والصناديق</label>
@@ -1504,7 +1519,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.6.3</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.7</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -1639,7 +1654,7 @@ const MARKS=[
 ];
 const LS="uqu-state-v2";
 // top-level fields that sync like the daily cap
-const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp","aiv","rnr"];
+const TOPF=["cap","pts","slept","low","parked","when","rewards","redeems","seen","sleepLog","crunch","crunchOff","docs","extra","epoch","since","nap","offers","bt","boxes","sits","rest","rtvDays","wk","thin","pauses","preasons","frogs","aicoach","aicase","cases","aiwk","goal","xplan","akp","aiv","rnr","lock"];
 // ---------- 🛡️ whatever comes from storage or another device is checked before it's used (a broken value can't take the page down) ----------
 const isISO=v=>typeof v==="string"&&/^\d{4}-\d\d-\d\d$/.test(v)&&!isNaN(Date.parse(v+"T12:00:00Z"));
 const isObj=v=>!!v&&typeof v==="object"&&!Array.isArray(v);
@@ -2832,6 +2847,36 @@ const jget=(f,def)=>{try{const v=S[f];if(!v)return def;const o=typeof v==="strin
 
 // ---------- 1) study session: «ابدأ المذاكرة» → «ذاكرتها» measures the minutes ----------
 const activeSession=()=>{let best=null;for(const id in S.marks){const m=S.marks[id];if(m&&m.startAt&&!m.studied&&BY_ID[id]&&(!best||m.startAt>best.at))best={id,at:m.startAt}}return best};
+// ---------- 🔒 v20.7: distracting apps lock. While a session runs (not paused) the synced field `lock` is "LOCK"; a Shortcut on
+// the iPhone/iPad reads it (users/<key>/lock.json) each time a distracting app opens and sends you back to the home screen ----------
+const LOCK_V="LOCK";
+let lockRun=null,lockW=[];
+const lockWant=()=>{const a=activeSession();return a&&!mk(a.id).pz?LOCK_V:false};
+// every device works it out from the same synced sessions, so they all agree; it waits for the fresh copy first
+function lockSync(){
+  if(syncPlanned()&&!merged)return;
+  if(lockRun==null)lockRun=(()=>{try{return localStorage.getItem("uqu-runner")==="1"}catch(e){return false}})();
+  if(lockRun)return;
+  const w=lockWant();if((S.lock||false)===w)return;
+  const now=Date.now();lockW=lockW.filter(t=>now-t<6e4);if(lockW.length>=6)return;   // two devices that disagree for a moment can't bounce it forever
+  lockW.push(now);setTop("lock",w);
+}
+function lockUrl(){const c=fbSaved();if(!c)return"";const f=c.config||{};
+  const base=String(f.databaseURL||(f.projectId?`https://${f.projectId}-default-rtdb.firebaseio.com`:"")).trim().replace(/\/+$/,"");
+  return/^https:\/\//.test(base)?`${base}/users/${encodeURIComponent(c.key)}/lock.json`:""}
+function lockRender(){
+  const u=lockUrl(),y=$("#lockYes");if(!y)return;
+  y.hidden=!u;$("#lockNo").hidden=!!u;$("#lockUrl").value=u;
+  $("#lockSt").textContent=u?(S.lock===LOCK_V?"🔒 مقفل الحين":"🔓 مفتوح الحين"):"";
+}
+async function lockTest(){
+  const u=lockUrl(),msg=$("#lockMsg");if(!u)return;msg.textContent="⏳ أجرّب الرابط…";
+  try{const r=await fetch(u,{cache:"no-store"}),t=await r.text();
+    if(!r.ok){msg.textContent=r.status===401||/denied/i.test(t)?"❌ Firebase رفض القراءة من برّا الموقع. القواعد (Rules) لازم تسمح بقراءة users.":`❌ الرابط ردّ بخطأ ${r.status}`;return}
+    const on=t.includes(LOCK_V);
+    msg.textContent=`✅ الرابط شغّال · الحين ${on?"🔒 مقفل (فيه جلسة شغّالة)":"🔓 مفتوح (ما فيه جلسة شغّالة)"}${on!==(S.lock===LOCK_V)?" · ⏳ لسه يتزامن، جرّب بعد ثواني":""}`;
+  }catch(e){msg.textContent="❌ ما قدرت أوصل للرابط. تأكد من النت."}
+}
 const hms=ms=>{const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return `${h}:${String(m).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`};
 function finishStudy(id){
   endPause(id);st.back=null;const m=mk(id),ms=sessMs(id),measured=ms>=30000?Math.max(1,Math.round(ms/6e4)):null;
@@ -4634,7 +4679,7 @@ function renderSettingsPage(){
    const bm=$("#lsMod");bm.disabled=sn<=modStartMs();bm.dataset.sure="";bm.textContent="خلّه من بداية المديول"}
   const nM=Object.values(S.marks).filter(m=>m&&(m.studied||m.rev1||m.anki||m.pre||m.startAt)).length,nR=Object.keys(S.marks).reduce((a,id)=>a+recsOf(id).length,0);
   {const u=undoSaved(),el=$("#bkUndo");el.hidden=!u;if(u){el.innerHTML=`↩️ عندك نسخة من بياناتك قبل آخر مسح أو استرجاع (قبل ${ago(u.at)}). <button class="linkbtn" id="bkUndoGo">رجّعها</button>`;$("#bkUndoGo").onclick=()=>sheetRestore(u.data,u.at,"بياناتك قبل آخر مسح")}}
-  safe(aiSettingsRender);
+  safe(aiSettingsRender);safe(lockRender);
   $("#rsInfo").textContent=`عندك الحين: ${cnt(nM,"محاضرة فيها سجلات","محاضرتين فيها سجلات","محاضرات فيها سجلات")} · ${nR} ملخص · ${ideasList().length} فكرة · ${xpTotal()} نقطة.`;
 }
 function sheetReset(){
@@ -5268,7 +5313,7 @@ function render(){
   // don't wipe a knot the user is typing; repaint when they leave the field
   if(typing()){deferred=true;return}
   safe(()=>{lastSig=timeSig()});
-  [ensureSit,renderHeader,renderSession,renderOfferBar,renderPage].forEach(safe);
+  [ensureSit,lockSync,renderHeader,renderSession,renderOfferBar,renderPage].forEach(safe);
   if(st.page==="main")safe(renderHub);
   if(focusOpen())safe(drawFocus);
   if(st.page==="main"){
@@ -5323,6 +5368,8 @@ document.querySelectorAll("[data-fsnd]").forEach(b=>b.onclick=()=>{try{localStor
 $("#fsndTest").onclick=()=>{const tp=fsndType();if(tp==="off"){toast("اختر صوت أول");return}try{if(!fsndUrl[tp])fsndUrl[tp]=URL.createObjectURL(makeNoiseWav(tp));const a=new Audio(fsndUrl[tp]);a.play().catch(()=>{});setTimeout(()=>a.pause(),3000)}catch(e){}};
 $("#sfxOn").onchange=e=>{try{localStorage.setItem(SFX_LS,e.target.checked?"1":"0")}catch(_){}if(e.target.checked)sfx("g")};
 $("#hapOn").onchange=e=>{try{localStorage.setItem(HAP_LS,e.target.checked?"1":"0")}catch(_){}if(e.target.checked)vib(40)};
+$("#lockCopy").onclick=async()=>{const u=lockUrl();if(!u)return;toast(await copyText(u)?"📋 نسخت الرابط · الصقه في «الحصول على محتويات URL»":"انسخه بنفسك من المربع تحت")};
+$("#lockTest").onclick=lockTest;$("#lockUrl").onfocus=e=>{try{e.target.select()}catch(_){}};
 $("#sfxTest").onclick=()=>{const was=sfxOn();if(!was)toast("الأصوات مقفلة، فعّلها فوق");else{sfx("j");vib([40,40,90])}};
 $("#fiveBar").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fiveAct(e)}};
 window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(PAGES.some(p=>p[0]===h)&&h!==st.page)setPage(h)});
@@ -6737,7 +6784,7 @@ async function akReview(id,a,signal){let u8=null;
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.6.3";
+const RN_DEV="ghrunner",APPV="20.7";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&+o.at>0?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
