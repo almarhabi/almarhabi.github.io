@@ -1,0 +1,32 @@
+# Signs the «قفل المذاكرة» shortcut (tools/shortcut/lock.plist) on a Mac, so the iPhone can add it in one tap.
+name: shortcut
+on:
+  workflow_dispatch:
+  push:
+    paths: [tools/shortcut/lock.plist, .github/workflows/shortcut.yml]
+permissions:
+  contents: write
+concurrency: shortcut
+jobs:
+  sign:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: sign
+        run: |
+          sw_vers
+          plutil -lint tools/shortcut/lock.plist
+          cp tools/shortcut/lock.plist "$RUNNER_TEMP/قفل المذاكرة.shortcut"
+          ok=""
+          for m in anyone people-who-know-me; do
+            if shortcuts sign --mode "$m" --input "$RUNNER_TEMP/قفل المذاكرة.shortcut" --output "$RUNNER_TEMP/signed-$m.shortcut" 2>&1; then echo "signed: $m"; ok="$m"; break; else echo "sign failed: $m"; fi
+          done
+          ls -la "$RUNNER_TEMP"
+          if [ -n "$ok" ]; then
+            cp "$RUNNER_TEMP/signed-$ok.shortcut" tools/shortcut/lock.shortcut
+            git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add tools/shortcut/lock.shortcut
+            git commit -m "signed shortcut ($ok)" && git push || true
+          else
+            echo "::warning::could not sign the shortcut on this Mac"
+          fi
