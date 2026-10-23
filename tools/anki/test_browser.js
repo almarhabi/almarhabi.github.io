@@ -21,6 +21,21 @@ await p.evaluate(async id=>{
 },id);
 await check('full two-stage generation preserves objectives, budget and extra weak card',async()=>{const d=await p.evaluate(()=>({v:testDeck.v,cap:testDeck.count.cap,main:testDeck.qa.main,extra:testDeck.qa.extras,cov:testDeck.qa.unO.length,out:testDeck.out}));assert.equal(d.v,3);assert.equal(d.cap,2);assert.equal(d.main,2);assert.equal(d.extra,1);assert.equal(d.cov,0);assert(d.out.every(c=>c.objective));});
 await check('all AI stages receive the same-file objectives and full numbered pages',async()=>{const calls=await p.evaluate(()=>window.calls);assert.equal(calls.length,2);for(const c of calls){assert(c.data.includes('Explain receptor signaling'));assert(c.data.includes('--- PAGE 1 ---'));assert(c.data.includes('--- END PAGE 4 ---'));assert.equal(c.effort,'high');assert.equal(c.over,true)}assert(calls[1].data.includes('OBJECTIVES FROM THIS SAME LECTURE'));});
+await check('new 15-page split sends complete boundaries and imports as 8 + 7 while saved clips stay intact',async()=>{
+const result=await p.evaluate(async id=>{
+  const oldSource=srcPages,oldCall=aiCall,oldSlides=await aiGet('slides',id),oldMark=mk(id).clips;
+  const requests=[];
+  try{
+    const pages=Array.from({length:15},(_,i)=>i===0?'Objectives: Explain receptor signaling. Identify a clinical finding.':'Lecture page '+(i+1)+': Detailed mechanism and clinical response material.');
+    srcPages=async()=>({pages,images:[],name:'Split.pdf'});
+    aiCall=async q=>{requests.push(q);const nums=[...q.data.matchAll(/--- PAGE (\d+) ---/g)].map(m=>+m[1]);const json={lecture:label(BY_ID[id]),clips:[{from:nums[0],to:nums.at(-1),title:'Mechanisms',ar:'الآليات',min:15,hook:'Why?',keys:['Signaling'],type:'why',prompt:'Explain'}]};if(!q.check(json))throw new Error('Real split validator rejected planned boundaries');return{json}};
+    const out=await aiSplit(id,{},()=>{},new AbortController().signal),parsed=parseClips(out.json,BY_ID[id]);
+    const manual=parseClips(JSON.stringify({slides:13,clips:[{from:1,to:7,keys:['first']},{from:8,to:13,keys:['tail']}]}),BY_ID[id]);
+    return{err:parsed.err,lengths:parsed.c.map(c=>c.t-c.f+1),manualErr:manual.err,manualLengths:manual.c.map(c=>c.t-c.f+1),unchanged:mk(id).clips===oldMark,requests:requests.map(q=>({data:q.data,rules:q.rules}))};
+  }finally{srcPages=oldSource;aiCall=oldCall;await aiPut('slides',id,oldSlides)}
+},id);
+assert.equal(result.err,undefined);assert.deepEqual(result.lengths,[8,7]);assert.equal(result.manualErr,undefined);assert.deepEqual(result.manualLengths,[13]);assert(result.unchanged);assert.equal(result.requests.length,2);assert(result.requests[0].data.includes('Objectives: Explain receptor signaling'));assert(result.requests[0].data.includes('--- END PAGE 8 ---'));assert(result.requests[1].data.includes('--- PAGE 9 ---'));assert(result.requests[1].data.includes('--- END PAGE 15 ---'));assert(result.requests.every(q=>q.rules.includes('AT LEAST 7 pages')));
+});
 await p.evaluate(id=>sheetAnki(id),id);await p.waitForSelector('#akDelete');
 await check('deck sheet shows objective coverage, command input and deletion',async()=>{assert(await p.locator('#akBox').innerText().then(t=>t.includes('خريطة أهداف المحاضرة')&&t.includes('Overflow')));assert(await p.locator('#akCommand').count());assert(await p.locator('#akDelete').count());});
 await check('delete requires a second tap and clears deck bytes and ANKI marks only',async()=>{await p.evaluate(id=>{quietPatch(id,{studied:'2026-10-20',cards:3,anki:'2026-10-20',ak:JSON.stringify({n:3})});return aiPut('decks',id+'|apkg',{job:'abcdefgh1',u8:new Uint8Array([80,75,1])})},id);await p.waitForTimeout(400);await p.locator('#akDelete').click();assert(await p.evaluate(id=>!!mk(id).anki,id));await p.waitForTimeout(400);await p.locator('#akDelete').click();await p.waitForSelector('#akGo',{state:'attached',timeout:5000});const state=await p.evaluate(async id=>({mark:mk(id),deck:await aiGet('decks',id),bytes:await aiGet('decks',id+'|apkg')}),id);assert(state.mark.akx>0);assert.equal(state.mark.anki,false);assert.equal(state.mark.studied,'2026-10-20');assert(!state.deck);assert(!state.bytes);});

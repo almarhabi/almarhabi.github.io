@@ -25,7 +25,23 @@ check('letters balanced ±1, no three identical, options move with explanation',
 check('synced deletion rejects stale decks',()=>{context.S.marks.lecture={akx:Date.now()+1000};assert.equal(run('akDeckOK(D)'),false);assert.throws(()=>run('akEnsureLive(D)'),/abort/)});
 // Check the real split/page functions without starting the app.
 for(const [a,b] of [['const lectureText=','// squeeze:'],['const spSlideLines=','const SPLIT_RULES='],['function spPlan(lines){','const SPLIT_PART_S=']])vm.runInContext(html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a))),context);
-check('1–500 pages split continuously into <=7 pages per part',()=>{for(let n=1;n<=500;n++){context.lines=Array(n).fill('content');const p=run('spPlan(lines)');assert.equal(p[0].a,1);assert.equal(p.at(-1).b,n);for(let i=0;i<p.length;i++){assert(p[i].b-p[i].a+1<=7);if(n>=4)assert(p[i].b-p[i].a+1>=4);if(i)assert.equal(p[i].a,p[i-1].b+1)}}});
+check('1–500 pages split continuously into balanced parts of at least 7 pages',()=>{for(let n=1;n<=500;n++){context.lines=Array(n).fill('content');const p=run('spPlan(lines)');assert.equal(p[0].a,1);assert.equal(p.at(-1).b,n);for(let i=0;i<p.length;i++){assert.equal(p.length,Math.max(1,Math.floor(n/7)));assert(p[i].b-p[i].a+1>=Math.min(n,7));assert(p[i].b-p[i].a+1<=Math.ceil(n/p.length));assert(run(`spValidPart([{from:${p[i].a},to:${p[i].b}}],{a:${p[i].a},b:${p[i].b}})`));if(i)assert.equal(p[i].a,p[i-1].b+1)}}});
 check('page delimiters retain full objectives and dense slide tails',()=>{context.pages=['Objectives\nExplain mechanisms.','x'.repeat(6000)+'END_OF_DENSE_PAGE'];const text=run('lectureText(pages)');assert(text.includes('END_OF_DENSE_PAGE'));assert(text.includes('--- PAGE 1 ---'));assert(text.includes('--- END PAGE 2 ---'));assert.equal(run('akPageText(lectureText(pages))'),text);assert.match(run('spSlideLines({lines:["S1: Goals","S2: Data"]},{a:1,b:2},[])'),/--- END PAGE 1 ---\n--- PAGE 2 ---/)});
-check('split response rejects oversized ranges and gaps',()=>{assert.equal(run('spValidPart([{from:1,to:7}],{a:1,b:7})'),true);assert.equal(run('spValidPart([{from:1,to:8}],{a:1,b:8})'),false);assert.equal(run('spValidPart([{from:1,to:3},{from:5,to:7}],{a:1,b:7})'),false)});
+check('split response accepts long and short-whole parts, rejects short fragments, gaps and overlap',()=>{
+for(const n of [1,6,7,8,13,14,15])assert.equal(run(`spValidPart([{from:1,to:${n}}],{a:1,b:${n}})`),true);
+for(const clips of [[{from:1,to:6},{from:7,to:14}],[{from:1,to:7},{from:9,to:15}],[{from:1,to:8},{from:8,to:15}],[{from:1,to:16}]]){context.clips=clips;assert.equal(run('spValidPart(clips,{a:1,b:15})'),false)}
+assert.equal(run('spValidPart([{from:1,to:8},{from:9,to:15}],{a:1,b:15})'),true);
+});
+check('ANKI prompt remains verbatim and adapter requires existing same-file objectives',()=>{
+assert.equal(run('AK_PROMPT').trim(),fs.readFileSync(path.join(__dirname,'PROMPT.md'),'utf8').trim());
+assert.match(run('AK_SITE'),/never infer replacements/);
+assert.match(run('AK_SITE'),/extra card OUTSIDE the main cap/);
+});
+vm.runInContext(html.slice(html.indexOf('const MIN_SL='),html.indexOf('// clips saved before the floor existed:')),context);
+check('new short clips merge; legacy floor remains explicitly available',()=>{
+context.shortClips=[{f:1,t:7,k:['one'],mi:10},{f:8,t:12,k:['two'],mi:8}];
+assert.equal(run('clipFloor(shortClips)'),1);assert.equal(run('shortClips[0].t'),12);
+context.oldClips=[{f:1,t:4,k:[],mi:10},{f:5,t:8,k:[],mi:10}];
+assert.equal(run('clipFloor(oldClips,4)'),0);assert.equal(run('oldClips.length'),2);
+});
 console.log(`${passed} regression checks passed`);

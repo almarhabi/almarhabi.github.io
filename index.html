@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-W8vNGJ5Ndrg19RvJb64q9/sEiHFU5GQzddKJyeQiVZ0=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-0kqungZ6DPGngEb7bwTdbTYOYshsvurKIJR2F1BZEmo=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="جدول مذاكرة الطب، تنظيم المحاضرات والمراجعات، ومقاطع الدراسة وبطاقات Anki.">
 <link rel="canonical" href="https://almarhabi.github.io/">
@@ -1533,7 +1533,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.10</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.11</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -3595,7 +3595,7 @@ function clipPrompt(b){
 "المطلوب: قسّم المحاضرة إلى «مقاطع» مذاكرة قصيرة، وجهّز لكل مقطع سؤال تشويق ونقاط مفتاحية وسؤال تفريغ، وأعطني النتيجة JSON فقط.",
 "",
 "قواعد التقسيم:",
-"1. المقطع من 4 إلى 7 شرائح، و7 حد أقصى؛ المحاضرة الأقصر من 4 شرائح تبقى مقطعًا واحدًا، أو تقريبًا 10 إلى 15 دقيقة مذاكرة. الشرائح الكثيفة (آليات، مسارات، جداول) مقطعها أقصر، وشرائح الصور والعناوين أطول.",
+"1. كل مقطع 7 صفحات على الأقل. المحاضرة الأقصر من 7 صفحات تبقى مقطعًا واحدًا. وزّع الصفحات بالتوازن، وادمج الباقي القصير مع المقطع السابق؛ لا تحذف أي صفحة. قدّر وقت المذاكرة حسب كثافة المحتوى.",
 "2. لا تقطع فكرة أو آلية في نصها؛ حدود المقطع تكون عند تغيّر الموضوع.",
 "3. غطِّ كل الشرائح بالترتيب بدون فراغات ولا تداخل: أول مقطع يبدأ من الشريحة 1، وكل مقطع يبدأ بعد نهاية اللي قبله مباشرة، وآخر مقطع ينتهي عند آخر شريحة.",
 "4. شرائح الغلاف والأهداف (Objectives) والمراجع ادمجها مع أقرب مقطع.",
@@ -3626,10 +3626,10 @@ function clipPrompt(b){
   ].join("\n");
 }
 // Claude's reply → clean clips, or a clear Arabic reason why not
-// ✂️ the 4-slide floor: a clip under 4 slides joins its shorter neighbour (its key points and minutes go along)
-const MIN_SL=4;
-function clipFloor(c){let mg=0;if(!c.length||!(c[0].f>0))return 0;
-  for(let i=0;i<c.length&&c.length>1;){const x=c[i];if(x.t-x.f+1>=MIN_SL){i++;continue}
+// New clips have a 7-page floor; keep the historical 4-page migration for existing clips.
+const MIN_SL=7;
+function clipFloor(c,min=MIN_SL){let mg=0;if(!c.length||!(c[0].f>0))return 0;
+  for(let i=0;i<c.length&&c.length>1;){const x=c[i];if(x.t-x.f+1>=min){i++;continue}
     const L=i>0?c[i-1]:null,R=i<c.length-1?c[i+1]:null,t=!L?R:!R?L:(L.t-L.f<=R.t-R.f?L:R);
     t.f=Math.min(t.f,x.f);t.t=Math.max(t.t,x.t);t.k=[...t.k,...x.k].slice(0,6);t.mi=Math.min(60,t.mi+x.mi);c.splice(i,1);mg++}
   return mg}
@@ -3638,9 +3638,9 @@ function clipFloorAll(){if(!achReady||(syncPlanned()&&!merged))return;const a=ac
   ALL.filter(needsStudy).forEach(b=>{if(a&&a.id===b.id)return;const o=sjson(mk(b.id).clips,null);if(!isObj(o)||!Array.isArray(o.c)||o.c.length<2)return;
     const p=cprOf(b.id);if(p.i>0||p.t.some(Boolean)||p.r.some(Boolean)||p.m.some(x=>x&&x.length))return;
     const c=o.c.filter(Array.isArray).map(x=>({f:Math.round(+x[0]||0),t:Math.round(+x[1]||0),h:x[2],ar:x[3],mi:+x[4]||0,hk:x[5],k:Array.isArray(x[6])?x[6]:[],y:x[7],p:x[8]}));
-    if(!clipFloor(c))return;n++;
+    if(!clipFloor(c,4))return;n++;
     savePatch(b.id,{clips:JSON.stringify({...o,c:c.map(x=>[x.f,x.t,x.h,x.ar,x.mi,x.hk,x.k,x.y,x.p])}),cpr:false})});
-  if(n)toast(`✂️ دمجت المقاطع القصيرة (أقل من ${MIN_SL} شرائح) في ${cnt(n,"محاضرة","محاضرتين","محاضرات")} ما بديتها`)}
+  if(n)toast(`✂️ دمجت المقاطع القصيرة (أقل من 4 شرائح) في ${cnt(n,"محاضرة","محاضرتين","محاضرات")} ما بديتها`)}
 [6e3,3e4,12e4].forEach(t=>setTimeout(()=>{try{clipFloorAll()}catch(e){console.warn(e)}},t));   // once your data has arrived from the sync
 function parseClips(text,b){
   let s=String(text||"").trim();if(!s)return{err:"الصق رد Claude أول."};
@@ -3664,9 +3664,8 @@ function parseClips(text,b){
   let n=Math.max(0,Math.round(+o.slides||0));const last=c[c.length-1].t;
   if(last&&n>last){c[c.length-1].t=n;warn.add(`مدّيت آخر مقطع لين آخر شريحة (${n}).`)}
   if(!n)n=last;
-  // ✂️ no clip under 4 slides (whoever split it: Kimi, a file, or Claude) — checked here in code, not only asked of the AI
+  // Apply the new minimum on import/generation only; stored clips and their progress keep their boundaries.
   {const mg=clipFloor(c);if(mg)warn.add(`دمجت ${mg===1?"مقطع قصير":mg+" مقاطع قصيرة"} (أقل من ${MIN_SL} شرائح) مع اللي جنبه.`)}
-  if(c.some(x=>x.f>0&&x.t-x.f+1>7))return{err:"المقطع لا يتجاوز 7 صفحات. اطلب إعادة تقسيم المقاطع الطويلة إلى 4–7 صفحات، مع أرقام البداية والنهاية."};
   c.forEach(x=>{if(!x.p)x.p=`اذكر كل اللي تتذكره عن ${x.h}`});
   if(c.some(x=>!x.k.length))warn.add("بعض المقاطع بدون نقاط مفتاحية، بتقارن فيها بالشرائح.");
   const want=norm(label(b)),got=norm(String(o.lecture||""));
@@ -6306,7 +6305,7 @@ function packSlides(pages,keepAll){
 const spSlideLines=(j,p,im)=>j.lines.slice(p.a-1,p.b).map((l,i)=>{const n=p.a+i,tags=(im||[]).map((x,k)=>x.p+1===n?`[IMAGE ${k+1}]`:"").filter(Boolean);return`--- PAGE ${n} ---\n${l}${tags.length?" "+tags.join(" "):""}\n--- END PAGE ${n} ---`}).join("\n");
 const SPLIT_RULES=`TASK=split
 Cut this lecture into short study clips. SLIDES have explicit --- PAGE n --- / --- END PAGE n --- boundaries, with "S<n>: text" within each page (each PAGE block is a separate slide; "·" = picture-only slide; "[IMAGE k]" = attached picture k is on that slide).
-Rules: each clip 4–7 slides (~10–15 min), NEVER more than 7 slides; a whole lecture shorter than 4 slides stays one clip; dense slides (mechanisms, pathways, tables) → shorter clips, picture/title slides → longer; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
+Rules: each clip has AT LEAST 7 pages; a whole lecture shorter than 7 pages stays one clip. Balance page counts and merge any short remainder into the previous clip. Estimate study minutes from content density; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
 Per clip: "title" English title as on the slides; "ar" Arabic title 2–5 words; "from"/"to" first and last slide; "min" expected minutes; "hook" ONE curiosity question in Arabic (English terms kept) that the clip answers, without giving the answer; "keys" 3–5 high-yield points in English, slide wording, one short line each; "type" the blurt type, one of free, child, exam, link, clinic, why, compare — vary them, never the same type in two clips in a row, no "link" in the first clip; "prompt" the blurt question in Arabic (English terms kept) matching its type: free: اذكر كل اللي تتذكره عن … · child: اشرح … لطفل عمره 10 سنين · exam: وش السؤال اللي ممكن يجي على … في الاختبار؟ وجاوبه · link: وش علاقة … بـ … (من مقطع سابق)؟ · clinic: وين تظهر الأهمية السريرية لـ …؟ · why: ليش …؟ · compare: قارن بين … و …
 "lecture" = the lecture title as on the slides.`;
 const SPLIT_S=sObj({lecture:S_STR,clips:sArr(sObj({title:S_STR,ar:S_STR,from:S_INT,to:S_INT,min:S_INT,hook:S_STR,keys:sArr(S_STR),type:{type:"string",enum:Object.keys(CLIP_T)},prompt:S_STR}))});
@@ -6509,15 +6508,15 @@ function spStart(lid,gid,name,stk){
   spAll()[lid]={lid,gid,name:String(name||""),at:Math.max(now,sj?sj.at+1:0),tAt:now,st:"text",img:aiImgOn(),keep:!!(clipsOf(lid)&&clipsRated(lid)),tries:0,run:0,pcMax:0,
     stk:(Array.isArray(stk)?stk:[]).filter(x=>isObj(x)&&typeof x.id==="string").map(x=>({id:x.id,n:String(x.n||"").slice(0,80)})).slice(0,12)};
   spSave();delete SPLIVE[lid];spRefresh(lid);spRun(lid)}
-// Each AI request contains at most 7 pages; balanced parts avoid short leftovers.
-function spPlan(lines){const n=lines.length;if(!n)return[];const P=Math.ceil(n/7),out=[];let a=1;
+// Balanced parts have at least 7 pages; a shorter whole lecture stays together.
+function spPlan(lines){const n=lines.length;if(!n)return[];const P=Math.max(1,Math.floor(n/7)),out=[];let a=1;
   for(let i=0;i<P;i++){const size=Math.floor(n/P)+(i<n%P?1:0);out.push({a,b:a+size-1});a+=size}return out}
 function spValidPart(clips,p){if(!Array.isArray(clips)||!clips.length)return false;let next=p.a;
-  for(const c of clips){if(!Number.isInteger(c.from)||!Number.isInteger(c.to)||c.from!==next||c.to<c.from||c.to>p.b||c.to-c.from+1>7)return false;next=c.to+1}return next===p.b+1}
+  for(const c of clips){if(!Number.isInteger(c.from)||!Number.isInteger(c.to)||c.from!==next||c.to<c.from||c.to>p.b||c.to-c.from+1<Math.min(7,p.b-p.a+1))return false;next=c.to+1}return next===p.b+1}
 const SPLIT_PART_S=sObj({lecture:S_STR,clips:SPLIT_S.properties.clips,figs:sArr(sObj({i:S_INT,d:S_STR}))});
 const SP_TYPES=["free","why","exam","compare","clinic","child"];
 function spPartRules(j,pi){return SPLIT_RULES.replace("(first clip starts at 1, last ends at the last slide)","(first clip starts at this PART's first slide, last ends at its last slide)")+
-  `\nThis request is ONE PART of the lecture (see the PART line): clip only these slides, keep their numbers as given. Start this part with type "${SP_TYPES[pi%SP_TYPES.length]}"${pi===0?' (never "link" first)':""}.`+
+  `\nThis request is ONE PART of the lecture (see the PART line): clip only these slides, keep their numbers as given. If this entire PART has fewer than 7 pages (a short lecture or a resumed older job), keep it as ONE clip. Start this part with type "${SP_TYPES[pi%SP_TYPES.length]}"${pi===0?' (never "link" first)':""}.`+
   `\n"figs": for each IMAGE n attached after the text (if any), what it teaches in at most 45 English words (structure / stain / graph axes and trend / table key cells / flowchart steps with →; keep labels and numbers); decorative → "-". Use the pictures to understand the slides too. No images → empty list.`}
 // is this device's job still the one that counts? (cancelled from the other device, or a newer job started there → it goes, quietly)
 function spStillMine(lid,j){const x=+mk(lid).spx||0,sj=spjOf(lid);if(x&&x===j.at)return"x";if(sj&&sj.d!==SP_DEV&&(sj.at>j.at||sj.at===j.at&&sj.d>SP_DEV)&&sj.st!=="x")return"lost";return""}
@@ -6639,7 +6638,7 @@ const AK_PROMPT="ROLE\nYou are an expert medical educator and spaced-repetition 
 const AK_SITE=`SITE ADAPTER
 Return JSON only, in two stages. The site calculates the review cap, checks coverage, deals A–D evenly and builds the .apkg. Do not run code.
 The learning objectives are ALWAYS in the opening pages of this user's lecture file: inspect those pages first, preserve their exact wording and do not replace existing objectives with inferred ones. If the opening pages cannot be read, flag that instead of inventing replacement objectives.
-Stage 1: read the WHOLE lecture (STEP 0), extract its objectives verbatim (STEP 1), extract and score atomic units (STEPS 3–4). If and only if the lecture has no objectives, infer 3–6 and label them Inferred. Flag ambiguity instead of inventing facts.
+Stage 1: read the WHOLE lecture (STEP 0), extract its objectives verbatim from the opening pages (STEP 1), extract and score atomic units (STEPS 3–4). This user supplies objectives in every lecture: never infer replacements. If objectives are unreadable or missing from the extracted text, report the ambiguity instead of inventing facts or objectives. Preserve all objective text and page boundaries in the lecture context.
 Stage 2: use the attached objectives map AND full lecture, allocate, compress, write and audit (STEPS 5–8). The computed cap is an upper bound, never a target. The old D/3 rule and fixed type percentages do not apply. The main cap does NOT include the independent weak-spot allowance below.
 Pictures are supplied as [Figure: description] within their original pages. No image cards.
 Blurt and weak spots change unit priority (+2 missed/wrong, -2 recalled completely); each weak idea gets one extra card OUTSIDE the main cap unless already tested as a main key. Deduplicate ideas. Never invent medical facts.
