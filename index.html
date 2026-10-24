@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-0kqungZ6DPGngEb7bwTdbTYOYshsvurKIJR2F1BZEmo=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-ZohRBYeu32b/y/Ek5jD6Qgda5wvJKvWulZ9KCa7SqOw=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="جدول مذاكرة الطب، تنظيم المحاضرات والمراجعات، ومقاطع الدراسة وبطاقات Anki.">
 <link rel="canonical" href="https://almarhabi.github.io/">
@@ -1533,7 +1533,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.11</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.12</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -5567,6 +5567,7 @@ function aiErrMsg(e){const c=e&&e.code,s=e&&e.status,t=String(e&&e.text||"").toL
   if(c==="net")return aiCfg().proxy?"ما قدرت أوصل للبروكسي. تأكد من رابطه في الإعدادات":"المتصفح منع الاتصال المباشر بـ Kimi (CORS). شغّل البروكسي من الإعدادات ← 🤖 Kimi K3 ← متقدّم";
   if(c==="timeout")return"Kimi طوّل ما رد. جرّب مرة ثانية";
   if(c==="abort")return"وقّفته";
+  if(c==="splitreply")return "تعذّر قبول تقسيم Kimi: "+(e.text||"رد غير مكتمل");
   if(c==="bad")return"رد Kimi ما كان بالصيغة المطلوبة. جرّب مرة ثانية";
   if(c==="budget")return"وصلت حدّك اليومي من التوكنز (تغيّره من الإعدادات)";
   if(s===401)return"المفتاح غلط أو انتهى. تأكد منه في الإعدادات";
@@ -5655,9 +5656,9 @@ function aiRate(e){const t=String(e&&e.text||""),l=t.toLowerCase(),num=re=>{cons
 async function aiCall(o){
   const c0=aiCfg();if(!c0.key)throw aiErr("nokey");if(navigator.onLine===false)throw aiErr("offline");
   const used=aiTokToday();if(!o.fg&&used>=c0.budget*.8)throw aiErr("budget");if(o.fg&&used>=c0.budget&&!o.over)throw aiErr("budget");
-  let tries=0,bad=0,big=false,swapped=false,waited=0,soft=0;const patience=o.patience||(o.fg||RUNNER?15*6e4:2*6e4);
+  let tries=0,bad=0,big=false,swapped=false,waited=0,soft=0,correction="";const patience=o.patience||(o.fg||RUNNER?15*6e4:2*6e4);
   for(;;){
-    const c=aiCfg(),b=aiBody(o,c,big);let r;const t0=Date.now();
+    const c=aiCfg(),b=aiBody(o,c,big);if(correction)b.messages.push({role:"user",content:correction});let r;const t0=Date.now();
     const rel=await aiGate(tokEst(JSON.stringify(b.messages))+(b.max_tokens||b.max_completion_tokens||0),o.signal);
     if(o.onGo)try{o.onGo()}catch(e){}
     try{r=await aiFetch(c,b,o)}
@@ -5695,7 +5696,10 @@ async function aiCall(o){
     const hasTools=Array.isArray(r.msg.tool_calls)&&r.msg.tool_calls.length;
     if(r.fin==="length"&&!big&&!hasTools&&(!o.schema||aiJSON(r.msg.content)==null)){big=true;continue}   // the thinking ate the room: once more with double
     r.text=String(r.msg.content||"").trim();
-    if(o.schema&&!hasTools){r.json=aiJSON(r.text);if(r.json==null||(o.check&&!o.check(r.json))){if(bad<1){bad++;continue}throw aiErr("bad")}}
+    if(o.schema&&!hasTools){r.json=aiJSON(r.text);if(r.json==null||(o.check&&!o.check(r.json))){
+      const detail=o.invalid?(r.fin==="length"?"انقطع الرد قبل اكتماله بسبب حد طول الإجابة.":r.json==null?"الرد ليس JSON مكتملًا وصالحًا.":o.invalid(r.json)):"";
+      if(bad<1){bad++;if(o.invalid)correction="Your previous response failed validation: "+detail+"\nReturn the complete corrected JSON only. Follow the requested PART boundaries and exact clip count; use integer page numbers, preserve every supplied page, and do not restart numbering at 1. Keep explanations concise.";continue}
+      throw detail?aiErr("splitreply",null,0,detail):aiErr("bad")}}
     return r;
   }
 }
@@ -6319,7 +6323,7 @@ async function aiSplit(id,src,onStep,signal){
   await aiPut("slides",id,{at:Date.now(),n:pk.n,txt:lectureText(pages),full:true,name:f.name});
   onStep&&onStep(`🧠 Kimi يقسّم ${cnt1(pk.n,"شريحة وحدة","شريحتين","شرائح")}…`,pk);
   const lines=pk.txt.split("\n"),parts=spPlan(lines),clips=[];let lecture="";
-  for(let pi=0;pi<parts.length;pi++){const pt=parts[pi],j={lines},r=await aiCall({k:"split",rules:spPartRules(j,pi),data:`LECTURE «${label(b)}» · ${pk.n} slides\nPART ${pi+1}/${parts.length}: S${pt.a}–S${pt.b}\nSLIDES\n${spSlideLines(j,pt,[])}`,schema:SPLIT_S,effort:"high",max:8000,fg:true,signal,check:j=>spValidPart(j.clips,pt),onProg:p=>onStep&&onStep(`✍️ الجزء ${pi+1}/${parts.length} · ${p.c?"يكتب… "+kfmt(p.c):"يفكر…"}`,pk)});
+  for(let pi=0;pi<parts.length;pi++){const pt=parts[pi],j={lines,parts},r=await aiCall({k:"split",rules:spPartRules(j,pi),data:`LECTURE «${label(b)}» · ${pk.n} slides\nPART ${pi+1}/${parts.length}: S${pt.a}–S${pt.b}\nSLIDES\n${spSlideLines(j,pt,[])}`,schema:spReplySchema(pt),effort:"high",max:8000,fg:true,signal,check:j=>!spPartIssue(j,pt),invalid:j=>spPartIssue(j,pt),onProg:p=>onStep&&onStep(`✍️ الجزء ${pi+1}/${parts.length} · ${p.c?"يكتب… "+kfmt(p.c):"يفكر…"}`,pk)});
     lecture=lecture||r.json.lecture;clips.push(...r.json.clips)}
   const mg=spMerge({parts:parts.map((pt,i)=>({...pt,res:{lecture,clips:clips.filter(c=>+c.from>=pt.a&&+c.from<=pt.b)}}))});
   return{json:JSON.stringify({app:"uqu-clips",v:1,lecture:String(lecture||label(b)),slides:pk.n,clips:mg.clips}),pk,link:f.link||"",approx:!!f.approx,how:f.how||"",figs,imgs:(f.images||[]).length,seeErr,imgErr:f.imgErr||""}}
@@ -6512,11 +6516,22 @@ function spStart(lid,gid,name,stk){
 function spPlan(lines){const n=lines.length;if(!n)return[];const P=Math.max(1,Math.floor(n/7)),out=[];let a=1;
   for(let i=0;i<P;i++){const size=Math.floor(n/P)+(i<n%P?1:0);out.push({a,b:a+size-1});a+=size}return out}
 function spValidPart(clips,p){if(!Array.isArray(clips)||!clips.length)return false;let next=p.a;
-  for(const c of clips){if(!Number.isInteger(c.from)||!Number.isInteger(c.to)||c.from!==next||c.to<c.from||c.to>p.b||c.to-c.from+1<Math.min(7,p.b-p.a+1))return false;next=c.to+1}return next===p.b+1}
+  for(const c of clips){if(!isObj(c)||!Number.isInteger(c.from)||!Number.isInteger(c.to)||c.from!==next||c.to<c.from||c.to>p.b||c.to-c.from+1<Math.min(7,p.b-p.a+1))return false;next=c.to+1}return next===p.b+1}
 const SPLIT_PART_S=sObj({lecture:S_STR,clips:SPLIT_S.properties.clips,figs:sArr(sObj({i:S_INT,d:S_STR}))});
+// A planned part has 7–13 pages (or is a short whole lecture): only ONE clip can meet the floor.
+function spReplySchema(p,figs=false){const base=figs?SPLIT_PART_S:SPLIT_S;if(p.b-p.a+1>=14)return base;
+  const item=SPLIT_S.properties.clips.items;
+  return{...base,properties:{...base.properties,clips:{type:"array",minItems:1,maxItems:1,items:{...item,properties:{...item.properties,from:{type:"integer",enum:[p.a]},to:{type:"integer",enum:[p.b]}}}}}}}
+function spPartIssue(reply,p){const clips=isObj(reply)&&reply.clips,span=p.b-p.a+1;
+  if(!Array.isArray(clips)||!clips.length)return"الرد لا يحتوي على قائمة clips غير فارغة.";
+  if(clips.some(c=>!isObj(c)||!Number.isInteger(c.from)||!Number.isInteger(c.to)))return"أرقام بداية ونهاية الصفحات يجب أن تكون أعدادًا صحيحة داخل كل مقطع.";
+  if(span<14&&(clips.length!==1||clips[0].from!==p.a||clips[0].to!==p.b))return`الجزء من الصفحة ${p.a} إلى ${p.b} يجب أن يكون مقطعًا واحدًا: from=${p.a}, to=${p.b}.`;
+  if(!spValidPart(clips,p))return`حدود الجزء ${p.a}–${p.b} غير مكتملة أو متداخلة، أو يوجد مقطع أقصر من 7 صفحات.`;
+  return""}
 const SP_TYPES=["free","why","exam","compare","clinic","child"];
-function spPartRules(j,pi){return SPLIT_RULES.replace("(first clip starts at 1, last ends at the last slide)","(first clip starts at this PART's first slide, last ends at its last slide)")+
+function spPartRules(j,pi){const p=j.parts&&j.parts[pi];return SPLIT_RULES.replace("(first clip starts at 1, last ends at the last slide)","(first clip starts at this PART's first slide, last ends at its last slide)")+
   `\nThis request is ONE PART of the lecture (see the PART line): clip only these slides, keep their numbers as given. If this entire PART has fewer than 7 pages (a short lecture or a resumed older job), keep it as ONE clip. Start this part with type "${SP_TYPES[pi%SP_TYPES.length]}"${pi===0?' (never "link" first)':""}.`+
+  (p&&p.b-p.a+1<14?`\nEXACT OUTPUT: clips must contain exactly ONE item, with integer from=${p.a} and to=${p.b}. These are absolute lecture page numbers. Do NOT split this part into smaller clips or omit its title/objectives/reference pages.`:"")+
   `\n"figs": for each IMAGE n attached after the text (if any), what it teaches in at most 45 English words (structure / stain / graph axes and trend / table key cells / flowchart steps with →; keep labels and numbers); decorative → "-". Use the pictures to understand the slides too. No images → empty list.`}
 // is this device's job still the one that counts? (cancelled from the other device, or a newer job started there → it goes, quietly)
 function spStillMine(lid,j){const x=+mk(lid).spx||0,sj=spjOf(lid);if(x&&x===j.at)return"x";if(sj&&sj.d!==SP_DEV&&(sj.at>j.at||sj.at===j.at&&sj.d>SP_DEV)&&sj.st!=="x")return"lost";return""}
@@ -6545,7 +6560,7 @@ async function spRun(lid){
         const im=j.imgs.filter(x=>x.p+1>=p.a&&x.p+1<=p.b).slice(0,8);
         const data=`LECTURE «${label(b)}»${b.dr?` · ${b.dr}`:""} · ${hrs(b)}h · ${j.n} ${j.approx?"sections (no slide breaks in this file: S<n> = section n)":"slides"}\nPART ${pi+1} of ${j.parts.length}: S${p.a}–S${p.b}\nSLIDES\n${spSlideLines(j,p,im)}${im.length?`\nIMAGES\n${im.map((x,i)=>`IMAGE ${i+1} · slide S${x.p+1}`).join("\n")}`:""}`;
         p.st="run";(SPLIVE[lid]||(SPLIVE[lid]={}))[pi]={c:0,s:0,t0:0};spSave();spRefresh(lid);
-        try{const r=await aiCall({k:"split",rules:spPartRules(j,pi),data,schema:SPLIT_PART_S,effort:"low",max:8000,fg:true,signal,check:x=>spValidPart(x.clips,p),
+        try{const r=await aiCall({k:"split",rules:spPartRules(j,pi),data,schema:spReplySchema(p,true),effort:"high",max:8000,fg:true,signal,check:x=>!spPartIssue(x,p),invalid:x=>spPartIssue(x,p),
             onProg:pr=>{const L=SPLIVE[lid];if(L)L[pi]={...(L[pi]||{}),c:pr.c||0,s:pr.s||0,w:null};spTick(lid)},
             onGo:()=>{const L=SPLIVE[lid];if(L&&L[pi]&&!L[pi].t0)L[pi].t0=Date.now();if(L&&L[pi])L[pi].w=null;spTick(lid)},
             onWait:w=>{const L=SPLIVE[lid];if(L)L[pi]={...(L[pi]||{}),w:{...w,at:Date.now()}};spTick(lid)},
