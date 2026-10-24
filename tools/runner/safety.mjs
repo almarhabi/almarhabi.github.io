@@ -59,8 +59,9 @@ export function safeState(input) {
   const usage = cleanJSON(input["uqu-aiuse"]);
   if (object(usage) && object(usage.d) && object(usage.t)) {
     const meter = x => object(x) && ["i", "c", "o", "n"].every(k => finite(x[k] ?? 0, 1e15));
-    const d = Object.fromEntries(Object.entries(usage.d).filter(([k, v]) => /^\d{4}-\d\d-\d\d$/.test(k) && meter(v)).sort().slice(-30).map(([k, v]) => [k, Object.fromEntries(["i", "c", "o", "n"].map(f => [f, v[f] || 0]))]));
-    if (meter(usage.t)) state["uqu-aiuse"] = JSON.stringify({ d, t: Object.fromEntries(["i", "c", "o", "n"].map(k => [k, usage.t[k] || 0])), log: [] });
+    const cleanMeter = x => ({...Object.fromEntries(["i", "c", "o", "n"].map(k => [k, x[k] || 0])), ...(finite(x.usd, 1e15) ? {usd: x.usd} : {})});
+    const d = Object.fromEntries(Object.entries(usage.d).filter(([k, v]) => /^\d{4}-\d\d-\d\d$/.test(k) && meter(v)).sort().slice(-30).map(([k, v]) => [k, cleanMeter(v)]));
+    if (meter(usage.t)) state["uqu-aiuse"] = JSON.stringify({ d, t: cleanMeter(usage.t), log: [] });
   }
   const tries = cleanJSON(input["uqu-aitry"]);
   if (object(tries) && /^\d{4}-\d\d-\d\d$/.test(tries.d || "") && object(tries.k)) {
@@ -85,6 +86,7 @@ export function safeState(input) {
   if (object(limits)) {
     const lim = object(limits.lim) ? Object.fromEntries(["at", "conc", "rpm", "tpm"].filter(k => finite(limits.lim[k])).map(k => [k, limits.lim[k]])) : null;
     const cap = object(limits.cap) ? Object.fromEntries(["mt", "eff", "fmt"].filter(k => own(limits.cap, k) && (typeof limits.cap[k] === "boolean" || ["schema", "object", "text", 1].includes(limits.cap[k]))).map(k => [k, limits.cap[k]])) : null;
+    if (cap && ["kimi-k3", "kimi-k3.1-pro"].includes(limits.cap.model)) cap.model = limits.cap.model;
     state["uqu-runlim"] = JSON.stringify({ lim, cap });
   }
   return state;

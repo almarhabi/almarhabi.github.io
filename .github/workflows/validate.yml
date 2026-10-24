@@ -76,6 +76,7 @@ jobs:
           node tools/audit/ai-regressions.js
           node tools/audit/ai-concurrency.cjs
           node tools/audit/ai-boundaries.cjs
+          node tools/audit/ai-model.cjs
           node tools/audit/ai-loader.cjs
           node tools/audit/integration-regressions.cjs
           node tools/audit/state-regressions.cjs
