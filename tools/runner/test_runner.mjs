@@ -124,3 +124,19 @@ test("a frozen page cannot bypass the runner deadline or retain its resources", 
  assert.equal(await runRunner(env,{playwright:stub.playwright,dispatcher:agent,operationTimeout:20}),1);
  assert(Date.now()-start<1000);assert(agent.closed);assert(stub.calls.closed);assert(!fs.existsSync(stub.calls.profile));
 });
+
+test("workflow marks missing runner configuration without exposing settings or starting work", async () => {
+  const { execFileSync } = await import('node:child_process');
+  const source = fs.readFileSync(new URL('../../.github/workflows/runner.yml', import.meta.url),'utf8');
+  const block=source.match(/      - name: Check background runner configuration[\s\S]*?        run: \|\n([\s\S]*?)\n      - /);
+  assert(block);const script=block[1].split('\n').map(s=>s.replace(/^          /,'')).join('\n');
+  for(const value of ['', ' \n\t ', 'mock-runner-config-secret']){
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),'uqu-workflow-'));
+    try{
+      const output=path.join(dir,'output'),summary=path.join(dir,'summary');
+      const log=execFileSync('bash',['-e','-c',script],{encoding:'utf8',env:{...process.env,UQU_RUNNER:value,GITHUB_OUTPUT:output,GITHUB_STEP_SUMMARY:summary}});
+      const configured=!!value.trim();assert.equal(fs.readFileSync(output,'utf8').trim(),'configured='+configured);
+      if(!configured){assert(log.includes('::warning::'));assert(fs.readFileSync(summary,'utf8').includes('No lecture splitting'));}else{assert(!log.includes(value));assert(!fs.existsSync(summary));}
+    }finally{fs.rmSync(dir,{recursive:true,force:true});}
+  }
+});

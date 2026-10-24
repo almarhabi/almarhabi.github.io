@@ -24,21 +24,39 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 58
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check background runner configuration
+        id: runner-config
+        env:
+          UQU_RUNNER: ${{ secrets.UQU_RUNNER }}
+        shell: bash
+        run: |
+          if [[ -z "${UQU_RUNNER//[[:space:]]/}" ]]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::UQU_RUNNER is not configured. No background work was performed."
+            printf '%s\n' '## Background runner is not configured' 'No lecture splitting, Anki generation, or synchronization ran.' 'In the site: Settings → AI → Anki on GitHub → Background runner → Copy settings. Save them as the repository Actions secret UQU_RUNNER, then use Test in the site.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.runner-config.outputs.configured == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           sparse-checkout: |
             index.html
             tools/runner
           persist-credentials: false
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - if: steps.runner-config.outputs.configured == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
 
       - name: Install playwright-core (Chrome is already on the runner)
+        if: steps.runner-config.outputs.configured == 'true'
         run: npm ci --prefix tools/runner --ignore-scripts --no-audit --no-fund --loglevel=error
 
       - name: Restore the runner's small state (usage, tries, Kimi limits; never a key)
+        if: steps.runner-config.outputs.configured == 'true'
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .runner-state
@@ -46,6 +64,7 @@ jobs:
           restore-keys: runner-state-v2-
 
       - name: Run
+        if: steps.runner-config.outputs.configured == 'true'
         env:
           UQU_RUNNER: ${{ secrets.UQU_RUNNER }}
           GH_TOKEN: ${{ github.token }}
@@ -54,7 +73,7 @@ jobs:
         run: node tools/runner/run.mjs
 
       - name: Keep the state for the next run
-        if: always() && hashFiles('.runner-state/state.json') != ''
+        if: always() && steps.runner-config.outputs.configured == 'true' && hashFiles('.runner-state/state.json') != ''
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .runner-state

@@ -15,7 +15,7 @@ await p.evaluate(async id=>{
   const source={story:'A causal story.',course:'Medicine',objectives:[{id:'O1',text:'Explain receptor signaling',verb:'Explain',slides:[1,2],inferred:false,weight:3},{id:'O2',text:'Identify a clinical finding',verb:'Identify',slides:[1,3],inferred:false,weight:1}],facts:[{id:'F1',s:2,sec:'Signaling',f:'Receptor inhibition reduces downstream signaling.',fam:'Pathways',obj:['O1'],alignment:3,exam:2,centrality:2,confusability:1,clinical:1,blurt:0,emphasized:true},{id:'F2',s:3,sec:'Findings',f:'The clinical response reflects a different physiological adaptation.',fam:'Responses',obj:['O2'],alignment:3,exam:2,centrality:2,confusability:1,clinical:1,blurt:0,emphasized:true}],dropped:[],ambiguous:[],errs:[],weak:[{n:1,ids:['F1']},{n:2,ids:['W1']}],extra:[{id:'W1',s:4,sec:'Weak spots',f:'A separate forgotten causal connection.',fam:'Pathways',obj:['O1']}]};
   const stems=['A kinase is blocked following ligand binding. Which response follows?','A child develops progressive weakness after exercise. Which cellular change explains this pattern?','Following removal of an inhibitory signal, which physiological outcome occurs?'];
   const cards=['F1','F2','W1'].map((key,i)=>({type:'Mechanism',section:i===1?'Findings':'Signaling',hy:true,stem:stems[i],options:{A:'Reduced signaling',B:'Enhanced secretion',C:'Preserved transport',D:'Reversed inhibition'},answer:'A',explain:'The relevant pathway mediates the observed response.',why:{A:'',B:'This belongs to a different pathway.',C:'This belongs to another response.',D:'This characterizes another process.'},warning:'',source:'Slide '+(i+2),keys:[key],ids:[key],obj:[i===1?'O2':'O1'],tier:'T1',weak:i===2}));
-  window.calls=[];aiCall=async q=>{window.calls.push({k:q.k,data:q.data,rules:q.rules,effort:q.effort,over:q.over});return{json:q.k==='anki1'?source:{cards}}};
+  window.calls=[];aiFetch=async(c,body,q)=>{window.calls.push({k:q.k,data:q.data,rules:q.rules,effort:q.effort,over:q.over});return{msg:{content:JSON.stringify(q.k==='anki1'?source:{cards})},fin:'stop',usage:{},ms:1}};
   await aiPut('slides',id,{full:true,n:4,txt:lectureText(['Objectives\nExplain receptor signaling\nIdentify a clinical finding','Receptor inhibition reduces downstream signaling.','Clinical response details.','A separate forgotten causal connection.']),name:'Lecture.pdf'});
   window.testDeck=await akGenerate(id,2,()=>{},new AbortController().signal);
 },id);
@@ -35,6 +35,31 @@ const result=await p.evaluate(async id=>{
   }finally{srcPages=oldSource;aiCall=oldCall;await aiPut('slides',id,oldSlides)}
 },id);
 assert.equal(result.err,undefined);assert.deepEqual(result.lengths,[8,7]);assert.equal(result.manualErr,undefined);assert.deepEqual(result.manualLengths,[13]);assert(result.unchanged);assert.equal(result.requests.length,2);assert(result.requests[0].data.includes('Objectives: Explain receptor signaling'));assert(result.requests[0].data.includes('--- END PAGE 8 ---'));assert(result.requests[1].data.includes('--- PAGE 9 ---'));assert(result.requests[1].data.includes('--- END PAGE 15 ---'));assert(result.requests.every(q=>q.rules.includes('AT LEAST 7 pages')&&q.rules.includes('EXACT OUTPUT')));
+});
+await check('real client → Python builder → APKG → token-free second device preserves the deck and deletion',async()=>{
+  const dir=fs.mkdtempSync(path.join(require('os').tmpdir(),'uqu-pipeline-'));let job='',posted=null,dispatches=0,routeFailure=null,peer=null;
+  const api=async route=>{try{
+    const req=route.request(),url=new URL(req.url()),input=url.pathname.match(/\/in\/([a-z0-9]+)\.json$/);
+    if(req.method()==='PUT'&&input){job=input[1];posted=JSON.parse(Buffer.from(req.postDataJSON().content,'base64').toString('utf8'));
+      const code='import sys,json;sys.path.insert(0,sys.argv[1]);from job import build;st=build(sys.argv[2],json.load(sys.stdin),sys.argv[3]);assert st["ok"],st;open(sys.argv[3]+"/"+sys.argv[2]+".json","w").write(json.dumps(st))';
+      require('child_process').execFileSync(process.env.PYTHON||'python3',['-c',code,path.join(__dirname),job,dir],{input:JSON.stringify(posted),timeout:30000});
+      return route.fulfill({json:{content:{sha:'test-sha'}}});
+    }
+    if(req.method()==='POST'&&url.pathname.endsWith('/dispatches')){dispatches++;return route.fulfill({status:204})}
+    const out=url.pathname.match(/\/out\/([a-z0-9]+)\.(json|apkg)$/);
+    if(out&&out[1]===job)return route.fulfill({contentType:out[2]==='json'?'application/json':'application/octet-stream',body:fs.readFileSync(path.join(dir,job+'.'+out[2]))});
+    return route.fulfill({status:404,json:{message:'not found'}});
+  }catch(e){routeFailure=e;return route.fulfill({status:500,json:{message:'test backend failed'}})}};
+  try{
+    await ctx.route('https://api.github.com/**',api);
+    const built=await p.evaluate(async()=>{aiSet({gh:'mock-github-token-for-tests-only'});const bytes=await ghBuild(testDeck,()=>{},new AbortController().signal);return{bytes:Array.from(bytes),ref:akjOf(testDeck.id)}});
+    assert.equal(routeFailure,null);assert.equal(dispatches,1);assert.equal(posted.cards.length,3);assert.equal(posted.cap,2);assert.deepEqual(posted.objectives,['O1','O2']);assert.equal(posted.cards.filter(c=>c.weak).length,1);assert.equal(built.ref.j,job);
+    assert.deepEqual(Buffer.from(built.bytes),fs.readFileSync(path.join(dir,job+'.apkg')));
+    peer=await browser.newContext();await peer.route('**/*',r=>r.request().url()==='http://uqu.test/'?r.fulfill({contentType:'text/html',body:html}):r.abort());await peer.route('https://raw.githubusercontent.com/**',api);
+    const other=await peer.newPage();other.on('pageerror',e=>errors.push(e.message));await other.goto('http://uqu.test/');
+    const result=await other.evaluate(async({id,ref})=>{S.marks[id]={akj:JSON.stringify(ref)};const a=akjOf(id),review=await akReview(id,a),bytes=await akjBytes(id,a);const token=ghOn();await akDelete(id);let canceled=false;try{await akjBytes(id,a)}catch(e){canceled=e.code==='abort'}return{token,cards:review.cards.length,objectives:review.objectives.map(o=>o.id),bytes:Array.from(bytes),canceled}},{id,ref:built.ref});
+    assert.equal(result.token,false);assert.equal(result.cards,3);assert.deepEqual(result.objectives,['O1','O2']);assert.deepEqual(result.bytes,built.bytes);assert(result.canceled);
+  }finally{await ctx.unroute('https://api.github.com/**',api);if(peer)await peer.close();fs.rmSync(dir,{recursive:true,force:true});await p.evaluate(()=>aiSet({gh:''}));}
 });
 await p.evaluate(id=>sheetAnki(id),id);await p.waitForSelector('#akDelete');
 await check('deck sheet shows objective coverage, command input and deletion',async()=>{assert(await p.locator('#akBox').innerText().then(t=>t.includes('خريطة أهداف المحاضرة')&&t.includes('Overflow')));assert(await p.locator('#akCommand').count());assert(await p.locator('#akDelete').count());});

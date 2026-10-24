@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-ZohRBYeu32b/y/Ek5jD6Qgda5wvJKvWulZ9KCa7SqOw=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-VAw8VlJNHXAwOyQail7kx+N5lNt4Gbg1NlbAkmT8QOo=' 'strict-dynamic' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="جدول مذاكرة الطب، تنظيم المحاضرات والمراجعات، ومقاطع الدراسة وبطاقات Anki.">
 <link rel="canonical" href="https://almarhabi.github.io/">
@@ -1533,7 +1533,7 @@ html.lowmo .segthumb,html.lowmo .chk input::before,html.lowmo #pgTitle{transitio
       <label class="chk"><input type="checkbox" id="moHi"> مؤثرات حركية قوية (اهتزاز الشاشة، وميض، انفجار قصاصات)</label>
       <label class="chk"><input type="checkbox" id="hapOn"> اهتزاز الجهاز (الآيفون و Android؛ الآيباد ما فيه محرك اهتزاز)</label>
       <button class="btn sm" id="sfxTest" style="align-self:flex-start">🔔 جرّب الصوت</button></section>
-    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.12</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
+    <p class="note" style="margin:0;text-align:center">الإصدار <b class="en">20.13</b> · 🤖 Kimi K3: أسئلة الصبح، المدرب، حالة اليوم، السؤال المعلّق، تقرير الأحد، التوقع، خطة الاختبار، اسأل بياناتك، التقسيم من Drive (بنسبة على جهازيك)، و ANKI ببرومبتك يبنيه GitHub</p>
   </section>
   <div id="pg-main" class="wrap">
   <div class="hub" id="hub"></div>
@@ -3595,7 +3595,7 @@ function clipPrompt(b){
 "المطلوب: قسّم المحاضرة إلى «مقاطع» مذاكرة قصيرة، وجهّز لكل مقطع سؤال تشويق ونقاط مفتاحية وسؤال تفريغ، وأعطني النتيجة JSON فقط.",
 "",
 "قواعد التقسيم:",
-"1. كل مقطع 7 صفحات على الأقل. المحاضرة الأقصر من 7 صفحات تبقى مقطعًا واحدًا. وزّع الصفحات بالتوازن، وادمج الباقي القصير مع المقطع السابق؛ لا تحذف أي صفحة. قدّر وقت المذاكرة حسب كثافة المحتوى.",
+"1. المفضّل أن يكون كل مقطع من 10 إلى 13 صفحة، والحد الأدنى 7 صفحات. المحاضرة الأقصر من 7 صفحات تبقى مقطعًا واحدًا. وزّع الصفحات بالتوازن، وادمج الباقي القصير مع المقطع السابق؛ لا تحذف أي صفحة. قدّر وقت المذاكرة حسب كثافة المحتوى.",
 "2. لا تقطع فكرة أو آلية في نصها؛ حدود المقطع تكون عند تغيّر الموضوع.",
 "3. غطِّ كل الشرائح بالترتيب بدون فراغات ولا تداخل: أول مقطع يبدأ من الشريحة 1، وكل مقطع يبدأ بعد نهاية اللي قبله مباشرة، وآخر مقطع ينتهي عند آخر شريحة.",
 "4. شرائح الغلاف والأهداف (Objectives) والمراجع ادمجها مع أقرب مقطع.",
@@ -6210,7 +6210,7 @@ async function aiFileRequest(url,options={},signal,limit=60e6,ms=90000){
     }else{bytes=new Uint8Array(await res.arrayBuffer());if(bytes.length>max)throw aiErr("drive",null,0,"big")}
     return{ok:res.ok,status:res.status,headers:res.headers,arrayBuffer:async()=>bytes.buffer,text:async()=>new TextDecoder().decode(bytes),json:async()=>JSON.parse(new TextDecoder().decode(bytes))}
   }catch(e){if(signal&&signal.aborted)throw aiErr("abort");if(ctl.signal.aborted)throw aiErr("drive",e,0,"timeout");if(e&&e.code)throw e;throw aiErr("drive",e,0,"net")}
-  finally{clearTimeout(timer);if(signal)signal.removeEventListener("abort",stop);if(reader){try{Promise.resolve(reader.cancel()).catch(()=>{})}catch(e){}try{reader.releaseLock()}catch(e){}}}
+  finally{ctl.abort();clearTimeout(timer);if(signal)signal.removeEventListener("abort",stop);if(reader){try{Promise.resolve(reader.cancel()).catch(()=>{})}catch(e){}try{reader.releaseLock()}catch(e){}}}
 }
 async function driveBytes(u,onStep,signal){
   const dr=!driveRef(u)&&directRef(u);
@@ -6309,7 +6309,7 @@ function packSlides(pages,keepAll){
 const spSlideLines=(j,p,im)=>j.lines.slice(p.a-1,p.b).map((l,i)=>{const n=p.a+i,tags=(im||[]).map((x,k)=>x.p+1===n?`[IMAGE ${k+1}]`:"").filter(Boolean);return`--- PAGE ${n} ---\n${l}${tags.length?" "+tags.join(" "):""}\n--- END PAGE ${n} ---`}).join("\n");
 const SPLIT_RULES=`TASK=split
 Cut this lecture into short study clips. SLIDES have explicit --- PAGE n --- / --- END PAGE n --- boundaries, with "S<n>: text" within each page (each PAGE block is a separate slide; "·" = picture-only slide; "[IMAGE k]" = attached picture k is on that slide).
-Rules: each clip has AT LEAST 7 pages; a whole lecture shorter than 7 pages stays one clip. Balance page counts and merge any short remainder into the previous clip. Estimate study minutes from content density; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
+Rules: prefer 10–13 pages per clip; each clip has AT LEAST 7 pages; a whole lecture shorter than 7 pages stays one clip. Balance page counts and merge any short remainder into the previous clip. Estimate study minutes from content density; never cut an idea in half, boundaries where the topic changes; cover ALL slides in order with no gaps or overlap (first clip starts at 1, last ends at the last slide); merge cover/objectives/references slides into the nearest clip.
 Per clip: "title" English title as on the slides; "ar" Arabic title 2–5 words; "from"/"to" first and last slide; "min" expected minutes; "hook" ONE curiosity question in Arabic (English terms kept) that the clip answers, without giving the answer; "keys" 3–5 high-yield points in English, slide wording, one short line each; "type" the blurt type, one of free, child, exam, link, clinic, why, compare — vary them, never the same type in two clips in a row, no "link" in the first clip; "prompt" the blurt question in Arabic (English terms kept) matching its type: free: اذكر كل اللي تتذكره عن … · child: اشرح … لطفل عمره 10 سنين · exam: وش السؤال اللي ممكن يجي على … في الاختبار؟ وجاوبه · link: وش علاقة … بـ … (من مقطع سابق)؟ · clinic: وين تظهر الأهمية السريرية لـ …؟ · why: ليش …؟ · compare: قارن بين … و …
 "lecture" = the lecture title as on the slides.`;
 const SPLIT_S=sObj({lecture:S_STR,clips:sArr(sObj({title:S_STR,ar:S_STR,from:S_INT,to:S_INT,min:S_INT,hook:S_STR,keys:sArr(S_STR),type:{type:"string",enum:Object.keys(CLIP_T)},prompt:S_STR}))});
@@ -6512,8 +6512,8 @@ function spStart(lid,gid,name,stk){
   spAll()[lid]={lid,gid,name:String(name||""),at:Math.max(now,sj?sj.at+1:0),tAt:now,st:"text",img:aiImgOn(),keep:!!(clipsOf(lid)&&clipsRated(lid)),tries:0,run:0,pcMax:0,
     stk:(Array.isArray(stk)?stk:[]).filter(x=>isObj(x)&&typeof x.id==="string").map(x=>({id:x.id,n:String(x.n||"").slice(0,80)})).slice(0,12)};
   spSave();delete SPLIVE[lid];spRefresh(lid);spRun(lid)}
-// Balanced parts have at least 7 pages; a shorter whole lecture stays together.
-function spPlan(lines){const n=lines.length;if(!n)return[];const P=Math.max(1,Math.floor(n/7)),out=[];let a=1;
+// Prefer 10–13 pages: use the fewest balanced parts capped at 13, never below 7 unless the whole lecture is shorter.
+function spPlan(lines){const n=lines.length;if(!n)return[];const P=Math.ceil(n/13),out=[];let a=1;
   for(let i=0;i<P;i++){const size=Math.floor(n/P)+(i<n%P?1:0);out.push({a,b:a+size-1});a+=size}return out}
 function spValidPart(clips,p){if(!Array.isArray(clips)||!clips.length)return false;let next=p.a;
   for(const c of clips){if(!isObj(c)||!Number.isInteger(c.from)||!Number.isInteger(c.to)||c.from!==next||c.to<c.from||c.to>p.b||c.to-c.from+1<Math.min(7,p.b-p.a+1))return false;next=c.to+1}return next===p.b+1}
@@ -6927,15 +6927,20 @@ const ghRepoDef=()=>{const m=location.hostname.match(/^([a-z0-9-]+)\.github\.io$
 const ghRepo=()=>{const r=aiCfg().ghr;return/^[\w.-]{1,100}\/[\w.-]{1,100}$/.test(r||"")?r:ghRepoDef()};
 const ghOn=()=>!!aiCfg().gh;
 function ghErr(t,status,msg){const x=aiErr("gh",null,status,t);x.msg=String(msg||"").slice(0,240);return x}
+// One bounded transport for GitHub API and anonymous artifact downloads; timeout includes the body.
+async function ghResponse(url,options,signal,limit=4e6,timeout=45000){
+  try{return await aiFileRequest(url,options,signal,limit,timeout)}
+  catch(e){if(e&&e.code==="abort"||signal&&signal.aborted)throw aiErr("abort");
+    throw ghErr(e&&e.text==="timeout"?"timeout":e&&e.text==="big"?"big":navigator.onLine===false?"offline":"net")}}
 async function ghReq(path,o={}){const c=aiCfg();if(!c.gh&&!o.anon)throw ghErr("notok");
-  let r;try{r=await fetch(GH_API+path,{method:o.method||"GET",cache:"no-store",signal:o.signal,
+  let r;try{r=await ghResponse(GH_API+path,{method:o.method||"GET",cache:"no-store",
       headers:{Accept:o.raw?"application/vnd.github.raw":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(c.gh&&!o.anon?{Authorization:"Bearer "+c.gh}:{}),...(o.body?{"Content-Type":"application/json"}:{})},
-      body:o.body?JSON.stringify(o.body):undefined})}
-  catch(e){if(o.signal&&o.signal.aborted)throw aiErr("abort");throw ghErr(navigator.onLine===false?"offline":"net")}
+      body:o.body?JSON.stringify(o.body):undefined},o.signal,o.raw&&/\.apkg(?:\?|$)/.test(path)?50e6:4e6,o.timeout||45000)}
+  catch(e){if(o.signal&&o.signal.aborted)throw aiErr("abort");if(e&&e.code)throw e;throw ghErr(navigator.onLine===false?"offline":"net")}
   if(r.status===404&&o.ok404)return null;
   if(!r.ok){let m="";try{m=String((await r.json()).message||"")}catch(e){}
     throw ghErr(r.status===401?"auth":r.status===403||r.status===429?(/rate limit/i.test(m)?"rate":"perm"):r.status===404?"nf":r.status===409||r.status===422?"conflict":"http",r.status,m)}
-  return o.raw?new Uint8Array(await r.arrayBuffer()):r.status===204?{}:r.json()}
+  try{return o.raw?new Uint8Array(await r.arrayBuffer()):r.status===204?{}:await r.json()}catch(e){throw ghErr("response",r.status)}}
 const b64u8=u8=>{let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)};
 function ghErrMsg(e){const t=String(e&&e.text||""),m=e&&e.msg||"";
   return t==="notok"?"حط GitHub token من الإعدادات ← 🤖 ← 🃏 بناء ANKI على GitHub."
@@ -6946,6 +6951,9 @@ function ghErrMsg(e){const t=String(e&&e.text||""),m=e&&e.msg||"";
    :t==="rate"?"GitHub قال كثرت الطلبات. جرّب بعد شوي."
    :t==="offline"?"ما فيه إنترنت."
    :t==="net"?"ما قدرت أوصل لـ GitHub. تأكد من النت."
+   :t==="timeout"?"توقف رد GitHub أثناء التحميل. أعد المحاولة؛ المهمة المحفوظة ما تضيع."
+   :t==="big"?"رد GitHub أكبر من الحد المسموح للتحميل."
+   :t==="response"?"GitHub رجّع ردًا غير صالح. أعد المحاولة بعد قليل."
    :t==="slow"?"GitHub طوّل أكثر من 6 دقايق وما خلص. يمكن Actions موقّف في المستودع (Settings ← Actions ← Allow all actions)."
    :t==="build"?"GitHub رفض البطاقات: "+m
    :t==="gone"?"الملف انحذف من GitHub (ينحذف بعد 14 يوم). ابنه من جديد."
@@ -6977,25 +6985,29 @@ async function ghBuild(D,onStep,signal){akEnsureLive(D,signal);const repo=ghRepo
     await aiDelay(4000,signal)}}
 // the last deck built on any of your devices (synced as marks[id].akj): with a token through the API, without one straight from the public branch
 const akjOf=id=>{const o=sjson(mk(id).akj,null);return isObj(o)&&+(o.start||o.at||0)>Math.max(+mk(id).akx||0,+mk(id).wpAt||0)&&typeof o.j==="string"&&/^[a-z0-9]{8,40}$/.test(o.j)?{...o,n:Math.max(0,Math.round(+o.n||0)),r:ghRepo()}:null};
-async function akjBytes(id,a,signal){if(!a||+(a.start||a.at||0)&&+(a.start||a.at)<=+(mk(id).akx||0))throw aiErr("abort");const deletedAt=+(mk(id).akx||0),loc=await aiGet("decks",id+"|apkg");if(isObj(loc)&&loc.job===a.j&&loc.u8&&loc.u8.length)return loc.u8;
+function akRefLive(id,a,signal){const m=mk(id),start=+(a&&(a.start||a.at)||0);
+  if(signal&&signal.aborted||!a||!start||start<=Math.max(+m.akx||0,+m.wpAt||0))throw aiErr("abort");
+  const latest=akjOf(id);if(latest&&latest.j!==a.j&&+(latest.start||latest.at||0)>=start)throw aiErr("abort")}
+async function akjBytes(id,a,signal){akRefLive(id,a,signal);const loc=await aiGet("decks",id+"|apkg");akRefLive(id,a,signal);
+  if(isObj(loc)&&loc.job===a.j&&loc.u8&&loc.u8.length>100&&loc.u8[0]===0x50&&loc.u8[1]===0x4b)return loc.u8;
   let u8=null;
   if(ghOn())u8=await ghReq(`/repos/${a.r}/contents/out/${a.j}.apkg?ref=${GH_BR}`,{raw:true,ok404:true,signal});
-  else{let r;try{r=await fetch(`https://raw.githubusercontent.com/${a.r}/${GH_BR}/out/${a.j}.apkg`,{cache:"no-store",signal})}catch(e){throw ghErr("net")}if(r.status===404)u8=null;else if(!r.ok)throw ghErr("http",r.status);else u8=new Uint8Array(await r.arrayBuffer())}
-  if(!u8)throw ghErr("gone");if(!(u8.length>100&&u8[0]===0x50&&u8[1]===0x4b))throw ghErr("file");
-  if(+(mk(id).akx||0)!==deletedAt)throw aiErr("abort");await aiPut("decks",id+"|apkg",{job:a.j,at:Date.now(),u8});return u8}
+  else{const r=await ghResponse(`https://raw.githubusercontent.com/${a.r}/${GH_BR}/out/${a.j}.apkg`,{cache:"no-store"},signal,50e6);if(r.status===404)u8=null;else if(!r.ok)throw ghErr("http",r.status);else u8=new Uint8Array(await r.arrayBuffer())}
+  akRefLive(id,a,signal);if(!u8)throw ghErr("gone");if(!(u8.length>100&&u8[0]===0x50&&u8[1]===0x4b))throw ghErr("file");
+  await aiPut("decks",id+"|apkg",{job:a.j,at:Date.now(),u8});akRefLive(id,a,signal);return u8}
 // the deck's review (the facts, the cards, the checks) travels with the .apkg, so any device can show it (and redo it with /flcard N)
 const akRvw=D=>{const o={...D};delete o.job;delete o.qa;delete o.previous;return o};
-async function akReview(id,a,signal){let u8=null;
+async function akReview(id,a,signal){akRefLive(id,a,signal);let u8=null;
   if(ghOn())u8=await ghReq(`/repos/${a.r}/contents/out/${a.j}.json?ref=${GH_BR}`,{raw:true,ok404:true,signal});
-  else{const r=await fetch(`https://raw.githubusercontent.com/${a.r}/${GH_BR}/out/${a.j}.json`,{cache:"no-store",signal}).catch(()=>null);if(r&&r.ok)u8=new Uint8Array(await r.arrayBuffer())}
-  if(!u8)return null;let st=null;try{st=JSON.parse(new TextDecoder().decode(u8))}catch(e){return null}
+  else{const r=await ghResponse(`https://raw.githubusercontent.com/${a.r}/${GH_BR}/out/${a.j}.json`,{cache:"no-store"},signal);if(r.status!==404&&!r.ok)throw ghErr("http",r.status);if(r.ok)u8=new Uint8Array(await r.arrayBuffer())}
+  akRefLive(id,a,signal);if(!u8)return null;let st=null;try{st=JSON.parse(new TextDecoder().decode(u8))}catch(e){return null}
   const D=isObj(st)&&st.ok?st.review:null;if(!akDeckOK(D)||D.id!==id)return null;
-  D.job={id:a.j,st:"ok",at:+a.at||Date.now(),done:+a.at||Date.now()};try{await akStore(D)}catch(e){}return D}
+  D.job={id:a.j,st:"ok",at:+a.at||Date.now(),done:+a.at||Date.now()};await akStore(D);akRefLive(id,a,signal);return D}
 
 // ---------- ☁️ v20.4: the GitHub runner — this same page, opened headless on GitHub Actions (tools/runner/run.mjs) ----------
 // Your devices only ask (marks[id].spj st "q" / marks[id].akq) and wake it; it splits, makes the ANKI decks and runs the background analysis,
 // and everything comes back through the sync. It also runs every hour on its own (the analysis, even when you don't open the site).
-const RN_DEV="ghrunner",APPV="20.10";
+const RN_DEV="ghrunner",APPV="20.13";
 const rnInfo=()=>{const o=sjson(S.rnr,null);return isObj(o)&&validStamp(o.at)&&+o.at>0&&!jobFuture(o.at)?o:null};
 const rnOn=()=>{const r=rnInfo();return!RUNNER&&!!r&&!!r.ok&&Date.now()-r.at<26*HR};   // set up, and it answered within a day
 const rnFresh=()=>{const r=rnInfo();return rnOn()&&Date.now()-r.at<3*HR};              // ...and ran lately: the background analysis is its job
@@ -7281,9 +7293,9 @@ async function akDelete(id){const now=Date.now(),q=akqOf(id),run=AKRUN[id];if(ru
 // the deck's bytes are fetched as soon as the sheet shows it, so 📤 can hand them to the share sheet straight from the tap (iPad needs that)
 const AKB={};
 const akRef=(D,a)=>D&&D.job&&D.job.st==="ok"?{j:D.job.id,r:ghRepo(),file:D.file,start:D.at}:a;
-async function akPreload(id,ref){if(!ref)return null;const deletedAt=+(mk(id).akx||0);const k=id+"|"+ref.j;if(AKB[k])return AKB[k];try{const bytes=await akjBytes(id,ref);if(+(mk(id).akx||0)!==deletedAt)return null;AKB[k]=bytes}catch(e){return null}return AKB[k]}
-async function akSend(id,ref,share){if(!ref||+(ref.start||ref.at||0)&&+(ref.start||ref.at)<=+(mk(id).akx||0)){toast("انحذفت هالبطاقات. افتح نافذة ANKI من جديد.");return}const name=(ref&&ref.file)||"ANKI.apkg";let u8=ref&&AKB[id+"|"+ref.j];
-  try{if(!u8)u8=await akjBytes(id,ref)}catch(e){toast("❌ "+akErrMsg(e));return}
+async function akPreload(id,ref){if(!ref)return null;const k=id+"|"+ref.j;try{akRefLive(id,ref);if(AKB[k])return AKB[k];const bytes=await akjBytes(id,ref);akRefLive(id,ref);AKB[k]=bytes}catch(e){return null}return AKB[k]}
+async function akSend(id,ref,share){try{akRefLive(id,ref)}catch(e){toast("تغيّرت هالبطاقات أو انحذفت. افتح نافذة ANKI من جديد.");return}const name=(ref&&ref.file)||"ANKI.apkg";let u8=ref&&AKB[id+"|"+ref.j];
+  try{if(!u8)u8=await akjBytes(id,ref);akRefLive(id,ref)}catch(e){toast("❌ "+akErrMsg(e));return}
   const f=new File([u8],name,{type:"application/octet-stream"});
   if(share){try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(e){if(e&&e.name==="AbortError")return}}
   downloadBytes(f,name,"application/octet-stream");toast("نزّل الملف 🃏 افتحه في ANKI")}
